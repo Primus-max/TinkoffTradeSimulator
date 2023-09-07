@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace TinkoffTradeSimulator.Windows
+namespace TinkoffTradeSimulator.Views.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
