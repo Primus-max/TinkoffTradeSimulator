@@ -11,4 +11,11 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Grpc.Core.Api" Version="2.57.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
+    <PackageReference Include="Tinkoff.InvestApi" Version="0.6.2" />
+    <PackageReference Include="Tinkoff.Trading.OpenApi" Version="1.7.5" />
+  </ItemGroup>
+
 </Project>
