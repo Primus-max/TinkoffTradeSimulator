@@ -4,57 +4,151 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TinkoffTradeSimulator"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="Тинькофф трэйдинг"
     Width="900"
     Height="600"
+    Background="{DynamicResource MaterialDesignPaper}"
+    FontFamily="{DynamicResource MaterialDesignFont}"
+    Loaded="MainWindow_Loaded"
+    TextElement.FontSize="13"
+    TextElement.FontWeight="Regular"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <!-- Левая область -->
-            <ColumnDefinition Width="5"/>
-            <!-- Сплиттер между левой и правой областью -->
-            <ColumnDefinition Width="3*"/>
-            <!-- Правая область -->
+            <ColumnDefinition Width="1.3*" />
+            <!--  Левая область  -->
+            <ColumnDefinition Width="5" />
+            <!--  Сплиттер между левой и правой областью  -->
+            <ColumnDefinition Width="3*" />
+            <!--  Правая область  -->
         </Grid.ColumnDefinitions>
 
-        <!-- Левая область -->
-        <Border Background="LightGray">
-            <!-- Содержимое левой области -->
-        </Border>
+        <DockPanel>
+            <StackPanel
+                Height="60"
+                Background="Ivory"
+                DockPanel.Dock="Top">
+                <TextBlock Margin="10" Text="Иванов Иван" />
+                <TextBlock
+                    Margin="10,0,0,0"
+                    FontSize="14"
+                    FontWeight="Bold">
+                    <Run Text="Счёт:" />
+                    <Run Text="1000000 р" />
+                </TextBlock>
+            </StackPanel>
+            <ListView
+                MinHeight="100"
+                ItemsSource="{Binding TickerInfoList}"
+                SelectionChanged="ListView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
+                        <GridViewColumn Header="Тикер">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="Green"
+                                        Text="{Binding TickerName}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Избранное" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </DockPanel>
 
-        <!-- Сплиттер между левой и правой областью -->
-        <GridSplitter Grid.Column="1" Width="5" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
 
-        <!-- Правая область -->
-        <Border Grid.Column="2" Background="LightGreen">
-            <!-- Верхняя часть правой области -->
+        <!--  Сплиттер между левой и правой областью  -->
+        <!--<GridSplitter
+            Grid.Column="1"
+            Width="5"
+            HorizontalAlignment="Stretch"
+            ResizeBehavior="PreviousAndNext" />-->
+
+        <!--  Правая область  -->
+        <Border Grid.Column="2">
+            <!--  Верхняя часть правой области  -->
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <!-- Верхняя часть -->
-                    <RowDefinition Height="Auto"/>
-                    <!-- Сплиттер между верхней и нижней частью -->
-                    <RowDefinition Height="*"/>
-                    <!-- Нижняя часть -->
+                    <RowDefinition Height="*" />
+                    <!--  Верхняя часть  -->
+                    <RowDefinition Height="Auto" />
+                    <!--  Сплиттер между верхней и нижней частью  -->
+                    <RowDefinition Height="*" />
+                    <!--  Нижняя часть  -->
                 </Grid.RowDefinitions>
 
-                <!-- Верхняя часть -->
-                <Border Grid.Row="0" Background="LightBlue">
-                    <!-- Содержимое верхней части -->
+                <!--  Верхняя часть  -->
+                <Border Grid.Row="0">
+                    <DockPanel>
+                        <StackPanel
+                            Height="40"
+                            Background="Aqua"
+                            DockPanel.Dock="Top">
+                            <TextBlock
+                                Margin="11"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Text="Открытые сделки" />
+                        </StackPanel>
+
+                        <ListView MinHeight="100" ItemsSource="{Binding TickerInfoList}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Цена" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Объём" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Прибыль" />
+                                    <GridViewColumn>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Закрыть" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+
                 </Border>
 
-                <!-- Сплиттер между верхней и нижней частью -->
-                <GridSplitter Grid.Row="1" Height="5" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
+                <!--  Сплиттер между верхней и нижней частью  -->
+                <GridSplitter
+                    Grid.Row="1"
+                    Height="5"
+                    HorizontalAlignment="Stretch"
+                    Background="Crimson"
+                    ResizeBehavior="PreviousAndNext" />
 
-                <!-- Нижняя часть -->
+                <!--  Нижняя часть  -->
                 <Border Grid.Row="2" Background="LightYellow">
-                    <!-- Содержимое нижней части -->
+                    <!--  Содержимое нижней части  -->
                 </Border>
             </Grid>
         </Border>
     </Grid>
-    
+
 </Window>
