@@ -1,12 +1,60 @@
-﻿<Window x:Class="TinkoffTradeSimulator.Views.Windows.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TinkoffTradeSimulator"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+﻿<Window
+    x:Class="TinkoffTradeSimulator.Views.Windows.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:TinkoffTradeSimulator"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Тинькофф трэйдинг"
+    Width="900"
+    Height="600"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <!-- Левая область -->
+            <ColumnDefinition Width="5"/>
+            <!-- Сплиттер между левой и правой областью -->
+            <ColumnDefinition Width="3*"/>
+            <!-- Правая область -->
+        </Grid.ColumnDefinitions>
 
+        <!-- Левая область -->
+        <Border Background="LightGray">
+            <!-- Содержимое левой области -->
+        </Border>
+
+        <!-- Сплиттер между левой и правой областью -->
+        <GridSplitter Grid.Column="1" Width="5" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
+
+        <!-- Правая область -->
+        <Border Grid.Column="2" Background="LightGreen">
+            <!-- Верхняя часть правой области -->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <!-- Верхняя часть -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Сплиттер между верхней и нижней частью -->
+                    <RowDefinition Height="*"/>
+                    <!-- Нижняя часть -->
+                </Grid.RowDefinitions>
+
+                <!-- Верхняя часть -->
+                <Border Grid.Row="0" Background="LightBlue">
+                    <!-- Содержимое верхней части -->
+                </Border>
+
+                <!-- Сплиттер между верхней и нижней частью -->
+                <GridSplitter Grid.Row="1" Height="5" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch"/>
+
+                <!-- Нижняя часть -->
+                <Border Grid.Row="2" Background="LightYellow">
+                    <!-- Содержимое нижней части -->
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
+    
 </Window>
