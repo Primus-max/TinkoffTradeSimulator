@@ -103,7 +103,7 @@
                     <DockPanel>
                         <StackPanel
                             Height="40"
-                            Background="Aqua"
+                            Background="#b27c35"
                             DockPanel.Dock="Top">
                             <TextBlock
                                 Margin="11"

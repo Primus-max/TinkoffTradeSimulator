@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
+using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
-    internal class MainWindowViewModel: BaseViewModel
+    internal class MainWindowViewModel : BaseViewModel
     {
         #region Приватные поля
         private ObservableCollection<TickerInfo>? _tickerInfoList;
@@ -28,15 +24,16 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _tickerInfoList;
             set => Set(ref _tickerInfoList, value);
-            
-        } 
+
+        }
         #endregion
 
 
         // Конструктор
-        public  MainWindowViewModel()
+        public MainWindowViewModel()
         {
-             LoadData();
+            LoadData();
+            ChartWindowViewModel chartWindow = new ChartWindowViewModel();
         }
 
         #region Методы
@@ -44,7 +41,7 @@ namespace TinkoffTradeSimulator.ViewModels
         // Загружаю актуальные данные из Tinkoff InvestAPI 
         public async Task LoadData()
         {
-            
+
             // Загрузите данные из Tinkoff API асинхронно
             await Task.Delay(1000); // Пример задержки, замените на реальную загрузку данных
 
@@ -62,11 +59,24 @@ namespace TinkoffTradeSimulator.ViewModels
             {
                 TickerInfoList.Add(new TickerInfo { Id = instrument.Isin, TickerName = instrument.Ticker });
             }
-
         }
 
-        
+        // Открываю окно и строю в нём график
+        private void OpenChartWindow()
+        {
+            // Создаем новую ViewModel для окна
+            var chartViewModel = new ChartWindowViewModel();
+
+            // Здесь передаем данные для графика в chartViewModel
+            
+
+            // Создаем новое окно и передаем ему ViewModel
+            var chartWindow = new ChartWindow();
+
+            // Открываем окно
+            chartWindow.Show();
+        }
         #endregion
     }
-    
+
 }
