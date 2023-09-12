@@ -25,8 +25,13 @@ namespace TinkoffTradeSimulator.Views.Windows
         {
             InitializeComponent();
 
+            // Тестовые данные
+            TestingData();
+        }
 
-            var plt = new Plot(600, 400);
+        public void TestingData()
+        {
+            var plotCandlesView = WpfPlot1.Plot;
 
             // Each candle is represented by a single OHLC object.
             OHLC price = new(
@@ -34,20 +39,21 @@ namespace TinkoffTradeSimulator.Views.Windows
                 high: 120,
                 low: 80,
                 close: 105,
-                timeStart: new DateTime(2021, 09, 24),
+                timeStart: new DateTime(1985, 09, 24),
                 timeSpan: TimeSpan.FromDays(1));
 
             // Users could be build their own array of OHLCs, or lean on 
             // the sample data generator to simulate price data over time.
             OHLC[] prices = DataGen.RandomStockPrices(new Random(0), 60);
 
+            plotCandlesView.AddColorbar();
+            plotCandlesView.AddBubblePlot();
             // Add a financial chart to the plot using an array of OHLC objects
-            WpfPlot1.Plot.AddCandlesticks(prices);
+            plotCandlesView.AddCandlesticks(prices);
+
+
 
             WpfPlot1.Refresh();
-           // WpfPlot1.Render();
         }
-
-       
     }
 }

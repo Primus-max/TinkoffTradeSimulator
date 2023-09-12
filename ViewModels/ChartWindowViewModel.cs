@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScottPlot;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _title;
 
         // Приватное свойство для хранения данных свечей
-        private ObservableCollection<Candlestick> _candlestickData;
+        private ObservableCollection<OHLC> _candlestickData;
         #endregion
 
         #region Публичные свойства
@@ -28,7 +29,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Публичное свойство для хранения данных свечей
-        public ObservableCollection<Candlestick> CandlestickData 
+        public ObservableCollection<OHLC> CandlestickData 
         { 
             get => _candlestickData; 
             set => Set(ref _candlestickData, value); 
@@ -40,46 +41,26 @@ namespace TinkoffTradeSimulator.ViewModels
             // Заголовок окна
             Title = "Тестовое окно с графиками";
 
-            // Получаю данные для отображения свечей
-            CandlestickData = new ObservableCollection<Candlestick>(GenerateTestData());
+            CandlestickData = new ObservableCollection<OHLC>();
 
-            //ChartWindow chartWindow = new ChartWindow();
-            //chartWindow.Show();
+            // Создаем тестовые данные для свечей
+            OHLC[] testData = new OHLC[]
+            {
+        new OHLC(100, 120, 80, 105, new DateTime(1985, 09, 24), TimeSpan.FromDays(1)),
+                // Добавьте еще свои тестовые данные здесь...
+            };
+
+            // Заполняем коллекцию свечей
+            foreach (var dataPoint in testData)
+            {
+                CandlestickData.Add(dataPoint);
+            }
         }
 
         #region Методы
-        private List<Candlestick> GenerateTestData()
-        {
-            List<Candlestick> data = new List<Candlestick>();
+        // Метод для генерации случайных данных OHLC
+       
 
-            // Генерируйте свои свечи или загружайте реальные данные сюда
-            // Пример заполнения случайными данными:
-            Random rand = new Random();
-            DateTime currentDate = DateTime.Now.Date;
-            double previousClose = 100.0;
-
-            for (int i = 0; i < 100; i++)
-            {
-                double open = previousClose;
-                double close = open + rand.NextDouble() * 10 - 5; // Случайное изменение цены
-                double high = Math.Max(open, close) + rand.NextDouble() * 5;
-                double low = Math.Min(open, close) - rand.NextDouble() * 5;
-
-                data.Add(new Candlestick
-                {
-                    Date = currentDate,
-                    Open = open,
-                    High = high,
-                    Low = low,
-                    Close = close
-                });
-
-                previousClose = close;
-                currentDate = currentDate.AddDays(1); // Переход к следующей дате
-            }
-
-            return data;
-        }
         #endregion
     }
 }
