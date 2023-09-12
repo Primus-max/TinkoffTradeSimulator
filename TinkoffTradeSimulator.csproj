@@ -12,6 +12,7 @@
     <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
     <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.67" />
     <PackageReference Include="Tinkoff.InvestApi" Version="0.6.2" />
     <PackageReference Include="Tinkoff.Trading.OpenApi" Version="1.7.5" />
   </ItemGroup>

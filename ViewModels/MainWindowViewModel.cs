@@ -34,6 +34,8 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             LoadData();
             ChartWindowViewModel chartWindow = new ChartWindowViewModel();
+
+            OpenChartWindow();
         }
 
         #region Методы
