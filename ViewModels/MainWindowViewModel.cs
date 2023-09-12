@@ -79,6 +79,10 @@ namespace TinkoffTradeSimulator.ViewModels
             chartWindow.Show();
         }
         #endregion
+
+        #region Комманды
+
+        #endregion
     }
 
 }
