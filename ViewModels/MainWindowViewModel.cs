@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using TinkoffTradeSimulator.ApiServices;
+using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
@@ -28,14 +30,32 @@ namespace TinkoffTradeSimulator.ViewModels
         }
         #endregion
 
+        #region Команды
+        public ICommand OpenChartWindowCommand { get; }
+
+        private bool CanOpenChartWindowCommandExecute(object p) => true;
+
+        private void OnOpenChartWindowCommandExecuted(object sender)
+        {
+            // Создайю экземпляр
+            ChartWindowViewModel chartWindow = new ChartWindowViewModel();
+
+            // Открываю окно
+            OpenChartWindow();
+        }
+
+        #endregion
+
 
         // Конструктор
         public MainWindowViewModel()
         {
-            LoadData();
-            ChartWindowViewModel chartWindow = new ChartWindowViewModel();
+            #region Инициализация команд
+            OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
+            #endregion
 
-            OpenChartWindow();
+            LoadData();
+            
         }
 
         #region Методы
@@ -70,7 +90,7 @@ namespace TinkoffTradeSimulator.ViewModels
             var chartViewModel = new ChartWindowViewModel();
 
             // Здесь передаем данные для графика в chartViewModel
-            
+
 
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
@@ -80,9 +100,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
         #endregion
 
-        #region Комманды
 
-        #endregion
     }
 
 }
