@@ -6,10 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Xml.Linq;
 using Tinkoff.InvestApi;
 
 namespace TinkoffTradeSimulator.ApiServices
 {
+    /// <summary>
+    /// Создане клиента TinkoffInvestAPI
+    /// </summary>
     public class TinkoffClient
     {
         // Создание клиента Тинькофф 
@@ -62,5 +67,32 @@ namespace TinkoffTradeSimulator.ApiServices
 
             return Task.FromResult(client);
         }
+
+        // Загружаю токен
+        //private static SettingsModel GetSettings()
+        //{
+        //    string filePath = "settings.json";
+        //    SettingsModel settingsModel = new SettingsModel();
+
+        //    try
+        //    {
+        //        if (File.Exists(filePath))
+        //        {
+        //            // Если файл существует, загрузите его содержимое
+        //            string jsonData = File.ReadAllText(filePath);
+        //            JObject data = JObject.Parse(jsonData);
+
+        //            // Пример загрузки данных из JSON в модель представления
+        //            settingsModel.TinkoffToken = data["TinkoffToken"]?.ToString();
+        //            settingsModel.ChromeLocation = data["ChromeLocation"]?.ToString();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"Ошибка при загрузке данных: {ex.Message}");
+        //    }
+
+        //    return settingsModel;
+        //}
     }
 }

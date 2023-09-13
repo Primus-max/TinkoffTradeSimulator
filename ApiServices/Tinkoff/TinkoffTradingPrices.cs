@@ -64,7 +64,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             catch (Exception)
             {
                 // Обработка ошибки при получении свечей
-                return new List<HistoricCandle>;
+                return new List<HistoricCandle>();
             }
         }
     }

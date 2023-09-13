@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
@@ -42,10 +44,8 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnOpenChartWindowCommandExecuted(object sender)
         {
-            // Получаю имя тикера из параметра который передаю из view по CommandParametr
+            // Получаю имя тикера из параметра который передаю из view по CommandParameter
             string tickerName = sender?.ToString();
-          
-            
 
             // Открываю окно
             OpenChartWindow(tickerName);
@@ -64,9 +64,6 @@ namespace TinkoffTradeSimulator.ViewModels
             
 
             LoadData();
-
-
-            
         }
 
         #region Методы
@@ -100,19 +97,11 @@ namespace TinkoffTradeSimulator.ViewModels
             var chartViewModel = new ChartWindowViewModel();
 
             // Устанавливаю значение Title через свойство
-            chartViewModel.Title = tickerName;
-
-            TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-            // получаю инструмент (по имени тикера)
-
-            Share instrument = await tinkoff.GetShareByTicker(tickerName);
-
-            TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
-
-            Candle customCandle = await tinkoff.GetCandles(instrument, timeFrame);
+            chartViewModel.Title = tickerName;            
 
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
+            // Устанавливаю контекст даннх для окна (странно, но это так же делаю в самом окне)
             chartWindow.DataContext = chartViewModel;
 
             // Открываем окно
