@@ -1,7 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Tinkoff.InvestApi;
+using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
+using TinkoffTradeSimulator.ApiServices.Tinkoff;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
@@ -12,6 +16,7 @@ namespace TinkoffTradeSimulator.ViewModels
     internal class MainWindowViewModel : BaseViewModel
     {
         #region Приватные поля
+        private  InvestApiClient? _client = null;
         private ObservableCollection<TickerInfo>? _tickerInfoList;
         private string _title;
         #endregion
@@ -56,7 +61,11 @@ namespace TinkoffTradeSimulator.ViewModels
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
             #endregion
 
+            
+
             LoadData();
+
+
             
         }
 
@@ -65,15 +74,14 @@ namespace TinkoffTradeSimulator.ViewModels
         // Загружаю актуальные данные из Tinkoff InvestAPI 
         public async Task LoadData()
         {
+            // Создаю клиента Тинькофф 
+            _client = await TinkoffClient.CreateAsync();
 
             // Загрузите данные из Tinkoff API асинхронно
             await Task.Delay(1000); // Пример задержки, замените на реальную загрузку данных
 
-            // Создаю клиента Тинькофф 
-            var client = await TinkoffClient.CreateAsync();
-
             // Получаю все актуальные данные от сервера
-            var instruments = await client?.Instruments?.SharesAsync();
+            var instruments = await _client?.Instruments?.SharesAsync();
 
             // Инициализирую коллекцию
             TickerInfoList = new ObservableCollection<TickerInfo>();
@@ -86,13 +94,22 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Открываю окно и строю в нём график
-        private void OpenChartWindow(string tickerName)
+        private async void OpenChartWindow(string tickerName)
         {
             // Создаю новую ViewModel для окна
             var chartViewModel = new ChartWindowViewModel();
 
             // Устанавливаю значение Title через свойство
             chartViewModel.Title = tickerName;
+
+            TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
+            // получаю инструмент (по имени тикера)
+
+            Share instrument = await tinkoff.GetShareByTicker(tickerName);
+
+            TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
+
+            Candle customCandle = await tinkoff.GetCandles(instrument, timeFrame);
 
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
