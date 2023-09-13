@@ -68,7 +68,7 @@
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Открыть" />
+                                    <Button CommandParameter="{Binding TickerName}" Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Открыть" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

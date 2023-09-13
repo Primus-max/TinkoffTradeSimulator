@@ -37,11 +37,13 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnOpenChartWindowCommandExecuted(object sender)
         {
-            // Создайю экземпляр
-            ChartWindowViewModel chartWindow = new ChartWindowViewModel();
+            // Получаю имя тикера из параметра который передаю из view по CommandParametr
+            string tickerName = sender?.ToString();
+          
+            
 
             // Открываю окно
-            OpenChartWindow();
+            OpenChartWindow(tickerName);
         }
 
         #endregion
@@ -84,16 +86,17 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Открываю окно и строю в нём график
-        private void OpenChartWindow()
+        private void OpenChartWindow(string tickerName)
         {
-            // Создаем новую ViewModel для окна
+            // Создаю новую ViewModel для окна
             var chartViewModel = new ChartWindowViewModel();
 
-            // Здесь передаем данные для графика в chartViewModel
-
+            // Устанавливаю значение Title через свойство
+            chartViewModel.Title = tickerName;
 
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
+            chartWindow.DataContext = chartViewModel;
 
             // Открываем окно
             chartWindow.Show();

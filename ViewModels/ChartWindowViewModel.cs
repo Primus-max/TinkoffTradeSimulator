@@ -36,11 +36,11 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #endregion
+        
         public ChartWindowViewModel()
         {
             // Заголовок окна
-            Title = "Тестовое окно с графиками";
-
+           
             CandlestickData = new ObservableCollection<OHLC>();
 
             // Создаем тестовые данные для свечей
