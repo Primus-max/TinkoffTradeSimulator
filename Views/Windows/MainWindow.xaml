@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="Тинькофф трэйдинг"
-    Width="900"
+    Width="1000"
     Height="600"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
@@ -19,6 +19,7 @@
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
     mc:Ignorable="d">
     <Window.DataContext>
         <vm:MainWindowViewModel />
@@ -68,7 +69,24 @@
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button CommandParameter="{Binding TickerName}" Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Открыть" />
+                                    <Button
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding TickerName}"
+                                        FontWeight="Bold"
+                                        Foreground="#0037e5"
+                                        ToolTip="Открыть в новом окне">
+                                        <!--<materialDesign:PackIcon
+                                            Width="28"
+                                            Height="28"
+                                            Kind="StarPlusOutline" />-->
+                                        <materialDesign:PackIcon
+                                            Width="28"
+                                            Height="28"
+                                            Kind="OpenInNew" />
+                                    </Button>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -124,7 +142,18 @@
                                     <GridViewColumn>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Удалить" />
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Foreground="Red"
+                                                    ToolTip="Удалить">
+                                                    <materialDesign:PackIcon
+                                                        Width="24"
+                                                        Height="24"
+                                                        Kind="Delete" />
+                                                </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
