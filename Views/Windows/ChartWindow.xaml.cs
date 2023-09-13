@@ -24,17 +24,12 @@ namespace TinkoffTradeSimulator.Views.Windows
     /// </summary>
     public partial class ChartWindow : Window
     {
-
-        private InvestApiClient? _client = null;
-
         public ChartWindow()
         {
             InitializeComponent();
 
             // Создаю экземпляр класса и передаю в конструкторе WpfPlot который создан во View
-            ChartWindowViewModel chartWindow = new ChartWindowViewModel(WpfPlot1);
+            ChartWindowViewModel chartWindow = new(WpfPlot1);
         }
-
-        
     }
 }
