@@ -9,8 +9,8 @@
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels" 
     xmlns:controls="clr-namespace:TinkoffTradeSimulator.Views.Controls"
     Title="{Binding Title}"
-    Width="800"
-    Height="450"
+    Width="900"
+    Height="600"
     mc:Ignorable="d">
     <Window.DataContext>
         <vm:ChartWindowViewModel />

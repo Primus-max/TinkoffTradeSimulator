@@ -68,7 +68,7 @@
                         <GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Избранное" />
+                                    <Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Открыть" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -79,11 +79,11 @@
 
 
         <!--  Сплиттер между левой и правой областью  -->
-        <!--<GridSplitter
+        <GridSplitter
             Grid.Column="1"
             Width="5"
             HorizontalAlignment="Stretch"
-            ResizeBehavior="PreviousAndNext" />-->
+            ResizeBehavior="PreviousAndNext" />
 
         <!--  Правая область  -->
         <Border Grid.Column="2">
@@ -124,7 +124,7 @@
                                     <GridViewColumn>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Избранное" />
+                                                <Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Удалить" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
@@ -144,8 +144,42 @@
                     ResizeBehavior="PreviousAndNext" />
 
                 <!--  Нижняя часть  -->
-                <Border Grid.Row="2" Background="LightYellow">
+                <Border
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    VerticalAlignment="Top">
                     <!--  Содержимое нижней части  -->
+                    <DockPanel>
+                        <StackPanel
+                            Height="40"
+                            Background="#b27c35"
+                            DockPanel.Dock="Top">
+                            <TextBlock
+                                Margin="11"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Text="История сделок" />
+                        </StackPanel>
+                        <ListView MinHeight="100" ItemsSource="{Binding TickerInfoList}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Цена" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Операция" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Объём" />
+                                    <GridViewColumn>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <!--<Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Удалить" />-->
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
                 </Border>
             </Grid>
         </Border>
