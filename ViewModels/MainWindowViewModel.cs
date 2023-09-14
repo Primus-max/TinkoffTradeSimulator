@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
-using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
-using TinkoffTradeSimulator.ApiServices.Tinkoff;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
@@ -18,9 +13,10 @@ namespace TinkoffTradeSimulator.ViewModels
     internal class MainWindowViewModel : BaseViewModel
     {
         #region Приватные поля
-        private  InvestApiClient? _client = null;
+        private InvestApiClient? _client = null;
         private ObservableCollection<TickerInfo>? _tickerInfoList;
         private string _title;
+        private ChartWindowViewModel _chartViewModel = null;
         #endregion
 
         #region Публичные поля
@@ -48,7 +44,7 @@ namespace TinkoffTradeSimulator.ViewModels
             string tickerName = sender?.ToString();
 
             // Открываю окно
-            OpenChartWindow(tickerName);
+            OpenChartWindow(tickerName);            
         }
 
         #endregion
@@ -61,7 +57,8 @@ namespace TinkoffTradeSimulator.ViewModels
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
             #endregion
 
-            
+            // Создаю новую ViewModel для окна
+            _chartViewModel = new ChartWindowViewModel();
 
             LoadData();
         }
@@ -92,17 +89,18 @@ namespace TinkoffTradeSimulator.ViewModels
 
         // Открываю окно и строю в нём график
         private async void OpenChartWindow(string tickerName)
-        {
-            // Создаю новую ViewModel для окна
-            var chartViewModel = new ChartWindowViewModel();
-
-            // Устанавливаю значение Title через свойство
-            chartViewModel.Title = tickerName;            
+        {                                
 
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
+
+            // Устанавливаю значение Title через свойство
+            _chartViewModel.Title = tickerName;
+
             // Устанавливаю контекст даннх для окна (странно, но это так же делаю в самом окне)
-            chartWindow.DataContext = chartViewModel;
+            chartWindow.DataContext = _chartViewModel;
+
+            //_chartViewModel.SetDataToView();
 
             // Открываем окно
             chartWindow.Show();

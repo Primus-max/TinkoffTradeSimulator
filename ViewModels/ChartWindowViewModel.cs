@@ -1,9 +1,8 @@
 ﻿using ScottPlot;
-using ScottPlot.Drawing.Colormaps;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Threading.Tasks;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
@@ -45,22 +44,26 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #endregion
 
-        public ChartWindowViewModel()
-        {
+        // Пустой (необходимый) конструктор
+        public ChartWindowViewModel() { }
 
-        }
+        // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot)
         {
             // Делаю доступным в этой области видимости полученный объект из конструктора
             _wpfPlot = plot;
-            
+
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
+
+            TestingData();
+
+            //SetDataToView();
         }
 
         #region Методы
 
-        public void TestingData()
+        public void TestingDataA()
         {
             // Each candle is represented by a single OHLC object.
             OHLC price = new(
@@ -92,50 +95,61 @@ namespace TinkoffTradeSimulator.ViewModels
             _client = await TinkoffClient.CreateAsync();
         }
 
-        public async void SetDataToView()
+        public async void TestingData()
         {
-            TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-            // получаю инструмент (по имени тикера)
-
-            Share instrument = await tinkoff.GetShareByTicker(Title);
-
-            TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
-
-            // Получаю список свечей за определённый промежуток времени по Share
-            List<HistoricCandle> candels = await tinkoff.GetCandles(instrument, timeFrame);
-
-
-            // Привожу полученные свечи к типу данных для OHLC
-            OHLC[] prices = null;
-
-            // Прохожу по свечам полученным от Тинькофф и формирую для отображении во View
-            foreach (var candle in candels)
+            try
             {
-                // Привожу к типу данных от Тинькофф к объекту OHLC для WpfPlot
-                double openPriceCandle = Convert.ToDouble(candle.Open);
-                double highPriceCandle = Convert.ToDouble(candle.High);
-                double lowPriceCandle = Convert.ToDouble(candle.Low);
-                double closePriceCandle = Convert.ToDouble(candle.Close);
+                TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
+                // получаем инструмент (по имени тикера)
 
-                
-                OHLC price = new(
-                    open: openPriceCandle,
-                    high: highPriceCandle,
-                    low: lowPriceCandle,
-                    close: closePriceCandle,
-                    timeStart: new DateTime(1985, 09, 24),
-                    timeSpan: TimeSpan.FromDays(1));
+                Share instrument = await tinkoff.GetShareByTicker("APA");
 
-                prices = new OHLC[] { price };
+                TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
+
+                // получаем список свечей за определенный промежуток времени по Share
+                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame);
+
+                // создаем список свечей OHLC
+                List<OHLC> prices = new List<OHLC>();
+
+                foreach (var candle in candles)
+                {
+                    // Приводим данные к типу OHLC
+                    double openPriceCandle = Convert.ToDouble(candle.Open);
+                    double highPriceCandle = Convert.ToDouble(candle.High);
+                    double lowPriceCandle = Convert.ToDouble(candle.Low);
+                    double closePriceCandle = Convert.ToDouble(candle.Close);
+
+                    // Преобразуем Timestamp в DateTime
+                    DateTime candleTime = candle.Time.ToDateTime();
+
+                    OHLC price = new OHLC(
+                        open: openPriceCandle,
+                        high: highPriceCandle,
+                        low: lowPriceCandle,
+                        close: closePriceCandle,
+                        timeStart: candleTime,
+                        timeSpan: TimeSpan.FromMinutes(1));
+
+                    prices.Add(price);
+                }
+
+                // Преобразуем список в массив OHLC[]
+                OHLC[] pricesArray = prices.ToArray();
+
+                // Добавляем сформированные данные к графику
+                _wpfPlot?.Plot.AddCandlesticks(pricesArray);
+
+                // Обновляем график
+                _wpfPlot?.Refresh();
             }
-                        
-            // Добавляю сформированные данные от Тинькофф в объект для отображения в виде свечей
-            _wpfPlot?.Plot.AddCandlesticks(prices);
-
-            // Обязательно надо обновлять объект для кореектного отображения данных
-            _wpfPlot.Refresh();
-
+            catch (Exception)
+            {
+                // Обрабатываем ошибки
+                // Можно выводить сообщение об ошибке или выполнять другие действия
+            }
         }
+
 
         #endregion
     }

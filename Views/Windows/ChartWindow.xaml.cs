@@ -28,6 +28,7 @@ namespace TinkoffTradeSimulator.Views.Windows
         {
             InitializeComponent();
 
+
             // Создаю экземпляр класса и передаю в конструкторе WpfPlot который создан во View
             ChartWindowViewModel chartWindow = new(WpfPlot1);
         }

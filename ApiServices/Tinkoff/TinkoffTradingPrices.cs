@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 
@@ -27,7 +28,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 SharesResponse sharesResponse = await _client?.Instruments.SharesAsync();
                 share = sharesResponse?.Instruments?.FirstOrDefault(x => x.Ticker == ticker) ?? new Share();
             }
-            catch (Exception)
+            catch (Exception )
             {
                 //MessageBox.Show($"Не удалось получить инструмент. Причина: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
