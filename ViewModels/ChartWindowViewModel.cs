@@ -16,8 +16,10 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Приватные свойства
         private InvestApiClient? _client = null;
         private WpfPlot? _wpfPlot = null;
-
         private string _title;
+
+        // Приветное свойство для выбора тамйфрема свечи
+        private CandleInterval _selectedCandleInterval = CandleInterval.OneMinute;
 
         // Приватное свойство для хранения данных свечей
         private ObservableCollection<OHLC> _candlestickData;
@@ -37,6 +39,12 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _candlestickData, value);
         }
 
+        // Публичное свойство для выбранного таймфрейма свечи
+        public CandleInterval SelectedCandleInterval
+        {
+            get => _selectedCandleInterval;
+            set => Set(ref _selectedCandleInterval, value);
+        }
         #endregion
 
         #region Команды
@@ -58,7 +66,7 @@ namespace TinkoffTradeSimulator.ViewModels
             LoadAsyncData();
 
             // Строю график и показываю по тикеру
-            GetAndSetCandlesIntoView(tickerName);
+            GetAndSetCandlesIntoView(tickerName, SelectedCandleInterval);
 
             //SetDataToView();
         }
@@ -99,34 +107,46 @@ namespace TinkoffTradeSimulator.ViewModels
             _client = await TinkoffClient.CreateAsync();
         }
 
-        public async void GetAndSetCandlesIntoView(string ticker)
+        public async void GetAndSetCandlesIntoView(string ticker, CandleInterval candleInterval)
         {
+            // На вский случай обновляю заголовок окна чтобы он был согласован
+            Title = ticker;
+
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-                // получаем инструмент (по имени тикера)
-
-                // TODO надо разобраться почему не передаётся тикер. значение обнуляется
 
                 Share instrument = await tinkoff.GetShareByTicker(ticker);
 
-                TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
+                TimeSpan timeFrame;
 
-                // получаем список свечей за определенный промежуток времени по Share
+                // В зависимости от интервала свечи выбираем соответствующий timeFrame
+                switch (candleInterval)
+                {
+                    case CandleInterval.OneMinute:
+                        timeFrame = TimeSpan.FromMinutes(1);
+                        break;
+                    case CandleInterval.TwoMinutes:
+                        timeFrame = TimeSpan.FromMinutes(2);
+                        break;
+                    // Добавьте обработку других интервалов здесь
+                    // ...
+                    default:
+                        timeFrame = TimeSpan.FromMinutes(1); // По умолчанию 1 минута
+                        break;
+                }
+
                 List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame);
 
-                // создаем список свечей OHLC
                 List<OHLC> prices = new List<OHLC>();
 
                 foreach (var candle in candles)
                 {
-                    // Приводим данные к типу OHLC
                     double openPriceCandle = Convert.ToDouble(candle.Open);
                     double highPriceCandle = Convert.ToDouble(candle.High);
                     double lowPriceCandle = Convert.ToDouble(candle.Low);
                     double closePriceCandle = Convert.ToDouble(candle.Close);
 
-                    // Преобразуем Timestamp в DateTime
                     DateTime candleTime = candle.Time.ToDateTime();
 
                     OHLC price = new OHLC(
@@ -135,26 +155,68 @@ namespace TinkoffTradeSimulator.ViewModels
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(1));
+                        timeSpan: timeFrame); // Используем выбранный интервал свечей
 
                     prices.Add(price);
                 }
 
-                // Преобразуем список в массив OHLC[]
                 OHLC[] pricesArray = prices.ToArray();
 
-                // Добавляем сформированные данные к графику
                 _wpfPlot?.Plot.AddCandlesticks(pricesArray);
-
-                // Обновляем график
                 _wpfPlot?.Refresh();
             }
             catch (Exception)
             {
                 // Обрабатываем ошибки
-                // Можно выводить сообщение об ошибке или выполнять другие действия
             }
         }
+
+
+        #region Выбор таймфрейма свечи
+
+        // Допустимый диапозон таймфрейма свечей у Тинькофф
+        public enum CandleInterval
+        {
+            OneMinute,
+            TwoMinutes,
+            ThreeMinutes,
+            FiveMinutes,
+            TenMinutes,
+            FifteenMinutes,
+            ThirtyMinutes,
+            OneHour,
+            TwoHours,
+            FourHours,
+            OneDay,
+            OneWeek,
+            OneMonth
+        }
+
+        // Метод увеличения таймфрейма свечи
+        public void IncreaseCandleInterval()
+        {
+            // Проверяем, не достигли ли максимального интервала
+            if (SelectedCandleInterval < CandleInterval.OneMonth)
+            {
+                SelectedCandleInterval++;
+                GetAndSetCandlesIntoView(Title, SelectedCandleInterval);               
+            }
+        }
+
+        // Метод уменьшения таймфрейма свечи
+        public void DecreaseCandleInterval()
+        {
+            // Проверяем, не достигли ли минимального интервала
+            if (SelectedCandleInterval > CandleInterval.OneMinute)
+            {
+                SelectedCandleInterval--;
+                GetAndSetCandlesIntoView(Title, SelectedCandleInterval);
+            }
+        }
+
+
+
+        #endregion
 
         #endregion
     }
