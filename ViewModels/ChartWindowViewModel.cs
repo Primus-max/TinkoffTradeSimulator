@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
@@ -48,45 +47,50 @@ namespace TinkoffTradeSimulator.ViewModels
         public ChartWindowViewModel() { }
 
         // Коснтурктор с перегрузами
-        public ChartWindowViewModel(WpfPlot plot)
+        public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
             // Делаю доступным в этой области видимости полученный объект из конструктора
             _wpfPlot = plot;
 
+            string tickerName = ticker;
+
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
 
-            TestingData();
+            // Строю график и показываю по тикеру
+            GetAndSetCandlesIntoView(tickerName);
 
             //SetDataToView();
         }
 
+
         #region Методы
 
-        public void TestingDataA()
-        {
-            // Each candle is represented by a single OHLC object.
-            OHLC price = new(
-                open: 100,
-                high: 120,
-                low: 80,
-                close: 105,
-                timeStart: new DateTime(1985, 09, 24),
-                timeSpan: TimeSpan.FromDays(1));
+        // Тестовые данны для построения свечей
+        //public void TestingDataA()
+        //{
+        //    // Each candle is represented by a single OHLC object.
+        //    OHLC price = new(
+        //        open: 100,
+        //        high: 120,
+        //        low: 80,
+        //        close: 105,
+        //        timeStart: new DateTime(1985, 09, 24),
+        //        timeSpan: TimeSpan.FromDays(1));
 
-            // Users could be build their own array of OHLCs, or lean on 
-            // the sample data generator to simulate price data over time.
-            OHLC[] prices = DataGen.RandomStockPrices(new Random(0), 60);
+        //    // Users could be build their own array of OHLCs, or lean on 
+        //    // the sample data generator to simulate price data over time.
+        //    OHLC[] prices = DataGen.RandomStockPrices(new Random(0), 60);
 
-            _wpfPlot.Plot.AddColorbar();
-            _wpfPlot.Plot.AddBubblePlot();
-            // Add a financial chart to the plot using an array of OHLC objects
-            _wpfPlot.Plot.AddCandlesticks(prices);
+        //    _wpfPlot.Plot.AddColorbar();
+        //    _wpfPlot.Plot.AddBubblePlot();
+        //    // Add a financial chart to the plot using an array of OHLC objects
+        //    _wpfPlot.Plot.AddCandlesticks(prices);
 
-            WpfPlot wpfPlot = new WpfPlot();
+        //    WpfPlot wpfPlot = new WpfPlot();
 
-            _wpfPlot.Refresh();
-        }
+        //    _wpfPlot.Refresh();
+        //}
 
         // Метод для асинхронной загрузки данных(любых данных) обобщающий метод
         private async void LoadAsyncData()
@@ -95,14 +99,16 @@ namespace TinkoffTradeSimulator.ViewModels
             _client = await TinkoffClient.CreateAsync();
         }
 
-        public async void TestingData()
+        public async void GetAndSetCandlesIntoView(string ticker)
         {
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
                 // получаем инструмент (по имени тикера)
 
-                Share instrument = await tinkoff.GetShareByTicker("APA");
+                // TODO надо разобраться почему не передаётся тикер. значение обнуляется
+
+                Share instrument = await tinkoff.GetShareByTicker(ticker);
 
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
@@ -149,7 +155,6 @@ namespace TinkoffTradeSimulator.ViewModels
                 // Можно выводить сообщение об ошибке или выполнять другие действия
             }
         }
-
 
         #endregion
     }

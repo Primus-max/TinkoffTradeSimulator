@@ -89,14 +89,15 @@ namespace TinkoffTradeSimulator.ViewModels
 
         // Открываю окно и строю в нём график
         private async void OpenChartWindow(string tickerName)
-        {                                
-
+        {
+            
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
 
             // Устанавливаю значение Title через свойство
             _chartViewModel.Title = tickerName;
 
+            //_chartViewModel.GetAndSetCandlesIntoView(tickerName);
             // Устанавливаю контекст даннх для окна (странно, но это так же делаю в самом окне)
             chartWindow.DataContext = _chartViewModel;
 
