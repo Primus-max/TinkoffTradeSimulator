@@ -115,38 +115,29 @@ namespace TinkoffTradeSimulator.ViewModels
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
+                // получаем инструмент (по имени тикера)
+
+                // TODO надо разобраться почему не передаётся тикер. значение обнуляется
 
                 Share instrument = await tinkoff.GetShareByTicker(ticker);
 
-                TimeSpan timeFrame;
+                TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
-                // В зависимости от интервала свечи выбираем соответствующий timeFrame
-                switch (candleInterval)
-                {
-                    case CandleInterval.OneMinute:
-                        timeFrame = TimeSpan.FromMinutes(1);
-                        break;
-                    case CandleInterval.TwoMinutes:
-                        timeFrame = TimeSpan.FromMinutes(2);
-                        break;
-                    // Добавьте обработку других интервалов здесь
-                    // ...
-                    default:
-                        timeFrame = TimeSpan.FromMinutes(1); // По умолчанию 1 минута
-                        break;
-                }
-
+                // получаем список свечей за определенный промежуток времени по Share
                 List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame);
 
+                // создаем список свечей OHLC
                 List<OHLC> prices = new List<OHLC>();
 
                 foreach (var candle in candles)
                 {
+                    // Приводим данные к типу OHLC
                     double openPriceCandle = Convert.ToDouble(candle.Open);
                     double highPriceCandle = Convert.ToDouble(candle.High);
                     double lowPriceCandle = Convert.ToDouble(candle.Low);
                     double closePriceCandle = Convert.ToDouble(candle.Close);
 
+                    // Преобразуем Timestamp в DateTime
                     DateTime candleTime = candle.Time.ToDateTime();
 
                     OHLC price = new OHLC(
@@ -155,19 +146,24 @@ namespace TinkoffTradeSimulator.ViewModels
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: timeFrame); // Используем выбранный интервал свечей
+                        timeSpan: TimeSpan.FromMinutes(1));
 
                     prices.Add(price);
                 }
 
+                // Преобразуем список в массив OHLC[]
                 OHLC[] pricesArray = prices.ToArray();
 
+                // Добавляем сформированные данные к графику
                 _wpfPlot?.Plot.AddCandlesticks(pricesArray);
+
+                // Обновляем график
                 _wpfPlot?.Refresh();
             }
             catch (Exception)
             {
                 // Обрабатываем ошибки
+                // Можно выводить сообщение об ошибке или выполнять другие действия
             }
         }
 
