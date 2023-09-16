@@ -113,6 +113,7 @@ namespace TinkoffTradeSimulator.ViewModels
         public async void GetAndSetCandlesIntoView(string ticker, int candleIntervalIndex)
         {
             Title = ticker;
+
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
@@ -151,6 +152,9 @@ namespace TinkoffTradeSimulator.ViewModels
 
                 OHLC[] pricesArray = prices.ToArray();
 
+                // Очищаем текущий график перед добавлением новых свечей
+                _wpfPlot?.Plot.Clear();
+
                 _wpfPlot?.Plot.AddCandlesticks(pricesArray);
                 _wpfPlot?.Refresh();
             }
@@ -159,6 +163,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 // Обработка ошибок
             }
         }
+
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее
         private static int GetCandleIntervalByIndex(int index)
@@ -186,14 +191,22 @@ namespace TinkoffTradeSimulator.ViewModels
         // Метод увеличения таймфрейма свечи
         public void IncreaseCandleInterval()
         {
+            // Максимально допустимый индекс для выбора таймфрейма
+            int maxIndex = 6;
+
             SelectedCandleIndex++;
+            if (SelectedCandleIndex > maxIndex) SelectedCandleIndex = maxIndex;
             GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
         }
 
         // Метод уменьшения таймфрейма свечи
         public void DecreaseCandleInterval()
-        {          
+        {
+            // Минимально допустимый индекс для выбора таймфрейма
+            int minxIndex = 1;
+
             SelectedCandleIndex--;
+            if (SelectedCandleIndex < 1) SelectedCandleIndex = 1;
             GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
         }
 

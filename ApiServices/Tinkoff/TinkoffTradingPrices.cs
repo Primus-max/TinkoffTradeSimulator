@@ -94,7 +94,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                         return CandleInterval._15Min;
                     }
                     // Если индекс меньше 0, вернуть _1Min
-                    else if (index < 0)
+                    else if (index <= 0)
                     {
                         return CandleInterval._1Min;
                     }
