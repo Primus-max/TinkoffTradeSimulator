@@ -109,26 +109,22 @@ namespace TinkoffTradeSimulator.ViewModels
             _client = await TinkoffClient.CreateAsync();
         }
 
+        // Метод получения свечей
         public async void GetAndSetCandlesIntoView(string ticker, int candleIntervalIndex)
         {
-
-            // На вский случай обновляю заголовок окна чтобы он был согласован
             Title = ticker;
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-                //tinkoff.GetCandleIntervalByIndex(candleIntervalIndex);
-
-                // TODO надо разобраться почему не передаётся тикер. значение обнуляется
-
                 Share instrument = await tinkoff.GetShareByTicker(ticker);
+
+                // Получение интервала в минутах
+                int selectedIntervalInMinutes = GetCandleIntervalByIndex(candleIntervalIndex);
 
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
-                // получаем список свечей за определенный промежуток времени по Share
                 List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, candleIntervalIndex);
 
-                // создаем список свечей OHLC
                 List<OHLC> prices = new List<OHLC>();
 
                 foreach (var candle in candles)
@@ -148,25 +144,40 @@ namespace TinkoffTradeSimulator.ViewModels
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(candleIntervalIndex));
+                        timeSpan: TimeSpan.FromMinutes(selectedIntervalInMinutes));
 
                     prices.Add(price);
                 }
 
-                // Преобразуем список в массив OHLC[]
                 OHLC[] pricesArray = prices.ToArray();
 
-                // Добавляем сформированные данные к графику
                 _wpfPlot?.Plot.AddCandlesticks(pricesArray);
-
-                // Обновляем график
                 _wpfPlot?.Refresh();
             }
             catch (Exception)
             {
-                // Обрабатываем ошибки
-                // Можно выводить сообщение об ошибке или выполнять другие действия
+                // Обработка ошибок
             }
+        }
+
+        // Получаю колличество минут для таймфрема по индексу который получаем при скролее
+        private static int GetCandleIntervalByIndex(int index)
+        {
+            // Перечень интервалов свечей в минутах
+            int[] candleIntervalsInMinutes = new int[] { 1, 2, 3, 5, 10, 15 };
+
+            // Убедимся, что индекс в допустимом диапазоне
+            if (index < 1)
+            {
+                index = 1;
+            }
+            else if (index > candleIntervalsInMinutes.Length)
+            {
+                index = candleIntervalsInMinutes.Length;
+            }
+
+            // Получим интервал в минутах
+            return candleIntervalsInMinutes[index - 1];
         }
 
 
