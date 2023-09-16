@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Tinkoff.InvestApi;
@@ -37,8 +38,8 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         }
 
         // Получаю исторические свечи по Share и временному промежутку
-        public async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame)
-        {
+        public async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, int candleIndexInterval)
+        {            
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset intervalAgo = now.Subtract(timeFrame);
             Timestamp nowTimestamp = Timestamp.FromDateTimeOffset(now);
@@ -50,7 +51,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 InstrumentId = instrument.Uid,
                 From = intervalAgoTimestamp,
                 To = nowTimestamp,
-                Interval = CandleInterval._1Min
+                Interval = GetCandleIntervalByIndex(candleIndexInterval)
             };
 
             try
@@ -68,5 +69,42 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 return new List<HistoricCandle>();
             }
         }
+
+        //  Метод получения свойства из CandleInterval по индексу, который получаем при скролле, чтобы сформировать таймфрейм свечи
+        public static CandleInterval GetCandleIntervalByIndex(int index)
+        {
+            switch (index)
+            {
+                case 1:
+                    return CandleInterval._1Min;
+                case 2:
+                    return CandleInterval._2Min;
+                case 3:
+                    return CandleInterval._3Min;
+                case 4:
+                    return CandleInterval._5Min;
+                case 5:
+                    return CandleInterval._10Min;
+                case 6:
+                    return CandleInterval._15Min;
+                default:
+                    // Если индекс больше или равен длине CandleInterval, вернуть _15Min
+                    if (index >= System.Enum.GetValues(typeof(CandleInterval)).Length)
+                    {
+                        return CandleInterval._15Min;
+                    }
+                    // Если индекс меньше 0, вернуть _1Min
+                    else if (index < 0)
+                    {
+                        return CandleInterval._1Min;
+                    }
+                    // Иначе вернуть соответствующий интервал
+                    else
+                    {
+                        return (CandleInterval)index;
+                    }
+            }
+        }
+
     }
 }

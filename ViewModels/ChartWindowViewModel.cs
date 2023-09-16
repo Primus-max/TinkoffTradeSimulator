@@ -18,8 +18,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private WpfPlot? _wpfPlot = null;
         private string _title;
 
-        // Приветное свойство для выбора тамйфрема свечи
-        private CandleInterval _selectedCandleInterval = CandleInterval.OneMinute;
+        // Приватное свойство для определения индекса по которому будет выбран CandleInterval
+        private int _selectedCandleIndex = 1;
+
 
         // Приватное свойство для хранения данных свечей
         private ObservableCollection<OHLC> _candlestickData;
@@ -39,11 +40,12 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _candlestickData, value);
         }
 
-        // Публичное свойство для выбранного таймфрейма свечи
-        public CandleInterval SelectedCandleInterval
+
+        // Публичное свойство для определения индекса по которому будет выбран CandleInterval
+        public int SelectedCandleIndex
         {
-            get => _selectedCandleInterval;
-            set => Set(ref _selectedCandleInterval, value);
+            get => (int)_selectedCandleIndex;
+            set => Set(ref _selectedCandleIndex, value);
         }
         #endregion
 
@@ -66,7 +68,7 @@ namespace TinkoffTradeSimulator.ViewModels
             LoadAsyncData();
 
             // Строю график и показываю по тикеру
-            GetAndSetCandlesIntoView(tickerName, SelectedCandleInterval);
+            GetAndSetCandlesIntoView(tickerName, SelectedCandleIndex);
 
             //SetDataToView();
         }
@@ -107,15 +109,15 @@ namespace TinkoffTradeSimulator.ViewModels
             _client = await TinkoffClient.CreateAsync();
         }
 
-        public async void GetAndSetCandlesIntoView(string ticker, CandleInterval candleInterval)
+        public async void GetAndSetCandlesIntoView(string ticker, int candleIntervalIndex)
         {
+
             // На вский случай обновляю заголовок окна чтобы он был согласован
             Title = ticker;
-
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-                // получаем инструмент (по имени тикера)
+                //tinkoff.GetCandleIntervalByIndex(candleIntervalIndex);
 
                 // TODO надо разобраться почему не передаётся тикер. значение обнуляется
 
@@ -124,7 +126,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
                 // получаем список свечей за определенный промежуток времени по Share
-                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame);
+                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, candleIntervalIndex);
 
                 // создаем список свечей OHLC
                 List<OHLC> prices = new List<OHLC>();
@@ -146,7 +148,7 @@ namespace TinkoffTradeSimulator.ViewModels
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(1));
+                        timeSpan: TimeSpan.FromMinutes(candleIntervalIndex));
 
                     prices.Add(price);
                 }
@@ -168,49 +170,21 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
 
-        #region Выбор таймфрейма свечи
-
-        // Допустимый диапозон таймфрейма свечей у Тинькофф
-        public enum CandleInterval
-        {
-            OneMinute,
-            TwoMinutes,
-            ThreeMinutes,
-            FiveMinutes,
-            TenMinutes,
-            FifteenMinutes,
-            ThirtyMinutes,
-            OneHour,
-            TwoHours,
-            FourHours,
-            OneDay,
-            OneWeek,
-            OneMonth
-        }
+        #region Выбор таймфрейма свечи       
 
         // Метод увеличения таймфрейма свечи
         public void IncreaseCandleInterval()
         {
-            // Проверяем, не достигли ли максимального интервала
-            if (SelectedCandleInterval < CandleInterval.OneMonth)
-            {
-                SelectedCandleInterval++;
-                GetAndSetCandlesIntoView(Title, SelectedCandleInterval);               
-            }
+            SelectedCandleIndex++;
+            GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
         }
 
         // Метод уменьшения таймфрейма свечи
         public void DecreaseCandleInterval()
-        {
-            // Проверяем, не достигли ли минимального интервала
-            if (SelectedCandleInterval > CandleInterval.OneMinute)
-            {
-                SelectedCandleInterval--;
-                GetAndSetCandlesIntoView(Title, SelectedCandleInterval);
-            }
+        {          
+            SelectedCandleIndex--;
+            GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
         }
-
-
 
         #endregion
 
