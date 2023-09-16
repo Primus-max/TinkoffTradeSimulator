@@ -1,11 +1,14 @@
 ﻿using ScottPlot;
+using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
+using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 
 namespace TinkoffTradeSimulator.ViewModels
@@ -21,9 +24,12 @@ namespace TinkoffTradeSimulator.ViewModels
         // Приватное свойство для определения индекса по которому будет выбран CandleInterval
         private int _selectedCandleIndex = 1;
 
-
         // Приватное свойство для хранения данных свечей
         private ObservableCollection<OHLC> _candlestickData;
+
+        private ChartToolTipManager _сhartToolTipManager;
+
+        private ToolTip _toolTipInfo;
         #endregion
 
         #region Публичные свойства
@@ -40,12 +46,23 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _candlestickData, value);
         }
 
-
         // Публичное свойство для определения индекса по которому будет выбран CandleInterval
         public int SelectedCandleIndex
         {
             get => (int)_selectedCandleIndex;
             set => Set(ref _selectedCandleIndex, value);
+        }
+
+        public ChartToolTipManager ChartToolTipManager
+        {
+            get => _сhartToolTipManager;
+            set => Set(ref _сhartToolTipManager, value);
+        }
+
+        public ToolTip ToolTipInfo
+        {
+            get => _toolTipInfo;
+            set => Set(ref _toolTipInfo, value);
         }
         #endregion
 
@@ -61,6 +78,13 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             // Делаю доступным в этой области видимости полученный объект из конструктора
             _wpfPlot = plot;
+            // Так можно изменить стили для окна
+            //_wpfPlot.plt.Style(
+            //    figureBackground: Color.DarkBlue,
+            //    dataBackground: Color.DarkGoldenrod
+            //    );
+
+            ToolTipInfo = new ToolTip();
 
             string tickerName = ticker;
 
@@ -76,33 +100,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Методы
 
-        // Тестовые данны для построения свечей
-        //public void TestingDataA()
-        //{
-        //    // Each candle is represented by a single OHLC object.
-        //    OHLC price = new(
-        //        open: 100,
-        //        high: 120,
-        //        low: 80,
-        //        close: 105,
-        //        timeStart: new DateTime(1985, 09, 24),
-        //        timeSpan: TimeSpan.FromDays(1));
-
-        //    // Users could be build their own array of OHLCs, or lean on 
-        //    // the sample data generator to simulate price data over time.
-        //    OHLC[] prices = DataGen.RandomStockPrices(new Random(0), 60);
-
-        //    _wpfPlot.Plot.AddColorbar();
-        //    _wpfPlot.Plot.AddBubblePlot();
-        //    // Add a financial chart to the plot using an array of OHLC objects
-        //    _wpfPlot.Plot.AddCandlesticks(prices);
-
-        //    WpfPlot wpfPlot = new WpfPlot();
-
-        //    _wpfPlot.Refresh();
-        //}
-
-        // Метод для асинхронной загрузки данных(любых данных) обобщающий метод
         private async void LoadAsyncData()
         {
             // Создаю клиента Тинькофф 
@@ -156,6 +153,11 @@ namespace TinkoffTradeSimulator.ViewModels
                 _wpfPlot?.Plot.Clear();
 
                 _wpfPlot?.Plot.AddCandlesticks(pricesArray);
+
+
+                // Обновляю информацию в TollTip
+                UpdateToolTipInfo( selectedIntervalInMinutes);
+
                 _wpfPlot?.Refresh();
             }
             catch (Exception)
@@ -163,7 +165,6 @@ namespace TinkoffTradeSimulator.ViewModels
                 // Обработка ошибок
             }
         }
-
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее
         private static int GetCandleIntervalByIndex(int index)
@@ -182,14 +183,16 @@ namespace TinkoffTradeSimulator.ViewModels
             }
 
             // Получим интервал в минутах
-            return candleIntervalsInMinutes[index - 1];
+            int candleInterval = candleIntervalsInMinutes[index - 1];
+
+            return candleInterval;
         }
 
 
         #region Выбор таймфрейма свечи       
 
         // Метод увеличения таймфрейма свечи
-        public void IncreaseCandleInterval()
+        public void IncreaseCandleInterval(ToolTip toolTip)
         {
             // Максимально допустимый индекс для выбора таймфрейма
             int maxIndex = 6;
@@ -197,19 +200,31 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedCandleIndex++;
             if (SelectedCandleIndex > maxIndex) SelectedCandleIndex = maxIndex;
             GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
+
+            ToolTipInfo = toolTip;
         }
 
         // Метод уменьшения таймфрейма свечи
-        public void DecreaseCandleInterval()
+        public void DecreaseCandleInterval(ToolTip toolTip)
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 1;
 
             SelectedCandleIndex--;
-            if (SelectedCandleIndex < 1) SelectedCandleIndex = 1;
+            if (SelectedCandleIndex < minxIndex) SelectedCandleIndex = minxIndex;
             GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
+
+            ToolTipInfo = toolTip;
+
         }
 
+        private void UpdateToolTipInfo(int timeFrame)
+        {
+            ToolTipInfo.HorizontalOffset = 20;
+            ToolTipInfo.VerticalOffset = 20;
+
+            ToolTipInfo.Content = $"Выбранный таймфрейм свечи: {timeFrame} минут";
+        }
         #endregion
 
         #endregion

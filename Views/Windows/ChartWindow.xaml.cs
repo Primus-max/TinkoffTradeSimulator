@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Windows.Controls;
+using System.Windows;
 using System.Windows.Input;
 using TinkoffTradeSimulator.ViewModels;
 
@@ -17,11 +18,12 @@ namespace TinkoffTradeSimulator.Views.Windows
             InitializeComponent();
 
             WpfPlot1.MouseWheel += OnMouseWheel;
+            
         }
 
         private void OnMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-           
+        {          
+
             if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
             {
                 // Если зажата клавиша ALT, то изменяем интервал свечей
@@ -29,18 +31,20 @@ namespace TinkoffTradeSimulator.Views.Windows
                 {
 
                     // Приближение (увеличение интервала)
-                    _chartViewModel.IncreaseCandleInterval();
+                    _chartViewModel.IncreaseCandleInterval(ToolTipWpfPlot);
                 }
                 else
                 {
                     // Отдаление (уменьшение интервала)
-                    _chartViewModel.DecreaseCandleInterval();                    
+                    _chartViewModel.DecreaseCandleInterval(ToolTipWpfPlot);                    
                 }
 
                 // Обновляем график с новым интервалом свечей
                 WpfPlot1.Refresh();
             }
         }
+
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

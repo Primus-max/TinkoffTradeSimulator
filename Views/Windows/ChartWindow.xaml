@@ -3,19 +3,39 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
+    xmlns:controls="clr-namespace:TinkoffTradeSimulator.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TinkoffTradeSimulator.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels" 
-    xmlns:controls="clr-namespace:TinkoffTradeSimulator.Views.Controls"
+    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="{Binding Title}"
     Width="900"
     Height="600"
-    mc:Ignorable="d" Loaded="Window_Loaded" >
+    Loaded="Window_Loaded"
+    mc:Ignorable="d">
     <Window.DataContext>
         <vm:ChartWindowViewModel />
     </Window.DataContext>
-    <Grid>      
+    <Grid>
         <ScottPlot:WpfPlot x:Name="WpfPlot1" />
+        
+        <Grid.ToolTip>
+            <ToolTip Content="{Binding ChartToolTipManager}"
+                x:Name="ToolTipWpfPlot"
+                
+                Placement="MousePoint"
+                >
+                <!--<StackPanel>
+                    --><!--  Информация о свечах  --><!--
+                    <TextBlock FontWeight="Bold" Text="Информация о свечах:" />
+                    <TextBlock Text="{Binding ToolTipOpen}" />
+                    <TextBlock Text="{Binding ToolTipClose}" />
+                    --><!--  Информация о таймфрейме  --><!--
+                    <TextBlock FontWeight="Bold" Text="Таймфрейм:" />
+                    <TextBlock Text="1 минута" />
+                </StackPanel>-->
+            </ToolTip>
+        </Grid.ToolTip>
     </Grid>
+
 </Window>
