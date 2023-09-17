@@ -31,16 +31,11 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private ToolTip _toolTipInfo;
 
-        private ObservableCollection<CandleTimeFrameButton> _candleTimeFrameButtons;
+        
         #endregion
 
         #region Публичные свойства
-        public ObservableCollection<CandleTimeFrameButton> CandleTimeFrameButtons
-        {
-            get => _candleTimeFrameButtons;
-            set => Set(ref _candleTimeFrameButtons, value);
-        }
-
+       
         public string Title
         {
             get => _title;
