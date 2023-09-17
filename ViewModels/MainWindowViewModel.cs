@@ -29,7 +29,7 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Приватные поля
         private InvestApiClient? _client = null;
         private ObservableCollection<TickerInfo>? _tickerInfoList;
-        private string _title;
+        private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null;
         #endregion
 
@@ -60,7 +60,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Открываю окно
             OpenChartWindow(tickerName);            
         }
-
+              
         #endregion
 
 
@@ -102,7 +102,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Открываю окно и строю в нём график
-        private async void OpenChartWindow(string tickerName)
+        private void OpenChartWindow(string tickerName)
         {
             
             // Создаем новое окно и передаем ему ViewModel
@@ -120,6 +120,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Открываем окно
             chartWindow.Show();
         }
+        
         #endregion
     }
 

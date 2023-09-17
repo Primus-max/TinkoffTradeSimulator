@@ -19,15 +19,12 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _candleTimeFrameButtons;
             set => Set(ref _candleTimeFrameButtons, value);
         }
-
         #endregion
 
         public CandleIntervalWindowViewModel()
         {
 
-
         }
-
         #region Методы
 
         #endregion

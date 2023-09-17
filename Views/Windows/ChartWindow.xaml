@@ -62,7 +62,10 @@
         <!--  Средняя область с кнопками и инструментами  -->
         <ToolBarTray Grid.Row="1">
             <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
-                <Button Margin="8,0,0,0" Content="1 мин" />
+                <Button
+                    Margin="8,0,0,0"
+                    Command="{Binding OpenCandleIntervalWindowCommand}"
+                    Content="1 мин" />
                 <!--  Добавьте другие кнопки для других таймфреймов  -->
                 <Separator />
                 <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">

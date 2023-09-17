@@ -3,13 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
+using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
+using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
@@ -19,23 +22,23 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Приватные свойства
         private InvestApiClient? _client = null;
         private WpfPlot? _wpfPlot = null;
-        private string _title;
+        private string _title = string.Empty;
 
         // Приватное свойство для определения временно интервала свечей
         private int _selectedHistoricalTimeCandleIndex = 10;
 
         // Приватное свойство для хранения данных свечей
-        private ObservableCollection<OHLC> _candlestickData;
+        private ObservableCollection<OHLC>? _candlestickData = null;
 
-        private ChartToolTipManager _сhartToolTipManager;
+        private ChartToolTipManager? _сhartToolTipManager = null;
 
-        private ToolTip _toolTipInfo;
+        private ToolTip? _toolTipInfo = null;
 
-        
+
         #endregion
 
         #region Публичные свойства
-       
+
         public string Title
         {
             get => _title;
@@ -70,15 +73,32 @@ namespace TinkoffTradeSimulator.ViewModels
         #endregion
 
         #region Команды
+        public ICommand? OpenCandleIntervalWindowCommand { get; } = null;
 
+        private bool CanOpenCandleIntervalWindowCommandExecute(object p) => true;
+
+        private void OnOpenCandleIntervalWindowCommandExecuted(object sender)
+        {
+            // Открываю окно с выбором таймфрема для свечи
+            OpenCandleIntervalWindow();
+        }
         #endregion
 
         // Пустой (необходимый) конструктор
-        public ChartWindowViewModel() { }
+        public ChartWindowViewModel()
+        {
+            #region Инициализация команд
+            OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
+            #endregion
+        }
 
         // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
+            #region Инициализация команд
+            OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
+            #endregion
+
             // Делаю доступным в этой области видимости полученный объект из конструктора
             _wpfPlot = plot;
             // Так можно изменить стили для окна
@@ -108,7 +128,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
             //SetDataToView();
         }
-
 
         #region Методы
 
@@ -201,6 +220,13 @@ namespace TinkoffTradeSimulator.ViewModels
             return candleInterval;
         }
 
+        // Открываю окно с выбором таймфрема
+        private static void OpenCandleIntervalWindow()
+        {
+            CandleIntervalWindow candleIntervalWindow = new();
+
+            candleIntervalWindow.Show();
+        }
 
         #region Выбор таймфрейма свечи       
 

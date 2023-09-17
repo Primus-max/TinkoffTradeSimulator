@@ -12,7 +12,7 @@ namespace TinkoffTradeSimulator.Views.Windows
     public partial class ChartWindow : Window
     {
 
-        private ChartWindowViewModel _chartViewModel;
+        private ChartWindowViewModel _chartViewModel = null;
 
         public ChartWindow()
         {
@@ -48,11 +48,10 @@ namespace TinkoffTradeSimulator.Views.Windows
             e.Handled = true;
         }
 
-
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Создаю экземпляр класса и передаю в конструкторе WpfPlot который создан во View, имя тикера (заголовок окна надо передавать по другому)
+            // Создаю экземпляр класса и передаю в конструкторе WpfPlot который создан во View,
+            // имя тикера (заголовок окна надо передавать по другому)
             _chartViewModel = new ChartWindowViewModel(WpfPlot1, Title);
         }
     }

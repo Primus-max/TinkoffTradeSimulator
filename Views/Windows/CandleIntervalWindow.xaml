@@ -13,7 +13,7 @@
         <ItemsControl ItemsSource="{Binding candleTimeFrames}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Click="CandleTimeFrameButton_Click" Content="{Binding Name}" />
+                    <Button  Content="{Binding Name}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
