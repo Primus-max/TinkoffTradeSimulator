@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using TinkoffTradeSimulator.ViewModels;
+using ScottPlot;
 
 namespace TinkoffTradeSimulator.Views.Windows
 {
@@ -17,31 +18,34 @@ namespace TinkoffTradeSimulator.Views.Windows
         {
             InitializeComponent();
 
+            // Отключаю события скролла от ScottPlot
+            WpfPlot1.Configuration.ScrollWheelZoom = false;
+
+            // Добавляю своё событие скролла
             WpfPlot1.MouseWheel += OnMouseWheel;
             
         }
 
+        // Событие сролла мышки для масштабирования таймфрейма свечи
         private void OnMouseWheel(object sender, MouseWheelEventArgs e)
-        {          
+        {
 
-            if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+            if (e.Delta > 0)
             {
-                // Если зажата клавиша ALT, то изменяем интервал свечей
-                if (e.Delta > 0)
-                {
-
-                    // Приближение (увеличение интервала)
-                    _chartViewModel.IncreaseCandleInterval(ToolTipWpfPlot);
-                }
-                else
-                {
-                    // Отдаление (уменьшение интервала)
-                    _chartViewModel.DecreaseCandleInterval(ToolTipWpfPlot);                    
-                }
-
-                // Обновляем график с новым интервалом свечей
-                WpfPlot1.Refresh();
+                // Скролл вперёд (увеличение интервала)
+                _chartViewModel.IncreaseCandleInterval();
             }
+            else
+            {
+                // Скролл назад (уменьшение интервала)
+                _chartViewModel.DecreaseCandleInterval();
+            }
+
+            // Обновляем график с новым интервалом свечей
+            WpfPlot1.Refresh();
+
+            // Отменим дальнейшую обработку события, чтобы избежать дополнительной прокрутки
+            e.Handled = true;
         }
 
 

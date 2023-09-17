@@ -21,8 +21,8 @@ namespace TinkoffTradeSimulator.ViewModels
         private WpfPlot? _wpfPlot = null;
         private string _title;
 
-        // Приватное свойство для определения индекса по которому будет выбран CandleInterval
-        private int _selectedCandleIndex = 1;
+        // Приватное свойство для определения временно интервала свечей
+        private int _selectedHistoricalTimeCandleIndex = 10;
 
         // Приватное свойство для хранения данных свечей
         private ObservableCollection<OHLC> _candlestickData;
@@ -47,10 +47,10 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Публичное свойство для определения индекса по которому будет выбран CandleInterval
-        public int SelectedCandleIndex
+        public int SelectedHistoricalTimeCandleIndex
         {
-            get => (int)_selectedCandleIndex;
-            set => Set(ref _selectedCandleIndex, value);
+            get => (int)_selectedHistoricalTimeCandleIndex;
+            set => Set(ref _selectedHistoricalTimeCandleIndex, value);
         }
 
         public ChartToolTipManager ChartToolTipManager
@@ -92,7 +92,7 @@ namespace TinkoffTradeSimulator.ViewModels
             LoadAsyncData();
 
             // Строю график и показываю по тикеру
-            GetAndSetCandlesIntoView(tickerName, SelectedCandleIndex);
+            GetAndSetCandlesIntoView(tickerName, SelectedHistoricalTimeCandleIndex);
 
             //SetDataToView();
         }
@@ -121,7 +121,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
-                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, candleIntervalIndex);
+                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, 1);
 
                 List<OHLC> prices = new List<OHLC>();
 
@@ -156,7 +156,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
 
                 // Обновляю информацию в TollTip
-                UpdateToolTipInfo( selectedIntervalInMinutes);
+                //UpdateToolTipInfo( selectedIntervalInMinutes);
 
                 _wpfPlot?.Refresh();
             }
@@ -191,40 +191,33 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Выбор таймфрейма свечи       
 
-        // Метод увеличения таймфрейма свечи
-        public void IncreaseCandleInterval(ToolTip toolTip)
+        //// Метод увеличения таймфрейма свечи
+        public void IncreaseCandleInterval()
         {
             // Максимально допустимый индекс для выбора таймфрейма
-            int maxIndex = 6;
+            int maxIndex = 100;
 
-            SelectedCandleIndex++;
-            if (SelectedCandleIndex > maxIndex) SelectedCandleIndex = maxIndex;
-            GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
-
-            ToolTipInfo = toolTip;
+            SelectedHistoricalTimeCandleIndex++;
+            if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex; 
         }
 
-        // Метод уменьшения таймфрейма свечи
-        public void DecreaseCandleInterval(ToolTip toolTip)
+        //// Метод уменьшения таймфрейма свечи
+        public void DecreaseCandleInterval()
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 1;
 
-            SelectedCandleIndex--;
-            if (SelectedCandleIndex < minxIndex) SelectedCandleIndex = minxIndex;
-            GetAndSetCandlesIntoView(Title, SelectedCandleIndex);
-
-            ToolTipInfo = toolTip;
-
+            SelectedHistoricalTimeCandleIndex--;
+            if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;           
         }
 
-        private void UpdateToolTipInfo(int timeFrame)
-        {
-            ToolTipInfo.HorizontalOffset = 20;
-            ToolTipInfo.VerticalOffset = 20;
+        //private void UpdateToolTipInfo(int timeFrame)
+        //{
+        //    ToolTipInfo.HorizontalOffset = 20;
+        //    ToolTipInfo.VerticalOffset = 20;
 
-            ToolTipInfo.Content = $"Выбранный таймфрейм свечи: {timeFrame} минут";
-        }
+        //    ToolTipInfo.Content = $"Выбранный таймфрейм свечи: {timeFrame} минут";
+        //}
         #endregion
 
         #endregion
