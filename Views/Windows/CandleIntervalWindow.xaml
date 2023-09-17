@@ -9,10 +9,11 @@
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="CandleIntervalWindow"
     Width="300"
-    Height="300"
-    d:DataContext="{d:DesignInstance Type=vm:CandleIntervalWindowViewModel}"
+    Height="300"    
     AllowsTransparency="True"
     Background="#80000000"
+    ResizeMode="NoResize"
+    SizeToContent="WidthAndHeight"   
     WindowStyle="None"
     mc:Ignorable="d">
     <Window.DataContext>
@@ -31,21 +32,21 @@
                     <StackPanel
                         Grid.Row="0"
                         Height="30"
-                        Background="Transparent" HorizontalAlignment="Right">
+                        HorizontalAlignment="Right"
+                        Background="Transparent">
                         <!--  Темная панель  -->
                         <Button
                             Background="Transparent"
                             BorderBrush="Transparent"
                             BorderThickness="0"
-                            Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                            CommandParameter="{Binding TickerName}"
+                            Command="{Binding CloseCandleIntervalWindowCommand}"
                             FontWeight="Bold"
-                            Foreground="#ffffff"
-                            ToolTip="Открыть в новом окне">                          
+                            Foreground="#ffffff">
                             <materialDesign:PackIcon
                                 Width="28"
                                 Height="28"
-                                Kind="Close" HorizontalAlignment="Right" />
+                                HorizontalAlignment="Right"
+                                Kind="Close" />
                         </Button>
                     </StackPanel>
 

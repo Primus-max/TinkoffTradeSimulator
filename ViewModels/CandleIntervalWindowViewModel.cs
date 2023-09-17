@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Input;
 using Tinkoff.InvestApi.V1;
 using Tinkoff.Trading.OpenApi.Models;
+using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
+using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
@@ -27,11 +33,30 @@ namespace TinkoffTradeSimulator.ViewModels
 
         public CandleIntervalWindowViewModel()
         {
+            #region Инициализация команд
+            CloseCandleIntervalWindowCommand = new LambdaCommand(OnCloseleIntervalWindowCommandExecuted, CanCloseCandleIntervalWindowCommandExecute);
+            #endregion
+
             FillCandleTimeFrameButtons();
         }
 
 
+        #region Команды
+        public ICommand? CloseCandleIntervalWindowCommand { get; } = null;
+
+        private bool CanCloseCandleIntervalWindowCommandExecute(object p) => true;
+
+        private void OnCloseleIntervalWindowCommandExecuted(object sender)
+        {
+            // Закрываю окно с выбором таймфрема для свечи
+            CloseCandleIntervalWindow();
+        }
+        #endregion
+
+
+
         #region Методы
+        // Наполняю окно кнопками с таймфреймами
         private void FillCandleTimeFrameButtons()
         {
             // Получите все значения перечисления CadleInterval
@@ -62,10 +87,13 @@ namespace TinkoffTradeSimulator.ViewModels
             CandleTimeFrameButtons = tempCollection;
         }
 
-
-        #endregion
-
-        #region Комманды
+        // Метод закрытия окна с выбором таймфреймов
+        private void CloseCandleIntervalWindow()
+        {
+            // Здесь выполняется закрытие окна CandleIntervalWindow
+            Application.Current.Windows.OfType<CandleIntervalWindow>().FirstOrDefault()?.Close();
+        
+        }
 
         #endregion
 

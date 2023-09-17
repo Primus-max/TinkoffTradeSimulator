@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
@@ -224,6 +227,15 @@ namespace TinkoffTradeSimulator.ViewModels
         private static void OpenCandleIntervalWindow()
         {
             CandleIntervalWindow candleIntervalWindow = new();
+
+            // Получаем активное окно (ChartWindow)
+            Window activeWindow = Application.Current.Windows.OfType<ChartWindow>().SingleOrDefault(x => x.IsActive);
+
+            if (activeWindow != null)
+            {
+                candleIntervalWindow.Owner = activeWindow;
+                candleIntervalWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
 
             candleIntervalWindow.Show();
         }
