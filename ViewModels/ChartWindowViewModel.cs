@@ -90,6 +90,7 @@ namespace TinkoffTradeSimulator.ViewModels
         // Пустой (необходимый) конструктор
         public ChartWindowViewModel()
         {
+            // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
             #endregion
@@ -98,26 +99,19 @@ namespace TinkoffTradeSimulator.ViewModels
         // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
+            // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
             #endregion
 
             // Делаю доступным в этой области видимости полученный объект из конструктора
             _wpfPlot = plot;
+
             // Так можно изменить стили для окна
             //_wpfPlot.plt.Style(
             //    figureBackground: Color.DarkBlue,
             //    dataBackground: Color.DarkGoldenrod
             //    );
-
-            List<CandleTimeFrameButton> candleTimeFrames = new List<CandleTimeFrameButton>
-            {
-                new CandleTimeFrameButton { Name = "1 минута", Time = TimeSpan.FromMinutes(1) },
-                new CandleTimeFrameButton { Name = "5 минут", Time = TimeSpan.FromMinutes(5) },
-                new CandleTimeFrameButton { Name = "15 минут", Time = TimeSpan.FromMinutes(15) },
-                // Добавьте другие таймфреймы по аналогии
-            };
-
 
             ToolTipInfo = new ToolTip();
 
@@ -133,7 +127,6 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Методы
-
         private async void LoadAsyncData()
         {
             // Создаю клиента Тинькофф 
@@ -154,7 +147,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 //int selectedIntervalInMinutes = GetCandleIntervalByIndex(candleHistoricalIntervalIndex);
 
                 // Опередляю за какой временной интервал получать свечи
-                TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
+                TimeSpan timeFrame = TimeSpan.FromMinutes(candleHistoricalIntervalIndex);
 
                 List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, 1);
 
@@ -240,10 +233,10 @@ namespace TinkoffTradeSimulator.ViewModels
             candleIntervalWindow.Show();
         }
 
-        #region Выбор таймфрейма свечи       
+        #region Выбор исторического интервала для свечей       
 
         //// Метод увеличения таймфрейма свечи
-        public void IncreaseCandleInterval()
+        public void IncreaseCandleHistorical()
         {
             // Максимально допустимый индекс для выбора таймфрейма
             int maxIndex = 100;
@@ -254,8 +247,8 @@ namespace TinkoffTradeSimulator.ViewModels
             GetAndSetCandlesIntoView(Title, SelectedHistoricalTimeCandleIndex);
         }
 
-        //// Метод уменьшения таймфрейма свечи
-        public void DecreaseCandleInterval()
+        // Метод уменьшения таймфрейма свечи
+        public void DecreaseCandleIHistorical()
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 1;
@@ -264,15 +257,7 @@ namespace TinkoffTradeSimulator.ViewModels
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
             GetAndSetCandlesIntoView(Title, SelectedHistoricalTimeCandleIndex);
-        }
-
-        //private void UpdateToolTipInfo(int timeFrame)
-        //{
-        //    ToolTipInfo.HorizontalOffset = 20;
-        //    ToolTipInfo.VerticalOffset = 20;
-
-        //    ToolTipInfo.Content = $"Выбранный таймфрейм свечи: {timeFrame} минут";
-        //}
+        }       
         #endregion
 
         #endregion

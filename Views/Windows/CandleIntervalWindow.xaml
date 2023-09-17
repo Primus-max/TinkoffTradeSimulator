@@ -9,11 +9,11 @@
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="CandleIntervalWindow"
     Width="300"
-    Height="300"    
+    Height="300"
     AllowsTransparency="True"
     Background="#80000000"
     ResizeMode="NoResize"
-    SizeToContent="WidthAndHeight"   
+    SizeToContent="WidthAndHeight"
     WindowStyle="None"
     mc:Ignorable="d">
     <Window.DataContext>
@@ -55,7 +55,6 @@
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Margin="10" Columns="3" />
-                                <!--  Сетка для кнопок  -->
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -69,12 +68,15 @@
                                     VerticalAlignment="Center"
                                     Background="#FF343434"
                                     BorderBrush="Transparent"
+                                    Command="{Binding DataContext.SelectHistoricalCandleIntervalCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding }"
                                     Content="{Binding Name}"
                                     FontSize="16"
                                     Foreground="White" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
                 </Grid>
             </Border>
         </ControlTemplate>

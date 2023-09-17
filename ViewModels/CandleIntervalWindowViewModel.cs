@@ -21,6 +21,8 @@ namespace TinkoffTradeSimulator.ViewModels
     {
         #region Приватные свойства        
         private ObservableCollection<CandleTimeFrameButton> _candleTimeFrameButtons = null;
+        private CandleTimeFrameButton _selectedTimeFrame = null;
+        
         #endregion
 
         #region Публичные свойства
@@ -29,12 +31,21 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _candleTimeFrameButtons;
             set => Set(ref _candleTimeFrameButtons, value);
         }
+
+        public CandleTimeFrameButton SelectedTimeFrame
+        {
+            get => _selectedTimeFrame;
+            set => Set(ref _selectedTimeFrame, value);
+        }
+
         #endregion
 
         public CandleIntervalWindowViewModel()
         {
             #region Инициализация команд
             CloseCandleIntervalWindowCommand = new LambdaCommand(OnCloseleIntervalWindowCommandExecuted, CanCloseCandleIntervalWindowCommandExecute);
+
+            SelectHistoricalCandleIntervalCommand = new LambdaCommand(OnSelectHistoricalCandleIntervalCommandExecuted, CanSelectHistoricalCandleIntervalCommandExecute);
             #endregion
 
             FillCandleTimeFrameButtons();
@@ -51,11 +62,45 @@ namespace TinkoffTradeSimulator.ViewModels
             // Закрываю окно с выбором таймфрема для свечи
             CloseCandleIntervalWindow();
         }
+
+        public ICommand? SelectHistoricalCandleIntervalCommand { get; } = null;
+
+        private bool CanSelectHistoricalCandleIntervalCommandExecute(object p) => true;
+
+        private void OnSelectHistoricalCandleIntervalCommandExecuted(object sender)
+        {            
+            // Закрываю окно с выбором таймфрема для свечи
+            HandleTimeFrameButtonClicked((CandleTimeFrameButton)sender);
+        }
         #endregion
 
-
-
         #region Методы
+        // Обновляю информацию по тикеру на основе переданного таймфрейма
+        public  void HandleTimeFrameButtonClicked(CandleTimeFrameButton selectedButton)
+        {            
+            SelectedTimeFrame = selectedButton;
+
+            if (SelectedTimeFrame != null)
+            {
+                Tinkoff.InvestApi.V1.CandleInterval candleInterval;
+
+                // Преобразование Name из SelectedTimeFrame в CandleInterval
+                if (Enum.TryParse(SelectedTimeFrame.Name, out candleInterval))
+                {
+                    // Вызывайте метод GetAndSetCandlesIntoView, передавая candleInterval
+                    // await GetAndSetCandlesIntoView("YourTicker", candleInterval);
+
+                    var sdfg = candleInterval;
+                }
+                else
+                {
+                    // Обработка ошибки преобразования
+                    // Возможно, вы захотите вывести сообщение об ошибке или выполнить другие действия.
+                }
+            }
+        }
+
+
         // Наполняю окно кнопками с таймфреймами
         private void FillCandleTimeFrameButtons()
         {
@@ -73,13 +118,13 @@ namespace TinkoffTradeSimulator.ViewModels
                     var name = cadleInterval.ToString();
 
                     // Уберите символ "_"
-                    name = name.Replace("_", "");
+                    //name = name.Replace("_", "");
 
                     // Создайте TimeSpan на основе числового значения и единицы измерения
-                    var timeSpan = TimeSpan.FromMinutes((int)interval);
+                   // var timeSpan = TimeSpan.FromMinutes((int)interval);
 
                     // Создайте и добавьте кнопку во временную коллекцию
-                    tempCollection.Add(new CandleTimeFrameButton { Name = name, Time = timeSpan });
+                    tempCollection.Add(new CandleTimeFrameButton { Name = name });
                 }
             }
 

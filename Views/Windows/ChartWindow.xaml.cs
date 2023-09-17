@@ -33,12 +33,12 @@ namespace TinkoffTradeSimulator.Views.Windows
             if (e.Delta > 0)
             {
                 // Скролл вперёд (увеличение интервала)
-                _chartViewModel.IncreaseCandleInterval();
+                _chartViewModel.IncreaseCandleHistorical();
             }
             else
             {
                 // Скролл назад (уменьшение интервала)
-                _chartViewModel.DecreaseCandleInterval();
+                _chartViewModel.DecreaseCandleIHistorical();
             }
 
             // Обновляем график с новым интервалом свечей
