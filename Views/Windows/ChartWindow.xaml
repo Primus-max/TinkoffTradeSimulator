@@ -16,26 +16,38 @@
     <Window.DataContext>
         <vm:ChartWindowViewModel />
     </Window.DataContext>
-    <Grid>
-        <ScottPlot:WpfPlot x:Name="WpfPlot1" />
-        
-        <Grid.ToolTip>
-            <ToolTip Content="{Binding ChartToolTipManager}"
-                x:Name="ToolTipWpfPlot"
-                
-                Placement="MousePoint"
-                >
-                <!--<StackPanel>
-                    --><!--  Информация о свечах  --><!--
-                    <TextBlock FontWeight="Bold" Text="Информация о свечах:" />
-                    <TextBlock Text="{Binding ToolTipOpen}" />
-                    <TextBlock Text="{Binding ToolTipClose}" />
-                    --><!--  Информация о таймфрейме  --><!--
-                    <TextBlock FontWeight="Bold" Text="Таймфрейм:" />
-                    <TextBlock Text="1 минута" />
-                </StackPanel>-->
-            </ToolTip>
-        </Grid.ToolTip>
+    <Grid >        
+        <Grid.RowDefinitions>
+            <!-- Верхняя область с информацией о монете -->
+            <RowDefinition Height="Auto" />
+            <!-- Средняя область с кнопками -->
+            <RowDefinition Height="Auto" />
+            <!-- Основная область с графиком -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя область с информацией о монете -->
+        <Border Grid.Row="0" Padding="10">
+            <!-- Здесь можете разместить информацию о монете, например, имя монеты, текущую цену и т. д. -->
+            <!-- Пример: -->
+            <StackPanel>
+                <TextBlock Text="Монета: Bitcoin" />
+                <TextBlock Text="Текущая цена: $50,000" />
+            </StackPanel>
+        </Border>
+
+        <!-- Средняя область с кнопками -->
+        <Border Grid.Row="1" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <!-- Здесь будут кнопки для выбора таймфрейма свечей -->
+                <Button Content="1 мин" Cursor="Hand"  />
+
+                <!-- Добавьте другие кнопки для других таймфреймов -->
+            </StackPanel>
+        </Border>
+
+        <!-- Основная область с графиком -->
+        <ScottPlot:WpfPlot x:Name="WpfPlot1" Grid.Row="2" />
     </Grid>
 
 </Window>

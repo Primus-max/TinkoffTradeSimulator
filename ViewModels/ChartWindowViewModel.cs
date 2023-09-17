@@ -107,7 +107,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод получения свечей
-        public async void GetAndSetCandlesIntoView(string ticker, int candleIntervalIndex)
+        public async void GetAndSetCandlesIntoView(string ticker, int candleHistoricalIntervalIndex)
         {
             Title = ticker;
 
@@ -117,8 +117,9 @@ namespace TinkoffTradeSimulator.ViewModels
                 Share instrument = await tinkoff.GetShareByTicker(ticker);
 
                 // Получение интервала в минутах
-                int selectedIntervalInMinutes = GetCandleIntervalByIndex(candleIntervalIndex);
+                //int selectedIntervalInMinutes = GetCandleIntervalByIndex(candleHistoricalIntervalIndex);
 
+                // Опередляю за какой временной интервал получать свечи
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
                 List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, 1);
@@ -142,7 +143,7 @@ namespace TinkoffTradeSimulator.ViewModels
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(selectedIntervalInMinutes));
+                        timeSpan: TimeSpan.FromMinutes(1));
 
                     prices.Add(price);
                 }
@@ -198,7 +199,9 @@ namespace TinkoffTradeSimulator.ViewModels
             int maxIndex = 100;
 
             SelectedHistoricalTimeCandleIndex++;
-            if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex; 
+            if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
+
+            GetAndSetCandlesIntoView(Title, SelectedHistoricalTimeCandleIndex);
         }
 
         //// Метод уменьшения таймфрейма свечи
@@ -208,7 +211,9 @@ namespace TinkoffTradeSimulator.ViewModels
             int minxIndex = 1;
 
             SelectedHistoricalTimeCandleIndex--;
-            if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;           
+            if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
+
+            GetAndSetCandlesIntoView(Title, SelectedHistoricalTimeCandleIndex);
         }
 
         //private void UpdateToolTipInfo(int timeFrame)
