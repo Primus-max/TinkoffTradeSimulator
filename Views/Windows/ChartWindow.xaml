@@ -6,6 +6,7 @@
     xmlns:controls="clr-namespace:TinkoffTradeSimulator.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TinkoffTradeSimulator.Views.Windows"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="{Binding Title}"
@@ -16,37 +17,69 @@
     <Window.DataContext>
         <vm:ChartWindowViewModel />
     </Window.DataContext>
-    <Grid >        
+    <Grid>
         <Grid.RowDefinitions>
-            <!-- Верхняя область с информацией о монете -->
+            <!--  Верхняя область с информацией о монете  -->
             <RowDefinition Height="Auto" />
-            <!-- Средняя область с кнопками -->
+            <!--  Средняя область с кнопками и инструментами  -->
             <RowDefinition Height="Auto" />
-            <!-- Основная область с графиком -->
+            <!--  Основная область с графиком  -->
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Верхняя область с информацией о монете -->
+        <!--  Верхняя область с информацией о монете  -->
         <Border Grid.Row="0" Padding="10">
-            <!-- Здесь можете разместить информацию о монете, например, имя монеты, текущую цену и т. д. -->
-            <!-- Пример: -->
+            <!--  Здесь можете разместить информацию о монете, например, имя монеты, текущую цену и т. д.  -->
+            <!--  Пример:  -->
             <StackPanel>
-                <TextBlock Text="Монета: Bitcoin" />
-                <TextBlock Text="Текущая цена: $50,000" />
+                <StackPanel Orientation="Horizontal">
+                    <!--  Здесь будет логотип монеты (вставьте изображение или другой элемент)  -->
+                    <Image
+                        Width="100"
+                        Height="100"
+                        HorizontalAlignment="Left"
+                        Source="C:\Users\FedoTT\source\repos\TinkoffTradeSimulator\bin\Debug\net6.0-windows\png-transparent-gold-billion-logo-illustration-bitcoin-cryptocurrency-exchange-bitcoin-gold-material-metal.png" />
+                    <StackPanel Margin="10,5,0,0" VerticalAlignment="Center">
+                        <!--  Имя монеты  -->
+                        <TextBlock FontSize="18" Text="Bitcoin" />
+                        <!--  Текущая цена  -->
+                        <TextBlock FontSize="18" Text="Цена: $50,000" />
+                    </StackPanel>
+
+                    <StackPanel Margin="40,0,0,0">
+                        <!--  Цена на сколько в плюс или минус  -->
+                        <TextBlock Text="Открытие: $60,000" />
+                        <!--  Максимальная цена  -->
+                        <TextBlock Text="Максимальная: $60,000" />
+                        <!--  Минимальная цена  -->
+                        <TextBlock Text="Минимальная: $45,000" />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
+
         </Border>
 
-        <!-- Средняя область с кнопками -->
-        <Border Grid.Row="1" Padding="10">
-            <StackPanel Orientation="Horizontal">
-                <!-- Здесь будут кнопки для выбора таймфрейма свечей -->
-                <Button Content="1 мин" Cursor="Hand"  />
+        <!--  Средняя область с кнопками и инструментами  -->
+        <ToolBarTray Grid.Row="1">
+            <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
+                <Button Margin="8,0,0,0" Content="1 мин" />
+                <!--  Добавьте другие кнопки для других таймфреймов  -->
+                <Separator />
+                <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">
+                    <ComboBoxItem Content="Fries" IsSelected="True" />
+                    <ComboBoxItem Content="Waffles" />
+                    <ComboBoxItem Content="Chocolate" />
+                </ComboBox>-->
+                <TextBox
+                    Width="80"
+                    Margin="10,0"
+                    materialDesign:HintAssist.Hint="Купить"
+                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                    Text="1" />
+            </ToolBar>
+        </ToolBarTray>
 
-                <!-- Добавьте другие кнопки для других таймфреймов -->
-            </StackPanel>
-        </Border>
-
-        <!-- Основная область с графиком -->
+        <!--  Основная область с графиком  -->
         <ScottPlot:WpfPlot x:Name="WpfPlot1" Grid.Row="2" />
     </Grid>
 

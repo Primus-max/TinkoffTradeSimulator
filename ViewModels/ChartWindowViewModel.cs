@@ -1,5 +1,4 @@
 ﻿using ScottPlot;
-using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +7,7 @@ using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
+using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 
@@ -30,9 +30,17 @@ namespace TinkoffTradeSimulator.ViewModels
         private ChartToolTipManager _сhartToolTipManager;
 
         private ToolTip _toolTipInfo;
+
+        private ObservableCollection<CandleTimeFrameButton> _candleTimeFrameButtons;
         #endregion
 
         #region Публичные свойства
+        public ObservableCollection<CandleTimeFrameButton> CandleTimeFrameButtons
+        {
+            get => _candleTimeFrameButtons;
+            set => Set(ref _candleTimeFrameButtons, value);
+        }
+
         public string Title
         {
             get => _title;
@@ -83,6 +91,15 @@ namespace TinkoffTradeSimulator.ViewModels
             //    figureBackground: Color.DarkBlue,
             //    dataBackground: Color.DarkGoldenrod
             //    );
+
+            List<CandleTimeFrameButton> candleTimeFrames = new List<CandleTimeFrameButton>
+            {
+                new CandleTimeFrameButton { Name = "1 минута", Time = TimeSpan.FromMinutes(1) },
+                new CandleTimeFrameButton { Name = "5 минут", Time = TimeSpan.FromMinutes(5) },
+                new CandleTimeFrameButton { Name = "15 минут", Time = TimeSpan.FromMinutes(15) },
+                // Добавьте другие таймфреймы по аналогии
+            };
+
 
             ToolTipInfo = new ToolTip();
 
