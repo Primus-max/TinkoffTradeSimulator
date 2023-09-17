@@ -1,4 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using Tinkoff.InvestApi.V1;
+using Tinkoff.Trading.OpenApi.Models;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
 
@@ -23,9 +27,41 @@ namespace TinkoffTradeSimulator.ViewModels
 
         public CandleIntervalWindowViewModel()
         {
-
+            FillCandleTimeFrameButtons();
         }
+
+
         #region Методы
+        private void FillCandleTimeFrameButtons()
+        {
+            // Получите все значения перечисления CadleInterval
+            var intervals = Enum.GetValues(typeof(Tinkoff.InvestApi.V1.CandleInterval));
+
+            // Создайте временную коллекцию для хранения кнопок
+            var tempCollection = new ObservableCollection<CandleTimeFrameButton>();
+
+            foreach (var interval in intervals)
+            {
+                if (interval is Tinkoff.InvestApi.V1.CandleInterval cadleInterval)
+                {
+                    // Имя значения перечисления
+                    var name = cadleInterval.ToString();
+
+                    // Уберите символ "_"
+                    name = name.Replace("_", "");
+
+                    // Создайте TimeSpan на основе числового значения и единицы измерения
+                    var timeSpan = TimeSpan.FromMinutes((int)interval);
+
+                    // Создайте и добавьте кнопку во временную коллекцию
+                    tempCollection.Add(new CandleTimeFrameButton { Name = name, Time = timeSpan });
+                }
+            }
+
+            // Присвойте временную коллекцию свойству CandleTimeFrameButtons
+            CandleTimeFrameButtons = tempCollection;
+        }
+
 
         #endregion
 
