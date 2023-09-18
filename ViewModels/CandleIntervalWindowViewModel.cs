@@ -82,12 +82,12 @@ namespace TinkoffTradeSimulator.ViewModels
 
             if (SelectedTimeFrame != null)
             {
-                CandleInterval candleInterval;
-
                 // Преобразование Name из SelectedTimeFrame в CandleInterval
-                if (Enum.TryParse(SelectedTimeFrame.Name, out candleInterval))
+                if (Enum.TryParse(SelectedTimeFrame.Name, out CandleInterval candleInterval))
                 {
-                    // Обновляю данные с новыми значениями
+                    // Закрываю окно после выбора таймфрейма
+                    CloseCandleIntervalWindow();
+
 
                     ChartWindowViewModel chartWindowViewModel = new();
 
@@ -100,7 +100,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 else
                 {
                     // Обработка ошибки преобразования
-                   // Возможно, вы захотите вывести сообщение об ошибке или выполнить другие действия.
+                    // Возможно, вы захотите вывести сообщение об ошибке или выполнить другие действия.
                 }
             }
         }

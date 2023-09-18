@@ -121,7 +121,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
 
-            // Получаю обновлённый список свечей
+            // Получаю обновлённый список свечей c задаными параметрами
             OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
             // Получаю данные по тикерам (передаю именованные параметры)
              UpdateChartWindow(pricesArray);

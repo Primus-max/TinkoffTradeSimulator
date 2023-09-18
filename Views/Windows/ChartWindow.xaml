@@ -41,9 +41,16 @@
                         Source="C:\Users\FedoTT\source\repos\TinkoffTradeSimulator\bin\Debug\net6.0-windows\png-transparent-gold-billion-logo-illustration-bitcoin-cryptocurrency-exchange-bitcoin-gold-material-metal.png" />
                     <StackPanel Margin="10,5,0,0" VerticalAlignment="Center">
                         <!--  Имя монеты  -->
-                        <TextBlock FontSize="18" Text="Bitcoin" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="18" Text="Имя:" Margin=" 0 0 10 0" Width="60"/>
+                            <TextBlock FontSize="18" Text="APA" Foreground="Green" FontWeight="Bold"/>
+                        </StackPanel>
                         <!--  Текущая цена  -->
-                        <TextBlock FontSize="18" Text="Цена: $50,000" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="18" Text="Цена:" Width="60"  Margin=" 0 0 10 0"/>
+                            <TextBlock FontSize="18" Text="$50000.0" Foreground="Green" FontWeight="Bold"/>
+                        </StackPanel>
+                        <TextBlock Text="-123,0%" Foreground="Red" HorizontalAlignment="Right"/>
                     </StackPanel>
 
                     <StackPanel Margin="40,0,0,0">
