@@ -246,7 +246,7 @@ namespace TinkoffTradeSimulator.ViewModels
             _db.SaveChanges();
         }
 
-        // Метод продаже
+        // Метод продажи
         #endregion
 
         #endregion

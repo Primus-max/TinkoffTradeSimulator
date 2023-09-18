@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
+using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.ViewModels.Base;
@@ -11,10 +12,9 @@ using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
-    
+
     // TODO Выводить стоимость 
-    
-    // TODO подключить базу данных SQLite
+
     // TODO Создать таблицу с историей сделок. Если будет флаг IsClosed значит это уже история сделок
     // TODO Добавить строку поиска по тикерам
     // TODO Добавить вкладку Избранное, в ней будут храниться тикеры 
@@ -29,6 +29,7 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Приватные поля
         private InvestApiClient? _client = null;
         private ObservableCollection<TickerInfo>? _tickerInfoList;
+        private ObservableCollection<TradeRecordInfo>? _tradeHistoricalInfoList = null!;
         private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null;
         private AppContext _db = null!;
@@ -46,6 +47,11 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _tickerInfoList, value);
 
         }
+        public ObservableCollection<TradeRecordInfo> TradeHistoricalInfoList
+        {
+            get => _tradeHistoricalInfoList;
+            set => Set(ref _tradeHistoricalInfoList, value);
+        }
         #endregion
 
         #region Команды
@@ -59,9 +65,9 @@ namespace TinkoffTradeSimulator.ViewModels
             string tickerName = sender?.ToString();
 
             // Открываю окно
-            OpenChartWindow(tickerName);            
+            OpenChartWindow(tickerName);
         }
-              
+
         #endregion
 
 
@@ -73,13 +79,15 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            
+            DbManager dbManager = new DbManager();
+            _db = dbManager.InitializeDB();
             #endregion
 
             // Создаю новую ViewModel для окна
             _chartViewModel = new ChartWindowViewModel();
 
-            _ = LoadData();                        
+            _ = LoadData();
+            LoadHistorticalTradingData();
         }
 
         #region Методы
@@ -106,10 +114,19 @@ namespace TinkoffTradeSimulator.ViewModels
             }
         }
 
+        // Загружаю исторические данные торгов
+        private void LoadHistorticalTradingData()
+        {
+            // Здесь предполагается, что _db представляет ваш контекст базы данных Entity Framework.
+            // Вы можете использовать метод ToObservableCollection() для преобразования списка в ObservableCollection.
+            TradeHistoricalInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+        }
+
+
         // Открываю окно и строю в нём график
         private void OpenChartWindow(string tickerName)
         {
-            
+
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
 
@@ -127,8 +144,8 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод загрузки базы данных
-        
-        
+
+
         #endregion
     }
 

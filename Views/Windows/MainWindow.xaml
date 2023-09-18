@@ -189,15 +189,15 @@
                                 FontWeight="Bold"
                                 Text="История сделок" />
                         </StackPanel>
-                        <ListView MinHeight="100" ItemsSource="{Binding TickerInfoList}">
+                        <ListView MinHeight="100" ItemsSource="{Binding TradeHistoricalInfoList}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date}" Header="Время" />
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Цена" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Операция" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Объём" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Operation}" Header="Операция" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Operation}" Header="Объём" />
                                     <GridViewColumn>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>

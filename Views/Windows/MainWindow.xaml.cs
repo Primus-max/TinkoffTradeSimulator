@@ -25,7 +25,7 @@ namespace TinkoffTradeSimulator.Views.Windows
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             MainWindowViewModel viewModel = new MainWindowViewModel();
-            viewModel.LoadData();
+            //viewModel.();
         }
 
         private async void GetPrice()
