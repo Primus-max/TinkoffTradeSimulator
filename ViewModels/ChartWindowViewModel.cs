@@ -1,19 +1,14 @@
 ﻿using ScottPlot;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
-using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
 using TinkoffTradeSimulator.Infrastacture.Commands;
-using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
@@ -100,120 +95,50 @@ namespace TinkoffTradeSimulator.ViewModels
         // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
+
+            // Делаю доступным в этой области видимости полученный объект из конструктора
+            _wpfPlot = plot;
+
+            // TODO найти в чём причина обнуления Title при определённых сценариях
+            // Обновляю заголовок окна на актуальный 
             Title = ticker;
 
             // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
             #endregion
-
-            // Делаю доступным в этой области видимости полученный объект из конструктора
-            _wpfPlot = plot;
-
-            // Так можно изменить стили для окна
-            //_wpfPlot.plt.Style(
-            //    figureBackground: Color.DarkBlue,
-            //    dataBackground: Color.DarkGoldenrod
-            //    );
-
-            ToolTipInfo = new ToolTip();
-
-            string tickerName = ticker;
+                       
 
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
-
-            // Строю график и показываю по тикеру
-           
-
-            //SetDataToView();
         }
 
         #region Методы
+        
+        // Метод загрузки асинхронных данных для вызова из конструктора
         private async void LoadAsyncData()
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
 
+            // Получаю обновлённый список свечей
+            OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
             // Получаю данные по тикерам (передаю именованные параметры)
-           await GetAndSetCandlesIntoView(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+             UpdateChartWindow(pricesArray);
         }
+        
+        // Метод обновления окна с данными
+        public void UpdateChartWindow(OHLC[] prices)
+        {          
+            // Очищаем текущий график перед добавлением новых свечей
+            _wpfPlot?.Plot.Clear();                   
 
-        // Метод получения свечей
-        // Поля или свойства для хранения текущих значений
-        private string _currentTicker = "DefaultTicker";
-        private int _currentCandleHistoricalIntervalIndex = 0;
+            // Добавляю полученный список через специальный метод ScottPlot
+            _wpfPlot?.Plot.AddCandlesticks(prices);
 
-        public async Task GetAndSetCandlesIntoView(string ticker = null, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
-        {
-            // Обновляем текущие значения, если параметры были переданы
-            if (ticker != null)
-            {
-                _currentTicker = ticker;
-            }
-
-            if (candleHistoricalIntervalIndex != null)
-            {
-                _currentCandleHistoricalIntervalIndex = candleHistoricalIntervalIndex.Value;
-            }
-
-            Title = _currentTicker;
-
-            try
-            {
-                TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-                Share instrument = await tinkoff.GetShareByTicker(_currentTicker);
-
-                // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex);
-
-                // Определение CandleInterval на основе параметра или значения по умолчанию
-                CandleInterval interval = candleInterval ?? CandleInterval._1Min;
-
-                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, interval);
-
-                List<OHLC> prices = new List<OHLC>();
-
-                foreach (var candle in candles)
-                {
-                    // Преобразовываем данные в OHLC
-                    double openPriceCandle = Convert.ToDouble(candle.Open);
-                    double highPriceCandle = Convert.ToDouble(candle.High);
-                    double lowPriceCandle = Convert.ToDouble(candle.Low);
-                    double closePriceCandle = Convert.ToDouble(candle.Close);
-
-                    // Преобразуем Timestamp в DateTime
-                    DateTime candleTime = candle.Time.ToDateTime();
-
-                    OHLC price = new OHLC(
-                        open: openPriceCandle,
-                        high: highPriceCandle,
-                        low: lowPriceCandle,
-                        close: closePriceCandle,
-                        timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex));
-
-                    prices.Add(price);
-                }
-
-                OHLC[] pricesArray = prices.ToArray();
-
-                // Очищаем текущий график перед добавлением новых свечей
-                _wpfPlot?.Plot.Clear();
-
-                _wpfPlot?.Plot.AddCandlesticks(pricesArray);
-
-                // Обновляем информацию в ToolTip
-                // UpdateToolTipInfo(selectedIntervalInMinutes);
-
-                _wpfPlot?.Refresh();
-            }
-            catch (Exception)
-            {
-                // Обработка ошибок
-            }
+            // Обновляю view
+            _wpfPlot?.Refresh();
         }
-
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее
         private static int GetCandleIntervalByIndex(int index)
@@ -257,7 +182,7 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Выбор исторического интервала для свечей       
 
         //// Метод увеличения таймфрейма свечи
-        public void IncreaseCandleHistorical()
+        public async void IncreaseCandleHistorical()
         {
             // Максимально допустимый индекс для выбора таймфрейма
             int maxIndex = 100;
@@ -265,11 +190,11 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex++;
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
 
-            GetAndSetCandlesIntoView(Title, SelectedHistoricalTimeCandleIndex);
+            await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
         }
 
         // Метод уменьшения таймфрейма свечи
-        public void DecreaseCandleIHistorical()
+        public async void DecreaseCandleIHistorical()
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 1;
@@ -277,8 +202,8 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex--;
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
-            GetAndSetCandlesIntoView(Title, SelectedHistoricalTimeCandleIndex);
-        }       
+            await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
+        }
         #endregion
 
         #endregion
