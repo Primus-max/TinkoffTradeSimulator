@@ -1,4 +1,5 @@
 ﻿using ScottPlot;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,9 @@ using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
+using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
+using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
@@ -22,6 +25,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private InvestApiClient? _client = null;
         private WpfPlot? _wpfPlot = null;
         private string _title = string.Empty;
+        private AppContext _db = null!;
 
         // Приватное свойство для определения временно интервала свечей
         private int _selectedHistoricalTimeCandleIndex = 10;
@@ -81,6 +85,17 @@ namespace TinkoffTradeSimulator.ViewModels
             // Открываю окно с выбором таймфрема для свечи
             OpenCandleIntervalWindow();
         }
+
+        public ICommand? BuyTickerCommand { get; } = null;
+
+        private bool CanBuyTickerCommandExecute(object p) => true;
+
+        private void OnBuyTickerCommandExecuted(object sender)
+        {
+            double value = Convert.ToDouble(sender);
+
+            BuyTicker(value);
+        }
         #endregion
 
         // Пустой (необходимый) конструктор
@@ -89,6 +104,13 @@ namespace TinkoffTradeSimulator.ViewModels
             // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
+
+            BuyTickerCommand = new LambdaCommand(OnBuyTickerCommandExecuted, CanBuyTickerCommandExecute);
+            #endregion
+
+            #region Инициализация базы данных
+            DbManager dbManager = new();
+            _db = dbManager.InitializeDB();
             #endregion
         }
 
@@ -107,7 +129,12 @@ namespace TinkoffTradeSimulator.ViewModels
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
             #endregion
-                       
+
+            #region Инициализация базы данных
+            DbManager dbManager = new ();
+            _db = dbManager.InitializeDB();
+            #endregion
+
 
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
@@ -204,6 +231,22 @@ namespace TinkoffTradeSimulator.ViewModels
 
             await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
         }
+
+        // Метод покупки 
+        private void BuyTicker(double value)
+        {
+            TradeRecordInfo tradeRecordInfo = new TradeRecordInfo();
+
+            tradeRecordInfo.Price = 3444;
+            tradeRecordInfo.TickerName = Title;
+            tradeRecordInfo.IsBuy = true;
+            tradeRecordInfo.Operation = "Продажа";
+
+            _db.TradeRecordsInfo.Add(tradeRecordInfo);
+            _db.SaveChanges();
+        }
+
+        // Метод продаже
         #endregion
 
         #endregion

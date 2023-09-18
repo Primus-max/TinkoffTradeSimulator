@@ -42,15 +42,34 @@
                     <StackPanel Margin="10,5,0,0" VerticalAlignment="Center">
                         <!--  Имя монеты  -->
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock FontSize="18" Text="Имя:" Margin=" 0 0 10 0" Width="60"/>
-                            <TextBlock FontSize="18" Text="APA" Foreground="Green" FontWeight="Bold"/>
+                            <TextBlock
+                                Width="60"
+                                Margin="0,0,10,0"
+                                FontSize="18"
+                                Text="Имя:" />
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="Green"
+                                Text="APA" />
                         </StackPanel>
                         <!--  Текущая цена  -->
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock FontSize="18" Text="Цена:" Width="60"  Margin=" 0 0 10 0"/>
-                            <TextBlock FontSize="18" Text="$50000.0" Foreground="Green" FontWeight="Bold"/>
+                            <TextBlock
+                                Width="60"
+                                Margin="0,0,10,0"
+                                FontSize="18"
+                                Text="Цена:" />
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="Green"
+                                Text="$50000.0" />
                         </StackPanel>
-                        <TextBlock Text="-123,0%" Foreground="Red" HorizontalAlignment="Right"/>
+                        <TextBlock
+                            HorizontalAlignment="Right"
+                            Foreground="Red"
+                            Text="-123,0%" />
                     </StackPanel>
 
                     <StackPanel Margin="40,0,0,0">
@@ -69,6 +88,7 @@
         <!--  Средняя область с кнопками и инструментами  -->
         <ToolBarTray Grid.Row="1">
             <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
+                <TextBlock VerticalAlignment="Center" Text="Таймфрейм:" />
                 <Button
                     Margin="8,0,0,0"
                     Command="{Binding OpenCandleIntervalWindowCommand}"
@@ -80,12 +100,43 @@
                     <ComboBoxItem Content="Waffles" />
                     <ComboBoxItem Content="Chocolate" />
                 </ComboBox>-->
-                <TextBox
-                    Width="80"
-                    Margin="10,0"
-                    materialDesign:HintAssist.Hint="Купить"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                    Text="1" />
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBox
+                        x:Name="QuantityTextBox"
+                        Width="80"
+                        Margin="10,0,20,0"
+                        materialDesign:HintAssist.Hint="Сколько"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="1" />
+                    <Button
+                        Background="DarkGray"
+                        BorderBrush="Transparent"
+                        Command="{Binding BuyTickerCommand}"
+                        CommandParameter="{Binding ElementName=QuantityTextBox, Path=Text}"
+                        Content="Купить" />
+                </StackPanel>
+
+
+                <Separator />
+                <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">
+    <ComboBoxItem Content="Fries" IsSelected="True" />
+    <ComboBoxItem Content="Waffles" />
+    <ComboBoxItem Content="Chocolate" />
+</ComboBox>-->
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <TextBox
+                        Width="80"
+                        Margin="10,0,20,0"
+                        materialDesign:HintAssist.Hint="Сколько"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="1" />
+                    <Button
+                        Background="DarkGray"
+                        BorderBrush="Transparent"
+                        Content="Продать" />
+                </StackPanel>
+
+
             </ToolBar>
         </ToolBarTray>
 

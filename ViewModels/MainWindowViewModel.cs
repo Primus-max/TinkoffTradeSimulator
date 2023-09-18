@@ -73,13 +73,13 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            InitializeDB();
+            
             #endregion
 
             // Создаю новую ViewModel для окна
             _chartViewModel = new ChartWindowViewModel();
 
-            _ = LoadData();
+            _ = LoadData();                        
         }
 
         #region Методы
@@ -127,16 +127,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод загрузки базы данных
-        private void InitializeDB()
-        {
-            // Экземпляр базы данных
-            _db = new AppContext();
-
-            // гарантируем, что база данных создана
-            _db.Database.EnsureCreated();
-            // загружаем данные из БД
-            _db.TradeRecordsInfo.Load();
-        }
+        
         
         #endregion
     }
