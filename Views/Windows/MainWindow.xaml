@@ -130,7 +130,7 @@
                                 Text="Открытые сделки" />
                         </StackPanel>
 
-                        <ListView MinHeight="100" ItemsSource="{Binding TradingInfoList}">
+                        <ListView MinHeight="100" ItemsSource="{Binding TradingInfoList}" SelectedItem="{Binding  SelectedTradeInfo}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
@@ -146,9 +146,10 @@
                                                     Background="Transparent"
                                                     BorderBrush="Transparent"
                                                     BorderThickness="0"
-                                                    Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{Binding DataContext.DeleteTradingTickerInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     Foreground="Red"
-                                                    ToolTip="Удалить">
+                                                    ToolTip="Удалить"
+                                                    CommandParameter="{Binding}">
                                                     <materialDesign:PackIcon
                                                         Width="24"
                                                         Height="24"

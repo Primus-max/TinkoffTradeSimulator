@@ -34,6 +34,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null;
         private AppContext _db = null!;
+        private TradeRecordInfo? _selectedTradeInfo = null!;
         #endregion
 
         #region Публичные поля
@@ -59,6 +60,12 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _tradingInfoList;
             set => Set(ref _tradingInfoList, value);
         }
+
+        public TradeRecordInfo SelectedTradeInfo
+        {
+            get => _selectedTradeInfo;
+            set => Set(ref _selectedTradeInfo, value);
+        }
         #endregion
 
         #region Команды
@@ -75,6 +82,17 @@ namespace TinkoffTradeSimulator.ViewModels
             OpenChartWindow(tickerName);
         }
 
+        public ICommand? DeleteTradingTickerInfoCommand { get; } = null;
+
+        private bool CanDeleteDradingTickerInfoCommandExecute(object p) => true;
+
+        private void OnDeleteDradingTickerInfoCommandExecuted(object sender)
+        {
+            TradeRecordInfo? tickerInfo = sender as TradeRecordInfo;
+
+            DbManager.Delete(tickerInfo);
+        }
+
         #endregion
 
 
@@ -83,6 +101,8 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             #region Инициализация команд
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
+
+            DeleteTradingTickerInfoCommand = new LambdaCommand(OnDeleteDradingTickerInfoCommandExecuted, CanDeleteDradingTickerInfoCommandExecute);
             #endregion
 
             #region Инициализация базы данных
@@ -125,7 +145,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         // Загружаю / отображаю исторические данные торгов
         private void LoadHistorticalTradingData()
-        {            
+        {
             // Привожу у нужным данным коллекцию из базы данных
             TradeHistoricalInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
         }

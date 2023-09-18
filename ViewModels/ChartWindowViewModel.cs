@@ -96,6 +96,8 @@ namespace TinkoffTradeSimulator.ViewModels
 
             BuyTicker(value);
         }
+
+        
         #endregion
 
         // Пустой (необходимый) конструктор
@@ -105,7 +107,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
 
-            BuyTickerCommand = new LambdaCommand(OnBuyTickerCommandExecuted, CanBuyTickerCommandExecute);
+            BuyTickerCommand = new LambdaCommand(OnBuyTickerCommandExecuted, CanBuyTickerCommandExecute);            
             #endregion
 
             #region Инициализация базы данных
@@ -231,6 +233,8 @@ namespace TinkoffTradeSimulator.ViewModels
 
             await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
         }
+        // Метод продажи
+        #endregion
 
         // Метод покупки 
         private void BuyTicker(double value)
@@ -242,12 +246,8 @@ namespace TinkoffTradeSimulator.ViewModels
             tradeRecordInfo.IsBuy = true;
             tradeRecordInfo.Operation = "Продажа";
 
-            _db.TradeRecordsInfo.Add(tradeRecordInfo);
-            _db.SaveChanges();
+            DbManager.SaveData(tradeRecordInfo);
         }
-
-        // Метод продажи
-        #endregion
 
         #endregion
     }
