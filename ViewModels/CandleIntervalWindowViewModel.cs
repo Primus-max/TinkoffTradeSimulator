@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Tinkoff.InvestApi.V1;
@@ -67,7 +68,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private bool CanSelectHistoricalCandleIntervalCommandExecute(object p) => true;
 
-        private void OnSelectHistoricalCandleIntervalCommandExecuted(object sender)
+        private  void OnSelectHistoricalCandleIntervalCommandExecuted(object sender)
         {            
             // Закрываю окно с выбором таймфрема для свечи
             HandleTimeFrameButtonClicked((CandleTimeFrameButton)sender);
@@ -76,7 +77,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Методы
         // Обновляю информацию по тикеру на основе переданного таймфрейма
-        public  void HandleTimeFrameButtonClicked(CandleTimeFrameButton selectedButton)
+        public async  Task HandleTimeFrameButtonClicked(CandleTimeFrameButton selectedButton)
         {            
             SelectedTimeFrame = selectedButton;
 
@@ -88,7 +89,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 if (Enum.TryParse(SelectedTimeFrame.Name, out candleInterval))
                 {
                     // Вызывайте метод GetAndSetCandlesIntoView, передавая candleInterval
-                    // await GetAndSetCandlesIntoView("YourTicker", candleInterval);
+                   // await GetAndSetCandlesIntoView(candleInterval: candleInterval) ;
 
                     var sdfg = candleInterval;
                 }
@@ -99,7 +100,6 @@ namespace TinkoffTradeSimulator.ViewModels
                 }
             }
         }
-
 
         // Наполняю окно кнопками с таймфреймами
         private void FillCandleTimeFrameButtons()

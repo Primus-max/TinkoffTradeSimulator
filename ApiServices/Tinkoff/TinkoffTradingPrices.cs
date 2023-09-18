@@ -38,7 +38,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         }
 
         // Получаю исторические свечи по Share и временному промежутку
-        public async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, int candleIndexInterval)
+        public async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, CandleInterval candleIndexInterval)
         {            
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset intervalAgo = now.Subtract(timeFrame);
@@ -51,7 +51,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 InstrumentId = instrument.Uid,
                 From = intervalAgoTimestamp,
                 To = nowTimestamp,
-                Interval = GetCandleIntervalByIndex(candleIndexInterval)
+                Interval = candleIndexInterval
             };
 
             try
@@ -69,6 +69,8 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 return new List<HistoricCandle>();
             }
         }
+
+        //
 
         //  Метод получения свойства из CandleInterval по индексу, который получаем при скролле, чтобы сформировать таймфрейм свечи
         public static CandleInterval GetCandleIntervalByIndex(int index)

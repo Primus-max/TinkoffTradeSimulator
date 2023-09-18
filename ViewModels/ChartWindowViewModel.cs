@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -99,6 +100,8 @@ namespace TinkoffTradeSimulator.ViewModels
         // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
+            Title = ticker;
+
             // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
@@ -121,7 +124,7 @@ namespace TinkoffTradeSimulator.ViewModels
             LoadAsyncData();
 
             // Строю график и показываю по тикеру
-            GetAndSetCandlesIntoView(tickerName, SelectedHistoricalTimeCandleIndex);
+           
 
             //SetDataToView();
         }
@@ -131,31 +134,49 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
+
+            // Получаю данные по тикерам (передаю именованные параметры)
+           await GetAndSetCandlesIntoView(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
         }
 
         // Метод получения свечей
-        public async void GetAndSetCandlesIntoView(string ticker, int candleHistoricalIntervalIndex)
+        // Поля или свойства для хранения текущих значений
+        private string _currentTicker = "DefaultTicker";
+        private int _currentCandleHistoricalIntervalIndex = 0;
+
+        public async Task GetAndSetCandlesIntoView(string ticker = null, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
         {
-            Title = ticker;
+            // Обновляем текущие значения, если параметры были переданы
+            if (ticker != null)
+            {
+                _currentTicker = ticker;
+            }
+
+            if (candleHistoricalIntervalIndex != null)
+            {
+                _currentCandleHistoricalIntervalIndex = candleHistoricalIntervalIndex.Value;
+            }
+
+            Title = _currentTicker;
 
             try
             {
                 TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-                Share instrument = await tinkoff.GetShareByTicker(ticker);
+                Share instrument = await tinkoff.GetShareByTicker(_currentTicker);
 
-                // Получение интервала в минутах
-                //int selectedIntervalInMinutes = GetCandleIntervalByIndex(candleHistoricalIntervalIndex);
+                // Определяем временной интервал для запроса свечей
+                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex);
 
-                // Опередляю за какой временной интервал получать свечи
-                TimeSpan timeFrame = TimeSpan.FromMinutes(candleHistoricalIntervalIndex);
+                // Определение CandleInterval на основе параметра или значения по умолчанию
+                CandleInterval interval = candleInterval ?? CandleInterval._1Min;
 
-                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, 1);
+                List<HistoricCandle> candles = await tinkoff.GetCandles(instrument, timeFrame, interval);
 
                 List<OHLC> prices = new List<OHLC>();
 
                 foreach (var candle in candles)
                 {
-                    // Приводим данные к типу OHLC
+                    // Преобразовываем данные в OHLC
                     double openPriceCandle = Convert.ToDouble(candle.Open);
                     double highPriceCandle = Convert.ToDouble(candle.High);
                     double lowPriceCandle = Convert.ToDouble(candle.Low);
@@ -170,7 +191,7 @@ namespace TinkoffTradeSimulator.ViewModels
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(1));
+                        timeSpan: TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex));
 
                     prices.Add(price);
                 }
@@ -182,9 +203,8 @@ namespace TinkoffTradeSimulator.ViewModels
 
                 _wpfPlot?.Plot.AddCandlesticks(pricesArray);
 
-
-                // Обновляю информацию в TollTip
-                //UpdateToolTipInfo( selectedIntervalInMinutes);
+                // Обновляем информацию в ToolTip
+                // UpdateToolTipInfo(selectedIntervalInMinutes);
 
                 _wpfPlot?.Refresh();
             }
@@ -193,6 +213,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 // Обработка ошибок
             }
         }
+
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее
         private static int GetCandleIntervalByIndex(int index)
