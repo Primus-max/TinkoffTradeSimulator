@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
@@ -30,6 +31,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private ObservableCollection<TickerInfo>? _tickerInfoList;
         private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null;
+        private AppContext _db = null!;
         #endregion
 
         #region Публичные поля
@@ -70,10 +72,14 @@ namespace TinkoffTradeSimulator.ViewModels
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
             #endregion
 
+            #region Инициализация базы данных
+            InitializeDB();
+            #endregion
+
             // Создаю новую ViewModel для окна
             _chartViewModel = new ChartWindowViewModel();
 
-            LoadData();
+            _ = LoadData();
         }
 
         #region Методы
@@ -118,6 +124,18 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Открываем окно
             chartWindow.Show();
+        }
+
+        // Метод загрузки базы данных
+        private void InitializeDB()
+        {
+            // Экземпляр базы данных
+            _db = new AppContext();
+
+            // гарантируем, что база данных создана
+            _db.Database.EnsureCreated();
+            // загружаем данные из БД
+            _db.TradeRecordsInfo.Load();
         }
         
         #endregion
