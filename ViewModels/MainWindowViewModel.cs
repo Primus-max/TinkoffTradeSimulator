@@ -30,6 +30,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private InvestApiClient? _client = null;
         private ObservableCollection<TickerInfo>? _tickerInfoList;
         private ObservableCollection<TradeRecordInfo>? _tradeHistoricalInfoList = null!;
+        private ObservableCollection<TradeRecordInfo>? _tradingInfoList = null!;
         private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null;
         private AppContext _db = null!;
@@ -51,6 +52,12 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _tradeHistoricalInfoList;
             set => Set(ref _tradeHistoricalInfoList, value);
+        }
+
+        public ObservableCollection<TradeRecordInfo> TradingInfoList
+        {
+            get => _tradingInfoList;
+            set => Set(ref _tradingInfoList, value);
         }
         #endregion
 
@@ -86,14 +93,16 @@ namespace TinkoffTradeSimulator.ViewModels
             // Создаю новую ViewModel для окна
             _chartViewModel = new ChartWindowViewModel();
 
-            _ = LoadData();
+
+            _ = LoadDataFromTinkoffApi();
             LoadHistorticalTradingData();
+            LoadTradingData();
         }
 
         #region Методы
 
-        // Загружаю актуальные данные из Tinkoff InvestAPI 
-        public async Task LoadData()
+        // Загружаю / отображаю актуальные данные из Tinkoff InvestAPI 
+        public async Task LoadDataFromTinkoffApi()
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
@@ -114,12 +123,18 @@ namespace TinkoffTradeSimulator.ViewModels
             }
         }
 
-        // Загружаю исторические данные торгов
+        // Загружаю / отображаю исторические данные торгов
         private void LoadHistorticalTradingData()
-        {
-            // Здесь предполагается, что _db представляет ваш контекст базы данных Entity Framework.
-            // Вы можете использовать метод ToObservableCollection() для преобразования списка в ObservableCollection.
+        {            
+            // Привожу у нужным данным коллекцию из базы данных
             TradeHistoricalInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+        }
+
+        // Загружаю / отображаю актуальные (торговые данные)
+        private void LoadTradingData()
+        {
+            // Привожу у нужным данным коллекцию из базы данных
+            TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
         }
 
 

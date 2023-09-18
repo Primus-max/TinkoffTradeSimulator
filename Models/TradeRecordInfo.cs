@@ -14,8 +14,9 @@ namespace TinkoffTradeSimulator.Models
         public double Price { get; set; } = 0; // Цена
         public string? Operation { get; set; } = string.Empty;// Тип операции (покупка/продажа и т. д.)
         public int Volume { get; set; } = 0; // Объем сделки
-        public bool IsBuy { get; set; } = false; // Куплена
-        public bool IsSell { get; set; } = false; // Продана
+        public bool IsBuy { get; set; } = false; // Покупка
+        public bool IsSell { get; set; } = false; // Продажа
+        public bool IsClosed { get; set; } = false; // Закрытая / открытая сделка
     }
 }
 

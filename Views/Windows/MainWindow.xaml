@@ -130,15 +130,15 @@
                                 Text="Открытые сделки" />
                         </StackPanel>
 
-                        <ListView MinHeight="100" ItemsSource="{Binding TickerInfoList}">
+                        <ListView MinHeight="100" ItemsSource="{Binding TradingInfoList}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date.TimeOfDay}" Header="Время" />
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Цена" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Объём" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Прибыль" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Прибыль" />
                                     <GridViewColumn>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>

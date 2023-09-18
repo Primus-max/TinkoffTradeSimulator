@@ -19,40 +19,40 @@ namespace TinkoffTradeSimulator.Views.Windows
             InitializeComponent();
 
             Loaded += MainWindow_Loaded;
-            GetPrice();
+            //GetPrice();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            MainWindowViewModel viewModel = new MainWindowViewModel();
+            MainWindowViewModel viewModel = new();
             //viewModel.();
         }
 
-        private async void GetPrice()
-        {
-           var client = await TinkoffClient.CreateAsync();
-            var nstruments = await client?.Instruments?.SharesAsync();
+        //private async void GetPrice()
+        //{
+        //   var client = await TinkoffClient.CreateAsync();
+        //    var nstruments = await client?.Instruments?.SharesAsync();
 
             
 
-            List<TickerInfo> tickers = new List<TickerInfo>();
+        //    List<TickerInfo> tickers = new List<TickerInfo>();
 
-            foreach ( var n in nstruments.Instruments) 
-            {
-                TickerInfo tickerInfo = new TickerInfo
-                {
-                    Id = n.Isin,
-                    TickerName = n.Name
-                };
+        //    foreach ( var n in nstruments.Instruments) 
+        //    {
+        //        TickerInfo tickerInfo = new TickerInfo
+        //        {
+        //            Id = n.Isin,
+        //            TickerName = n.Name
+        //        };
 
-                tickers.Add(tickerInfo);
-            }
+        //        tickers.Add(tickerInfo);
+        //    }
 
             
 
-            Instrument instrument1 = new Instrument();
+        //    Instrument instrument1 = new Instrument();
            
-        }
+        //}
 
         private void ListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
