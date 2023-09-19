@@ -23,7 +23,6 @@ namespace TinkoffTradeSimulator.Views.Windows
 
             // Добавляю своё событие скролла
             WpfPlot1.MouseWheel += OnMouseWheel;
-            
         }
 
         // Событие сролла мышки для масштабирования таймфрейма свечи

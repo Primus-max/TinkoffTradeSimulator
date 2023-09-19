@@ -12,6 +12,7 @@
     Title="{Binding Title}"
     Width="900"
     Height="600"
+    Background="#A5424B51"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
     <Window.DataContext>
@@ -38,7 +39,7 @@
                         Width="100"
                         Height="100"
                         HorizontalAlignment="Left"
-                        Source="C:\Users\FedoTT\source\repos\TinkoffTradeSimulator\bin\Debug\net6.0-windows\png-transparent-gold-billion-logo-illustration-bitcoin-cryptocurrency-exchange-bitcoin-gold-material-metal.png" />
+                        Source="C:\Users\FedoTT\source\repos\TinkoffTradeSimulator\bin\Debug\net6.0-windows\png-transparent-bitcoin-currency-coin-money-bank-finances-currency-symbol-transparent-background-gold-medal.png" />
                     <StackPanel Margin="10,5,0,0" VerticalAlignment="Center">
                         <!--  Имя монеты  -->
                         <StackPanel Orientation="Horizontal">
@@ -101,7 +102,14 @@
                     <ComboBoxItem Content="Waffles" />
                     <ComboBoxItem Content="Chocolate" />
                 </ComboBox>-->
+
                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Command="{Binding BuyTickerCommand}"
+                        CommandParameter="{Binding ElementName=QuantityTextBox, Path=Text}"
+                        Content="Купить" />
                     <TextBox
                         x:Name="QuantityTextBox"
                         Width="80"
@@ -110,32 +118,17 @@
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                         Text="1" />
                     <Button
-                        Background="DarkGray"
+                        Background="Transparent"
                         BorderBrush="Transparent"
-                        Command="{Binding BuyTickerCommand}"
-                        CommandParameter="{Binding ElementName=QuantityTextBox, Path=Text}"
-                        Content="Купить" />
+                        Content="Продать" />
                 </StackPanel>
-
-
                 <Separator />
                 <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">
     <ComboBoxItem Content="Fries" IsSelected="True" />
     <ComboBoxItem Content="Waffles" />
     <ComboBoxItem Content="Chocolate" />
 </ComboBox>-->
-                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                    <TextBox
-                        Width="80"
-                        Margin="10,0,20,0"
-                        materialDesign:HintAssist.Hint="Сколько"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Text="1" />
-                    <Button
-                        Background="DarkGray"
-                        BorderBrush="Transparent"
-                        Content="Продать" />
-                </StackPanel>
+
 
 
             </ToolBar>

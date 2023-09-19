@@ -1,6 +1,7 @@
 ﻿using ScottPlot;
 using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,6 +17,7 @@ using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
+using Style = ScottPlot.Style;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
@@ -120,6 +122,11 @@ namespace TinkoffTradeSimulator.ViewModels
             // Делаю доступным в этой области видимости полученный объект из конструктора
             _wpfPlot = plot;
 
+
+            // Устанавливаю стили для графика
+            SetPlotStyle(ticker);
+
+
             // TODO найти в чём причина обнуления Title при определённых сценариях
             // Обновляю заголовок окна на актуальный 
             Title = ticker;
@@ -138,6 +145,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
         }
+               
 
         #region Методы
 
@@ -250,6 +258,15 @@ namespace TinkoffTradeSimulator.ViewModels
             tradeRecordInfo.Operation = "Продажа";
 
             DbManager.SaveData(tradeRecordInfo);
+        }
+
+        // Метод установки стилей для графика
+        private void SetPlotStyle(string tickerName)
+        {
+            _wpfPlot.Plot.Style(Style.Gray1);
+            _wpfPlot.Plot.Title($"График свечей для {tickerName}");
+            _wpfPlot.Plot.XLabel("Ось Х");
+            _wpfPlot.Plot.YLabel("Ось Y");
         }
 
         #endregion
