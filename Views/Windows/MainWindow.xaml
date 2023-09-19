@@ -76,7 +76,38 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
+                <materialDesign:ColorZone
+                    Grid.Column="0"
+                    Padding="8,4,8,4"
+                    Panel.ZIndex="1"
+                    materialDesign:ElevationAssist.Elevation="Dp2"
+                    CornerRadius="2"
+                    Mode="Inverted">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            Grid.Column="0"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Hint="Поиск"
+                            materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                            BorderThickness="0" />
+
+                        <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
+                            <materialDesign:PackIcon Kind="Search" Opacity=".56" />
+                        </Button>
+                    </Grid>
+                </materialDesign:ColorZone>
+            </Grid>
             <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
                 <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -111,9 +142,9 @@
                                                     Foreground="#0037e5"
                                                     ToolTip="Открыть в новом окне">
                                                     <!--<materialDesign:PackIcon
-    Width="28"
-    Height="28"
-    Kind="StarPlusOutline" />-->
+Width="28"
+Height="28"
+Kind="StarPlusOutline" />-->
                                                     <materialDesign:PackIcon
                                                         Width="28"
                                                         Height="28"
@@ -131,9 +162,8 @@
                     <TextBlock Margin="8" Text="Список избранных тикеров" />
                 </TabItem>
             </TabControl>
-
-
         </DockPanel>
+
 
 
         <!--  Сплиттер между левой и правой областью  -->
