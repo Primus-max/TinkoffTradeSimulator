@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-
+	
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.57.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
@@ -36,4 +36,9 @@
     </None>
   </ItemGroup>
 
+	<ItemGroup>
+		<Folder Include="Converters\" />
+	</ItemGroup>
+
+ 
 </Project>

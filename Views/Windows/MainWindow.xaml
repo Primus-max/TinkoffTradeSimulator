@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:TinkoffTradeSimulator"
+    xmlns:local="clr-namespace:TinkoffTradeSimulator.Services"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
@@ -24,6 +24,11 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
+
+    <Window.Resources>
+        <local:CurrencyConverter x:Key="CurrencyConverter" />
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -40,13 +45,38 @@
                 materialDesign:ColorZoneAssist.Foreground="White"
                 materialDesign:ColorZoneAssist.Mode="Custom"
                 DockPanel.Dock="Top"
-                Header="Сейчас: 19 сентября 2023 года 13:18"
                 Style="{StaticResource MaterialDesignGroupBox}">
+                <GroupBox.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0,0,15,0" Text="Сегодня" />
+                        <TextBlock Text="{Binding CurrentDate, StringFormat='dd MMMM yyyy года HH:mm'}" />
+                    </StackPanel>
+                </GroupBox.Header>
                 <StackPanel MinHeight="100">
-                    <TextBlock Text="Иванов Иван" />
-                    <TextBlock Text="Счёт: 34000.3 рублей" />
+                    <TextBlock
+                        Margin="0,0,0,5"
+                        FontSize="20"
+                        Text="Иванов Иван" />
+                    <TextBlock Margin="0,0,0,20" FontSize="28">
+                        <Run Text="Счёт: " />
+                        <Run Text="{Binding AccountBalance, Converter={StaticResource CurrencyConverter}}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            FontSize="12"
+                            Foreground="White"
+                            Text="За сегодня:" />
+                        <TextBlock
+                            Margin="0,0,0,10"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="Green"
+                            Text="{Binding DailyEarnings, Converter={StaticResource CurrencyConverter}}" />
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
+
             <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
                 <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -111,7 +141,8 @@
             Grid.Column="1"
             Width="5"
             HorizontalAlignment="Stretch"
-            ResizeBehavior="PreviousAndNext" />
+            ResizeBehavior="PreviousAndNext"
+            ToolTip="Возьми и тяни" />
 
         <!--  Правая область  -->
         <Border Grid.Column="2">
@@ -247,7 +278,8 @@
                     Height="5"
                     HorizontalAlignment="Stretch"
                     Background="#b7b7b7"
-                    ResizeBehavior="PreviousAndNext" />
+                    ResizeBehavior="PreviousAndNext"
+                    ToolTip="Возьми и тяни" />
 
                 <!--  Нижняя часть  -->
                 <Border

@@ -1,7 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
@@ -36,6 +36,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private ChartWindowViewModel _chartViewModel = null!;
         private AppContext _db = null!;
         private TradeRecordInfo? _selectedTradeInfo = null!;
+        private decimal _accountBalance = 1000;
+        private DateTime _currentDate = DateTime.Now;
+        private decimal _dailyEarnings = 1200;
         #endregion
 
         #region Публичные поля
@@ -67,6 +70,22 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _selectedTradeInfo;
             set => Set(ref _selectedTradeInfo, value);
         }
+        public decimal AccountBalance
+        {
+            get => _accountBalance;
+            set => Set(ref _accountBalance, value);
+        }
+
+        public DateTime CurrentDate
+        {
+            get => _currentDate;
+            set => Set(ref _currentDate, value);
+        }
+        public decimal DailyEarnings
+        {
+            get => _dailyEarnings;
+            set => Set(ref _dailyEarnings, value);
+        }
         #endregion
 
         #region Команды
@@ -91,7 +110,7 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             TradeRecordInfo? tickerInfo = sender as TradeRecordInfo;
 
-            DbManager.Delete(tickerInfo);       
+            DbManager.Delete(tickerInfo);
 
         }
 
@@ -100,7 +119,7 @@ namespace TinkoffTradeSimulator.ViewModels
         // Конструктор
         public MainWindowViewModel()
         {
-            
+
             #region Инициализация команд
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
 
@@ -108,7 +127,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            DbManager dbManager = new ();
+            DbManager dbManager = new();
             _db = dbManager.InitializeDB();
             #endregion
 
