@@ -35,6 +35,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private ObservableCollection<OHLC>? _candlestickData = null;     
 
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString()};
+
         #endregion
 
         #region Публичные свойства
