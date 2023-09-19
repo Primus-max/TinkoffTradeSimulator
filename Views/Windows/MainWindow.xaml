@@ -119,14 +119,13 @@
                 <!--  Верхняя часть  -->
                 <Border Grid.Row="0">
                     <DockPanel>
-
                         <StackPanel DockPanel.Dock="Top">
                             <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
                                 <DockPanel>
                                     <!--<ToggleButton
-                                        VerticalAlignment="Center"
-                                        DockPanel.Dock="Right"
-                                        Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
+                VerticalAlignment="Center"
+                DockPanel.Dock="Right"
+                Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                                     <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
                                         <TextBlock
                                             VerticalAlignment="Center"
@@ -134,59 +133,65 @@
                                             Text="Открытые сделки" />
                                         <!--<ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" />-->
                                         <!--<ComboBox
-                                            Margin="8,0,0,0"
-                                            materialDesign:ColorZoneAssist.Mode="Standard"
-                                            materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource MaterialDesignPaper}"
-                                            BorderBrush="{DynamicResource MaterialDesignPaper}"
-                                            BorderThickness="0"
-                                            SelectedIndex="0">
-                                            <ComboBoxItem Content="Android" />
-                                            <ComboBoxItem Content="iOS" />
-                                            <ComboBoxItem Content="Linux" />
-                                            <ComboBoxItem Content="Windows" />
-                                        </ComboBox>-->
-                                        <materialDesign:ColorZone
-                                            Margin="60,0,0,0"
-                                            Padding="8,4,8,4"
-                                            Panel.ZIndex="1"
-                                            materialDesign:ElevationAssist.Elevation="Dp2"
-                                            CornerRadius="2"
-                                            Mode="Standard">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <Button Style="{StaticResource MaterialDesignToolButton}">
-                                                    <materialDesign:PackIcon Kind="Search" Opacity=".56" />
-                                                </Button>
-                                                <TextBox
-                                                    Grid.Column="1"
-                                                    MinWidth="200"
-                                                    Margin="8,0,0,0"
-                                                    VerticalAlignment="Center"
-                                                    materialDesign:HintAssist.Hint="Поиск"
-                                                    materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
-                                                    BorderThickness="0" />
-                                                <!--<Button Grid.Column="2" Style="{StaticResource MaterialDesignToolButton}">
-                                                    <materialDesign:PackIcon
-                                                        Margin="8,0,0,0"
-                                                        Kind="Microphone"
-                                                        Opacity=".56" />
-                                                </Button>-->
-                                            </Grid>
-                                        </materialDesign:ColorZone>
-                                        <Button
-                                            Margin="8,0,0,0"
-                                            Panel.ZIndex="0"
-                                            Style="{StaticResource MaterialDesignToolForegroundButton}">
-                                            <materialDesign:PackIcon Kind="Send" />
-                                        </Button>
+                    Margin="8,0,0,0"
+                    materialDesign:ColorZoneAssist.Mode="Standard"
+                    materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource MaterialDesignPaper}"
+                    BorderBrush="{DynamicResource MaterialDesignPaper}"
+                    BorderThickness="0"
+                    SelectedIndex="0">
+                    <ComboBoxItem Content="Android" />
+                    <ComboBoxItem Content="iOS" />
+                    <ComboBoxItem Content="Linux" />
+                    <ComboBoxItem Content="Windows" />
+                </ComboBox>-->
                                     </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel
+                                            Width="300"
+                                            Margin="0,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                            <materialDesign:ColorZone
+                                                Padding="8,4,8,4"
+                                                Panel.ZIndex="1"
+                                                materialDesign:ElevationAssist.Elevation="Dp2"
+                                                CornerRadius="2"
+                                                Mode="Standard">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox
+                                                        Grid.Column="0"
+                                                        MinWidth="200"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        materialDesign:HintAssist.Hint="Поиск"
+                                                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                                                        BorderThickness="0" />
+                                                    <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
+                                                        <materialDesign:PackIcon Kind="Search" Opacity=".56" />
+                                                    </Button>
+                                                </Grid>
+                                            </materialDesign:ColorZone>
+                                            <!--<Button
+                                                Margin="8,0,0,0"
+                                                Panel.ZIndex="0"
+                                                Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                                <materialDesign:PackIcon Kind="Send" />
+                                            </Button>-->
+                                        </StackPanel>
+                                    </Grid>
                                 </DockPanel>
                             </materialDesign:ColorZone>
                         </StackPanel>
+
 
                         <ListView
                             MinHeight="100"
@@ -231,7 +236,7 @@
                     Grid.Row="1"
                     Height="5"
                     HorizontalAlignment="Stretch"
-                    Background="Crimson"
+                    Background="#b7b7b7"
                     ResizeBehavior="PreviousAndNext" />
 
                 <!--  Нижняя часть  -->
@@ -241,16 +246,79 @@
                     VerticalAlignment="Top">
                     <!--  Содержимое нижней части  -->
                     <DockPanel>
-                        <StackPanel
-                            Height="40"
-                            Background="#b27c35"
-                            DockPanel.Dock="Top">
-                            <TextBlock
-                                Margin="11"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Text="История сделок" />
+                        <StackPanel DockPanel.Dock="Top">
+                            <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
+                                <DockPanel>
+                                    <!--<ToggleButton
+VerticalAlignment="Center"
+DockPanel.Dock="Right"
+Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
+                                    <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="18"
+                                            Text="История сделок" />
+                                        <!--<ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" />-->
+                                        <!--<ComboBox
+    Margin="8,0,0,0"
+    materialDesign:ColorZoneAssist.Mode="Standard"
+    materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource MaterialDesignPaper}"
+    BorderBrush="{DynamicResource MaterialDesignPaper}"
+    BorderThickness="0"
+    SelectedIndex="0">
+    <ComboBoxItem Content="Android" />
+    <ComboBoxItem Content="iOS" />
+    <ComboBoxItem Content="Linux" />
+    <ComboBoxItem Content="Windows" />
+</ComboBox>-->
+                                    </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel
+                                            Width="300"
+                                            Margin="0,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                            <materialDesign:ColorZone
+                                                Padding="8,4,8,4"
+                                                Panel.ZIndex="1"
+                                                materialDesign:ElevationAssist.Elevation="Dp2"
+                                                CornerRadius="2"
+                                                Mode="Standard">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox
+                                                        Grid.Column="0"
+                                                        MinWidth="200"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        materialDesign:HintAssist.Hint="Поиск"
+                                                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                                                        BorderThickness="0" />
+                                                    <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
+                                                        <materialDesign:PackIcon Kind="Search" Opacity=".56" />
+                                                    </Button>
+                                                </Grid>
+                                            </materialDesign:ColorZone>
+                                            <!--<Button
+                                Margin="8,0,0,0"
+                                Panel.ZIndex="0"
+                                Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                <materialDesign:PackIcon Kind="Send" />
+                            </Button>-->
+                                        </StackPanel>
+                                    </Grid>
+                                </DockPanel>
+                            </materialDesign:ColorZone>
                         </StackPanel>
+
                         <ListView MinHeight="100" ItemsSource="{Binding TradeHistoricalInfoList}">
                             <ListView.View>
                                 <GridView>
