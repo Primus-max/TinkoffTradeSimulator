@@ -21,8 +21,8 @@ namespace TinkoffTradeSimulator.ViewModels
     {
         #region Приватные свойства        
         private ObservableCollection<CandleTimeFrameButton> _candleTimeFrameButtons = null;
-        private CandleTimeFrameButton _selectedTimeFrame = null;
-
+        private CandleTimeFrameButton _selectedTimeFrame = null!;
+        private EventAggregator _eventAggregator = null!;
         #endregion
 
         #region Публичные свойства
@@ -42,6 +42,9 @@ namespace TinkoffTradeSimulator.ViewModels
 
         public CandleIntervalWindowViewModel()
         {
+
+           // EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
+
             #region Инициализация команд
             CloseCandleIntervalWindowCommand = new LambdaCommand(OnCloseleIntervalWindowCommandExecuted, CanCloseCandleIntervalWindowCommandExecute);
 
@@ -51,6 +54,7 @@ namespace TinkoffTradeSimulator.ViewModels
             FillCandleTimeFrameButtons();
         }
 
+       
 
         #region Команды
         public ICommand? CloseCandleIntervalWindowCommand { get; } = null;
@@ -69,7 +73,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnSelectHistoricalCandleIntervalCommandExecuted(object sender)
         {
-            // Закрываю окно с выбором таймфрема для свечи
+            // Обновляю данные иакрываю окно с выбором таймфрема для свечи
             HandleTimeFrameButtonClicked((CandleTimeFrameButton)sender);
         }
         #endregion
@@ -80,6 +84,9 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             SelectedTimeFrame = selectedButton;
 
+            // Публикация события об изменении таймфрема из которого берём имя для кнопки
+            EventAggregator.PublishCandleIntervalSelected(SelectedTimeFrame);
+
             if (SelectedTimeFrame != null)
             {
                 // Преобразование Name из SelectedTimeFrame в CandleInterval
@@ -87,7 +94,6 @@ namespace TinkoffTradeSimulator.ViewModels
                 {
                     // Закрываю окно после выбора таймфрейма
                     CloseCandleIntervalWindow();
-
 
                     ChartWindowViewModel chartWindowViewModel = new();
 
@@ -119,13 +125,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 if (interval is Tinkoff.InvestApi.V1.CandleInterval cadleInterval)
                 {
                     // Имя значения перечисления
-                    var name = cadleInterval.ToString();
-
-                    // Уберите символ "_"
-                    //name = name.Replace("_", "");
-
-                    // Создайте TimeSpan на основе числового значения и единицы измерения
-                    // var timeSpan = TimeSpan.FromMinutes((int)interval);
+                    var name = cadleInterval.ToString();                    
 
                     // Создайте и добавьте кнопку во временную коллекцию
                     tempCollection.Add(new CandleTimeFrameButton { Name = name });
@@ -137,7 +137,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод закрытия окна с выбором таймфреймов
-        private void CloseCandleIntervalWindow()
+        private static void CloseCandleIntervalWindow()
         {
             // Здесь выполняется закрытие окна CandleIntervalWindow
             Application.Current.Windows.OfType<CandleIntervalWindow>().FirstOrDefault()?.Close();

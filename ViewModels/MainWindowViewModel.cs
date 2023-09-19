@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
@@ -90,15 +91,16 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             TradeRecordInfo? tickerInfo = sender as TradeRecordInfo;
 
-            DbManager.Delete(tickerInfo);
+            DbManager.Delete(tickerInfo);       
+
         }
 
         #endregion
 
-
         // Конструктор
         public MainWindowViewModel()
         {
+            
             #region Инициализация команд
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
 
@@ -112,7 +114,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Создаю новую ViewModel для окна
             _chartViewModel = new ChartWindowViewModel();
-
 
             _ = LoadDataFromTinkoffApi();
             LoadHistorticalTradingData();
@@ -156,7 +157,6 @@ namespace TinkoffTradeSimulator.ViewModels
             // Привожу у нужным данным коллекцию из базы данных
             TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
         }
-
 
         // Открываю окно и строю в нём график
         private void OpenChartWindow(string tickerName)

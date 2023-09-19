@@ -37,7 +37,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private ToolTip? _toolTipInfo = null;
 
-
+        private CandleTimeFrameButton _selectedTimeFrame = null;
         #endregion
 
         #region Публичные свойства
@@ -72,6 +72,12 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _toolTipInfo;
             set => Set(ref _toolTipInfo, value);
+        }
+
+        public CandleTimeFrameButton SelectedTimeFrame
+        {
+            get => _selectedTimeFrame;
+            set => Set(ref _selectedTimeFrame, value);
         }
         #endregion
 
@@ -114,6 +120,15 @@ namespace TinkoffTradeSimulator.ViewModels
             DbManager dbManager = new();
             _db = dbManager.InitializeDB();
             #endregion
+
+            // Подписываемся на событие CandleIntervalSelected
+            EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
+        }
+
+        // Метод получения выбранно кнопки для отображения имени
+        private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
+        {
+            SelectedTimeFrame = selectedButton;
         }
 
         // Коснтурктор с перегрузами
@@ -216,7 +231,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Максимально допустимый индекс для выбора таймфрейма
             int maxIndex = 100;
 
-            SelectedHistoricalTimeCandleIndex++;
+            SelectedHistoricalTimeCandleIndex += 10;
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
 
             await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
@@ -226,9 +241,9 @@ namespace TinkoffTradeSimulator.ViewModels
         public async void DecreaseCandleIHistorical()
         {
             // Минимально допустимый индекс для выбора таймфрейма
-            int minxIndex = 1;
+            int minxIndex = 10;
 
-            SelectedHistoricalTimeCandleIndex--;
+            SelectedHistoricalTimeCandleIndex -= 10;
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
             await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);

@@ -1,4 +1,5 @@
 ﻿using System;
+using Tinkoff.InvestApi.V1;
 
 namespace TinkoffTradeSimulator.Models
 {

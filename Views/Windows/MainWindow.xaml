@@ -130,7 +130,7 @@
                                 Text="Открытые сделки" />
                         </StackPanel>
 
-                        <ListView MinHeight="100" ItemsSource="{Binding TradingInfoList}" SelectedItem="{Binding  SelectedTradeInfo}">
+                        <ListView MinHeight="100" ItemsSource="{Binding TradingInfoList, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding  SelectedTradeInfo}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />

@@ -51,7 +51,7 @@
                                 FontSize="18"
                                 FontWeight="Bold"
                                 Foreground="Green"
-                                Text="APA" />
+                                Text="{Binding Title}" />
                         </StackPanel>
                         <!--  Текущая цена  -->
                         <StackPanel Orientation="Horizontal">
@@ -92,7 +92,7 @@
                 <Button
                     Margin="8,0,0,0"
                     Command="{Binding OpenCandleIntervalWindowCommand}"
-                    Content="1 мин" />
+                    Content="{Binding SelectedTimeFrame.Name}" />
                 <!--  Добавьте другие кнопки для других таймфреймов  -->
                 <Separator />
                 <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">

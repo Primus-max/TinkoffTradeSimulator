@@ -144,7 +144,6 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             }
         }
 
-
         //  Метод получения свойства из CandleInterval по индексу, который получаем при скролле, чтобы сформировать таймфрейм свечи
         public static CandleInterval GetCandleIntervalByIndex(int index)
         {
