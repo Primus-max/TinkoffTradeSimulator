@@ -29,11 +29,11 @@ namespace TinkoffTradeSimulator.ViewModels
     {
         #region Приватные поля
         private InvestApiClient? _client = null;
-        private ObservableCollection<TickerInfo>? _tickerInfoList;
+        private ObservableCollection<TickerInfo>? _tickerInfoList = null!;
         private ObservableCollection<TradeRecordInfo>? _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo>? _tradingInfoList = null!;
         private string _title = string.Empty;
-        private ChartWindowViewModel _chartViewModel = null;
+        private ChartWindowViewModel _chartViewModel = null!;
         private AppContext _db = null!;
         private TradeRecordInfo? _selectedTradeInfo = null!;
         #endregion
@@ -108,7 +108,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            DbManager dbManager = new DbManager();
+            DbManager dbManager = new ();
             _db = dbManager.InitializeDB();
             #endregion
 
@@ -127,9 +127,6 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
-
-            // Загрузите данные из Tinkoff API асинхронно
-            await Task.Delay(1000); // Пример задержки, замените на реальную загрузку данных
 
             // Получаю все актуальные данные от сервера
             var instruments = await _client?.Instruments?.SharesAsync();

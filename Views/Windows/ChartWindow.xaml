@@ -88,8 +88,9 @@
         <!--  Средняя область с кнопками и инструментами  -->
         <ToolBarTray Grid.Row="1">
             <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
-                <TextBlock VerticalAlignment="Center" Text="Таймфрейм:" />
+                <!--<TextBlock VerticalAlignment="Center" Text="Таймфрейм:" />-->
                 <Button
+                    Width="80"
                     Margin="8,0,0,0"
                     Command="{Binding OpenCandleIntervalWindowCommand}"
                     Content="{Binding SelectedTimeFrame.Name}" />

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
+using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
 using TinkoffTradeSimulator.Data;
@@ -31,13 +32,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private int _selectedHistoricalTimeCandleIndex = 10;
 
         // Приватное свойство для хранения данных свечей
-        private ObservableCollection<OHLC>? _candlestickData = null;
+        private ObservableCollection<OHLC>? _candlestickData = null;     
 
-        private ChartToolTipManager? _сhartToolTipManager = null;
-
-        private ToolTip? _toolTipInfo = null;
-
-        private CandleTimeFrameButton _selectedTimeFrame = null;
+        private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString()};
         #endregion
 
         #region Публичные свойства
@@ -60,19 +57,7 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => (int)_selectedHistoricalTimeCandleIndex;
             set => Set(ref _selectedHistoricalTimeCandleIndex, value);
-        }
-
-        public ChartToolTipManager ChartToolTipManager
-        {
-            get => _сhartToolTipManager;
-            set => Set(ref _сhartToolTipManager, value);
-        }
-
-        public ToolTip ToolTipInfo
-        {
-            get => _toolTipInfo;
-            set => Set(ref _toolTipInfo, value);
-        }
+        }        
 
         public CandleTimeFrameButton SelectedTimeFrame
         {
@@ -121,16 +106,12 @@ namespace TinkoffTradeSimulator.ViewModels
             _db = dbManager.InitializeDB();
             #endregion
 
+            #region Подписки на события
             // Подписываемся на событие CandleIntervalSelected
             EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
+            #endregion
         }
-
-        // Метод получения выбранно кнопки для отображения имени
-        private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
-        {
-            SelectedTimeFrame = selectedButton;
-        }
-
+        
         // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
@@ -158,7 +139,13 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Методы
-        
+
+        // Метод получения выбранно кнопки для отображения имени
+        private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
+        {
+            SelectedTimeFrame = selectedButton;
+        }
+
         // Метод загрузки асинхронных данных для вызова из конструктора
         private async void LoadAsyncData()
         {
