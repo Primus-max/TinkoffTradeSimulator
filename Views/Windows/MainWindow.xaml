@@ -112,7 +112,10 @@
             <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
                 <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ListView MinHeight="100" ItemsSource="{Binding FilteredByTickerInfoList}" ScrollViewer.CanContentScroll="True">
+                        <ListView
+                            MinHeight="100"
+                            ItemsSource="{Binding FilteredByTickerInfoList}"
+                            ScrollViewer.CanContentScroll="True">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
@@ -272,7 +275,6 @@
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Прибыль" />
                                     <GridViewColumn>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -282,12 +284,12 @@
                                                     BorderThickness="0"
                                                     Command="{Binding DataContext.DeleteTradingTickerInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
-                                                    Foreground="Red"
-                                                    ToolTip="Удалить">
+                                                    Foreground="White"
+                                                    ToolTip="Закрыть сделку">
                                                     <materialDesign:PackIcon
                                                         Width="24"
                                                         Height="24"
-                                                        Kind="Delete" />
+                                                        Kind="Handshake" />
                                                 </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
