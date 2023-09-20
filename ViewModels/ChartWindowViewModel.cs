@@ -38,10 +38,11 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString()};
 
+        private double _volumeTradingTicker = 1!;
+
         #endregion
 
         #region Публичные свойства
-
         public string Title
         {
             get => _title;
@@ -66,6 +67,11 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _selectedTimeFrame;
             set => Set(ref _selectedTimeFrame, value);
+        }
+        public double VolumeTradingTicker
+        {
+            get => _volumeTradingTicker;
+            set => Set(ref _volumeTradingTicker, value);
         }
         #endregion
 
@@ -247,7 +253,8 @@ namespace TinkoffTradeSimulator.ViewModels
         // Метод продажи
         #endregion
 
-        // Метод покупки 
+
+        #region Методы по торговле (покупка/продажа)
         private void BuyTicker(double value)
         {
             TradeRecordInfo tradeRecordInfo = new TradeRecordInfo();
@@ -257,8 +264,11 @@ namespace TinkoffTradeSimulator.ViewModels
             tradeRecordInfo.IsBuy = true;
             tradeRecordInfo.Operation = "Продажа";
 
-            DbManager.SaveData(tradeRecordInfo);
+            DbManager.SaveTradingData(tradeRecordInfo);
         }
+        #endregion
+        // Метод покупки 
+
 
         // Метод установки стилей для графика
         private void SetPlotStyle(string tickerName)

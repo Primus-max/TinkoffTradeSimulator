@@ -130,7 +130,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn>
+                                    <GridViewColumn >
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button
@@ -140,7 +140,7 @@
                                                     Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding TickerName}"
                                                     FontWeight="Bold"
-                                                    Foreground="#0037e5"
+                                                    Foreground="#acacac"
                                                     ToolTip="Открыть в новом окне">
                                                     <materialDesign:PackIcon
                                                         Width="28"
@@ -393,8 +393,9 @@ Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                         <ListView MinHeight="100" ItemsSource="{Binding TradeHistoricalInfoList}">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Date}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date.Date}" Header="Дата" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date.TimeOfDay}" Header="Время" />
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Operation}" Header="Операция" />

@@ -111,12 +111,12 @@
                         CommandParameter="{Binding ElementName=QuantityTextBox, Path=Text}"
                         Content="Купить" />
                     <TextBox
-                        x:Name="QuantityTextBox"
+                        x:Name="QuantityTextBox"                        
                         Width="80"
                         Margin="10,0,20,0"
                         materialDesign:HintAssist.Hint="Сколько"
                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Text="1" />
+                        Text="{Binding VolumeTradingTicker}" />
                     <Button
                         Background="Transparent"
                         BorderBrush="Transparent"

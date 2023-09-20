@@ -12,8 +12,7 @@ namespace TinkoffTradeSimulator.Views.Windows
         {
             InitializeComponent();
             _mainWindowViewModel = new MainWindowViewModel();
-            DataContext = _mainWindowViewModel;
-           // Loaded += MainWindow_Loaded;          
+            DataContext = _mainWindowViewModel;                
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -25,11 +24,6 @@ namespace TinkoffTradeSimulator.Views.Windows
             // Вызовите метод фильтрации
             _mainWindowViewModel.UpdateFilteredTickerInfoList(filterText);
         }
-
-        //private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    _mainWindowViewModel = new();
-        //    //viewModel.();
-        //}
+        
     }
 }

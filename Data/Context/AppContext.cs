@@ -11,6 +11,7 @@ namespace TinkoffTradeSimulator
     internal class AppContext : DbContext
     {
         public DbSet<TradeRecordInfo> TradeRecordsInfo{ get; set; } = null!;
+        public DbSet<TradeRecordInfo> HIstoricalTradeRecordsInfo { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=flats.db");

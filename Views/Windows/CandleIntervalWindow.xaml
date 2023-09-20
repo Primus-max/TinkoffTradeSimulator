@@ -69,7 +69,7 @@
                                     Background="#FF343434"
                                     BorderBrush="Transparent"
                                     Command="{Binding DataContext.SelectHistoricalCandleIntervalCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding }"
+                                    CommandParameter="{Binding}"
                                     Content="{Binding Name}"
                                     FontSize="16"
                                     Foreground="White" />

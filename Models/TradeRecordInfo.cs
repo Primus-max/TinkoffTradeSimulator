@@ -8,7 +8,7 @@ namespace TinkoffTradeSimulator.Models
 {
     public class TradeRecordInfo
     {
-        public int Id { get; set; } // Уникальный идентификатор записи
+        public int Id { get; set; } 
         public DateTime Date { get; set; } = DateTime.Now;// Дата и время сделки
         public string? TickerName { get; set; } = string.Empty; // Название инструмента
         public double Price { get; set; } = 0; // Цена

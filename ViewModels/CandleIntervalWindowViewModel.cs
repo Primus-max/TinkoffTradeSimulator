@@ -144,7 +144,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
         }
 
-
         #endregion
 
     }
