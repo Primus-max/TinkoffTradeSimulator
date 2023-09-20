@@ -12,7 +12,7 @@
     Height="600"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
-    Loaded="MainWindow_Loaded"
+   
     TextElement.FontSize="13"
     TextElement.FontWeight="Regular"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -24,14 +24,12 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
-
     <Window.Resources>
         <local:CurrencyConverter x:Key="CurrencyConverter" />
     </Window.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="0.8*" />
             <!--  Левая область  -->
             <ColumnDefinition Width="5" />
             <!--  Сплиттер между левой и правой областью  -->
@@ -100,9 +98,13 @@
                             VerticalAlignment="Center"
                             materialDesign:HintAssist.Hint="Поиск"
                             materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
-                            BorderThickness="0" />
-
-                        <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
+                            BorderThickness="0"
+                            Text="{Binding FilterByTickerName, UpdateSourceTrigger=PropertyChanged}"
+                            TextChanged="TextBox_TextChanged" />
+                        <Button
+                            Grid.Column="1"
+                            Command="{Binding FilterTickerInfoListCommand}"
+                            Style="{StaticResource MaterialDesignToolButton}">
                             <materialDesign:PackIcon Kind="Search" Opacity=".56" />
                         </Button>
                     </Grid>
@@ -111,10 +113,7 @@
             <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
                 <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ListView
-                            MinHeight="100"
-                            ItemsSource="{Binding TickerInfoList}"
-                            SelectionChanged="ListView_SelectionChanged">
+                        <ListView MinHeight="100" ItemsSource="{Binding FilteredByTickerInfoList}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
@@ -122,10 +121,10 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Foreground="Green"
-                                                    Text="{Binding TickerName}" />
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="Green"
+                            Text="{Binding TickerName}" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
@@ -133,29 +132,31 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button
-                                                    Background="Transparent"
-                                                    BorderBrush="Transparent"
-                                                    BorderThickness="0"
-                                                    Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding TickerName}"
-                                                    FontWeight="Bold"
-                                                    Foreground="#0037e5"
-                                                    ToolTip="Открыть в новом окне">
-                                                    <!--<materialDesign:PackIcon
-Width="28"
-Height="28"
-Kind="StarPlusOutline" />-->
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                            CommandParameter="{Binding TickerName}"
+                            FontWeight="Bold"
+                            Foreground="#0037e5"
+                            ToolTip="Открыть в новом окне">
                                                     <materialDesign:PackIcon
-                                                        Width="28"
-                                                        Height="28"
-                                                        Kind="OpenInNew" />
+                                Width="28"
+                                Height="28"
+                                Kind="OpenInNew" />
                                                 </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
                                 </GridView>
                             </ListView.View>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
                         </ListView>
+
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Избранное">
@@ -163,9 +164,6 @@ Kind="StarPlusOutline" />-->
                 </TabItem>
             </TabControl>
         </DockPanel>
-
-
-
         <!--  Сплиттер между левой и правой областью  -->
         <GridSplitter
             Grid.Column="1"
