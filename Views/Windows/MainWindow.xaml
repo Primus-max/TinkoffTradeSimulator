@@ -12,7 +12,6 @@
     Height="600"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
-   
     TextElement.FontSize="13"
     TextElement.FontWeight="Regular"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -113,7 +112,7 @@
             <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
                 <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ListView MinHeight="100" ItemsSource="{Binding FilteredByTickerInfoList}">
+                        <ListView MinHeight="100" ItemsSource="{Binding FilteredByTickerInfoList}" ScrollViewer.CanContentScroll="True">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
@@ -121,10 +120,10 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Foreground="Green"
-                            Text="{Binding TickerName}" />
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Foreground="Green"
+                                                    Text="{Binding TickerName}" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
@@ -132,18 +131,18 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            BorderThickness="0"
-                            Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                            CommandParameter="{Binding TickerName}"
-                            FontWeight="Bold"
-                            Foreground="#0037e5"
-                            ToolTip="Открыть в новом окне">
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding TickerName}"
+                                                    FontWeight="Bold"
+                                                    Foreground="#0037e5"
+                                                    ToolTip="Открыть в новом окне">
                                                     <materialDesign:PackIcon
-                                Width="28"
-                                Height="28"
-                                Kind="OpenInNew" />
+                                                        Width="28"
+                                                        Height="28"
+                                                        Kind="OpenInNew" />
                                                 </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -152,7 +151,7 @@
                             </ListView.View>
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling"/>
+                                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>

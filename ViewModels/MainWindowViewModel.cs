@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
@@ -103,6 +104,11 @@ namespace TinkoffTradeSimulator.ViewModels
         }
         #endregion
 
+
+        // Инициализация исходной коллекции
+        private ObservableCollection<TickerInfo> _originalTickerInfoList = new ObservableCollection<TickerInfo>();
+
+     
         #region Команды
         public ICommand OpenChartWindowCommand { get; }
 
@@ -134,7 +140,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnFilterTickerInfoListCommandCommandExecuted(object sender)
         {
-            FilterTickerData(FilterByTickerName);
+            UpdateFilteredTickerInfoList(FilterByTickerName);
         }
         #endregion
 
@@ -181,16 +187,17 @@ namespace TinkoffTradeSimulator.ViewModels
             // Получаю все актуальные данные от сервера
             var instruments = await _client?.Instruments?.SharesAsync();
 
-            // Инициализирую коллекцию
-            FilteredByTickerInfoList = new ObservableCollection<TickerInfo>();
+            // Очищаю исходную коллекцию
+            _originalTickerInfoList.Clear();
 
-            // Заполняю данными список который будет источником данных для отображения в главном окне
+            // Заполняю исходную коллекцию данными
             foreach (var instrument in instruments.Instruments)
             {
-                FilteredByTickerInfoList.Add(new TickerInfo { Id = instrument.Isin, TickerName = instrument.Ticker });
+                _originalTickerInfoList.Add(new TickerInfo { Id = instrument.Isin, TickerName = instrument.Ticker });
             }
 
-            //FilteredByTickerInfoList = TickerInfoList;
+            // Заполняю коллекцию для отображения
+            UpdateFilteredTickerInfoList(string.Empty);
         }
 
         // Загружаю / отображаю исторические данные торгов
@@ -228,29 +235,24 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод фильтрации по имени тикера
-        public void FilterTickerData(string filter)
+        public void UpdateFilteredTickerInfoList(string filter)
         {
-            // Создаем временную коллекцию для хранения отфильтрованных элементов
-            var filteredItems = new ObservableCollection<TickerInfo>();
-
-            foreach (var tickerInfo in FilteredByTickerInfoList)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                if (string.IsNullOrEmpty(filter) || tickerInfo.TickerName.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                FilteredByTickerInfoList.Clear();
+
+                // Фильтрую исходную коллекцию и добавляю отфильтрованные элементы в FilteredByTickerInfoList
+                foreach (var tickerInfo in _originalTickerInfoList)
                 {
-                    filteredItems.Add(tickerInfo);
+                    if (string.IsNullOrEmpty(filter) || tickerInfo.TickerName.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                    {
+                        FilteredByTickerInfoList.Add(tickerInfo);
+                    }
                 }
-            }
-
-            // Очищаем текущую коллекцию FilteredByTickerInfoList
-            FilteredByTickerInfoList.Clear();
-
-            // Добавляем отфильтрованные элементы в FilteredByTickerInfoList
-            foreach (var filteredItem in filteredItems)
-            {
-
-                FilteredByTickerInfoList.Add(filteredItem);
-            }
+            });
         }
+
+
         #endregion
     }
 

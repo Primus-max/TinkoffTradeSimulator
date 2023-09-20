@@ -23,7 +23,7 @@ namespace TinkoffTradeSimulator.Views.Windows
 
 
             // Вызовите метод фильтрации
-            _mainWindowViewModel.FilterTickerData(filterText);
+            _mainWindowViewModel.UpdateFilteredTickerInfoList(filterText);
         }
 
         //private void MainWindow_Loaded(object sender, RoutedEventArgs e)
