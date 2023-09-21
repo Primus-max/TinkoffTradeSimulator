@@ -1,11 +1,8 @@
 ﻿using ScottPlot;
 using System;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
@@ -15,7 +12,6 @@ using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Services;
-using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
 using Style = ScottPlot.Style;
@@ -35,9 +31,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private int _selectedHistoricalTimeCandleIndex = 10;
 
         // Приватное свойство для хранения данных свечей
-        private ObservableCollection<OHLC>? _candlestickData = null;     
+        private ObservableCollection<OHLC>? _candlestickData = null;
 
-        private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString()};
+        private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
 
         private int _volumeTradingTicker = 1!;
 
@@ -67,7 +63,7 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => (int)_selectedHistoricalTimeCandleIndex;
             set => Set(ref _selectedHistoricalTimeCandleIndex, value);
-        }        
+        }
 
         public CandleTimeFrameButton SelectedTimeFrame
         {
@@ -97,12 +93,21 @@ namespace TinkoffTradeSimulator.ViewModels
         private bool CanBuyTickerCommandExecute(object p) => true;
 
         private void OnBuyTickerCommandExecuted(object sender)
-        {         
+        {
 
             BuyTicker();
         }
 
-        
+        public ICommand? SellickerCommand { get; } = null;
+
+        private bool CanSellickerCommandExecute(object p) => true;
+
+        private void OnSellickerCommandExecuted(object sender)
+        {
+            SellTicker();
+        }
+
+
         #endregion
 
         // Пустой (необходимый) конструктор
@@ -112,7 +117,9 @@ namespace TinkoffTradeSimulator.ViewModels
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
 
-            BuyTickerCommand = new LambdaCommand(OnBuyTickerCommandExecuted, CanBuyTickerCommandExecute);            
+            BuyTickerCommand = new LambdaCommand(OnBuyTickerCommandExecuted, CanBuyTickerCommandExecute);
+
+            SellickerCommand = new LambdaCommand(OnSellickerCommandExecuted, CanSellickerCommandExecute);
             #endregion
 
             #region Инициализация базы данных
@@ -130,7 +137,7 @@ namespace TinkoffTradeSimulator.ViewModels
             EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
             #endregion
         }
-        
+
         // Коснтурктор с перегрузами
         public ChartWindowViewModel(WpfPlot plot, string ticker)
         {
@@ -153,7 +160,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            DbManager dbManager = new ();
+            DbManager dbManager = new();
             _db = dbManager.InitializeDB();
             #endregion
 
@@ -161,7 +168,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
         }
-               
+
 
         #region Методы
 
@@ -180,14 +187,14 @@ namespace TinkoffTradeSimulator.ViewModels
             // Получаю обновлённый список свечей c задаными параметрами
             OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
             // Получаю данные по тикерам (передаю именованные параметры)
-             UpdateChartWindow(pricesArray);
+            UpdateChartWindow(pricesArray);
         }
-        
+
         // Метод обновления окна с данными
         public void UpdateChartWindow(OHLC[] prices)
-        {          
+        {
             // Очищаем текущий график перед добавлением новых свечей
-            _wpfPlot?.Plot.Clear();                   
+            _wpfPlot?.Plot.Clear();
 
             // Добавляю полученный список через специальный метод ScottPlot
             _wpfPlot?.Plot.AddCandlesticks(prices);
@@ -265,6 +272,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
 
         #region Методы по торговле (покупка/продажа)
+        // Общий метод покупки и продажи
         private void ExecuteTrade(string operation)
         {
             string tickerName = Title;
@@ -291,11 +299,18 @@ namespace TinkoffTradeSimulator.ViewModels
                     {
                         // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
                         // Можно добавить нужную логику здесь
+                        return; // Выходим из метода, так как объем недостаточный
                     }
                 }
                 else
                 {
                     tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
+                }
+
+                if (tradeRecordInfo.Volume == 0)
+                {
+                    // Если объем стал равным 0, удаляем запись из базы данных
+                    _db.TradeRecordsInfo.Remove(tradeRecordInfo);
                 }
             }
             else
@@ -350,6 +365,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Опубликовываем событие для исторической коллекции
             EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
         }
+
 
         // Метод для покупки
         private void BuyTicker()

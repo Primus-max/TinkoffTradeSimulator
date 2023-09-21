@@ -15,15 +15,25 @@ namespace TinkoffTradeSimulator.Views.Windows
             DataContext = _mainWindowViewModel;                
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void FilterByTickerAll_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Получите текст из TextBox
             string filterText = ((TextBox)sender).Text;
 
-
             // Вызовите метод фильтрации
             _mainWindowViewModel.UpdateFilteredTickerInfoList(filterText);
         }
-        
+
+        private void FilterByTickerTradeRecordHistorial_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Получите текст из TextBox
+            string filterText = ((TextBox)sender).Text;
+
+            // Вызываем метод фильтрации для TradeHistoricalInfoList в вашей ViewModel
+            _mainWindowViewModel.FilterTradeHistoricalInfoListByTicker(filterText);
+
+            // Вызываем метод фильтрации для TradingInfoList в вашей ViewModel
+            //ViewModel.FilterTradingInfoListByTicker(filterText);
+        }
     }
 }

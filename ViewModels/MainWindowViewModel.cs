@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,6 +12,7 @@ using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
+using TinkoffTradeSimulator.Models.Interfaces;
 using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
@@ -32,6 +35,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private ObservableCollection<TickerInfo>? _tickerInfoList = null!;
         private ObservableCollection<TickerInfo>? _filteredByTickerInfoList = null!;
         private ObservableCollection<HistoricalTradeRecordInfo>? _tradeHistoricalInfoList = null!;
+        private ObservableCollection<HistoricalTradeRecordInfo>? _filteredTradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo>? _tradingInfoList = null!;
         private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null!;
@@ -40,9 +44,10 @@ namespace TinkoffTradeSimulator.ViewModels
         private decimal _accountBalance = 1000;
         private DateTime _currentDate = DateTime.Now;
         private decimal _dailyEarnings = 1200;
-        private string _filterByTickerName = string.Empty;
+        private string _filterByTickerNameAll = string.Empty;
         private readonly ObservableCollection<TickerInfo> _originalTickerInfoList = new ObservableCollection<TickerInfo>();
-        #endregion
+        private string _filterByTickerTradeRecordHistorical = string.Empty;
+        private ObservableCollection<object> _originalTradeInfoList = new ObservableCollection<object>();
 
         #region Публичные поля
         public string Title
@@ -66,6 +71,11 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _tradeHistoricalInfoList;
             set => Set(ref _tradeHistoricalInfoList, value);
+        }
+        public ObservableCollection<HistoricalTradeRecordInfo> FilteredTradeHistoricalInfoList
+        {
+            get => _filteredTradeHistoricalInfoList;
+            set => Set(ref _filteredTradeHistoricalInfoList, value);
         }
         public ObservableCollection<TradeRecordInfo> TradingInfoList
         {
@@ -92,10 +102,15 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _dailyEarnings;
             set => Set(ref _dailyEarnings, value);
         }
-        public string FilterByTickerName
+        public string FilterByTickerNameAll
         {
-            get => _filterByTickerName;
-            set => Set(ref _filterByTickerName, value);
+            get => _filterByTickerNameAll;
+            set => Set(ref _filterByTickerNameAll, value);
+        }
+        public string FilterByTickerTradeRecordHistorical
+        {
+            get => _filterByTickerTradeRecordHistorical;
+            set => Set(ref _filterByTickerTradeRecordHistorical, value);
         }
         #endregion
 
@@ -130,7 +145,16 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnFilterTickerInfoListCommandCommandExecuted(object sender)
         {
-            UpdateFilteredTickerInfoList(FilterByTickerName);
+            UpdateFilteredTickerInfoList(FilterByTickerNameAll);
+        }
+
+        public ICommand? FilterTradingRecorsInfoListCommand { get; } = null;
+
+        private bool CanFilterTradingRecorsInfoListCommandExecute(object p) => true;
+
+        private void OnFilterTradingRecorsInfoListCommandExecuted(object sender)
+        {
+            //TradeHistoricalInfoList = FilterTradeInfoListByTicker(TradeHistoricalInfoList, FilterByTickerTradeRecordHistorical);
         }
         #endregion
 
@@ -144,6 +168,8 @@ namespace TinkoffTradeSimulator.ViewModels
             CloseTradingDealCommand = new LambdaCommand(OnCloseTradingDealCommandExecuted, CanCloseTradingDealCommandExecute);
 
             FilterTickerInfoListCommand = new LambdaCommand(OnFilterTickerInfoListCommandCommandExecuted, CanFilterTickerInfoListCommandCommandExecute);
+
+            FilterTradingRecorsInfoListCommand = new LambdaCommand(OnFilterTradingRecorsInfoListCommandExecuted, CanFilterTradingRecorsInfoListCommandExecute);
             #endregion
 
             #region Инициализация базы данных
@@ -155,6 +181,7 @@ namespace TinkoffTradeSimulator.ViewModels
             FilteredByTickerInfoList = new ObservableCollection<TickerInfo>();
             TradingInfoList = new ObservableCollection<TradeRecordInfo>(); // Коллекция о текущих операциях
             TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(); // Коллекция об исторических операциях
+            FilteredTradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(); // Отфильтрованная коллекция
             #endregion
 
             _chartViewModel = new ChartWindowViewModel();
@@ -241,6 +268,7 @@ namespace TinkoffTradeSimulator.ViewModels
             chartWindow.Show();
         }
 
+        #region Фильтры
         // Метод фильтрации по имени тикера
         public void UpdateFilteredTickerInfoList(string filter)
         {
@@ -265,7 +293,48 @@ namespace TinkoffTradeSimulator.ViewModels
             });
         }
 
-        #endregion
+        // Обобщенный метод для фильтрации
+        public ObservableCollection<T> FilterTradeInfoListByTicker<T>(string tickerNameFilter) where T : ITradeInfo
+        {
+            if (string.IsNullOrWhiteSpace(tickerNameFilter))
+            {
+                // Если фильтр пустой или null, возвращаем исходную коллекцию без фильтрации
+                return new ObservableCollection<T>(_originalTradeInfoList.OfType<T>());
+            }
+
+            // Очищаем фильтрованную коллекцию
+            var filteredList = new ObservableCollection<T>();
+
+            foreach (var item in _originalTradeInfoList.OfType<T>())
+            {
+                if (item.TickerName.Contains(tickerNameFilter, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Если элемент соответствует фильтру, добавляем его в фильтрованную коллекцию
+                    filteredList.Add(item);
+                }
+            }
+
+            return filteredList;
+        }
+        public void FilterTradeHistoricalInfoListByTicker(string tickerNameFilter)
+        {
+            // Используем обобщенный метод для фильтрации TradeHistoricalInfoList
+            TradeHistoricalInfoList = FilterTradeInfoListByTicker<HistoricalTradeRecordInfo>(tickerNameFilter);
+        }
+
+        public void FilterTradingInfoListByTicker(string tickerNameFilter)
+        {
+            // Используем обобщенный метод для фильтрации TradingInfoList
+            TradingInfoList = FilterTradeInfoListByTicker<TradeRecordInfo>(tickerNameFilter);
+        }
+
     }
 
+    #endregion
+
+
+    #endregion
 }
+
+
+#endregion

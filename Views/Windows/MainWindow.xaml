@@ -99,7 +99,7 @@
                             materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                             BorderThickness="0"
                             Text="{Binding FilterByTickerName, UpdateSourceTrigger=PropertyChanged}"
-                            TextChanged="TextBox_TextChanged" />
+                            TextChanged="FilterByTickerAll_TextChanged" />
                         <Button
                             Grid.Column="1"
                             Command="{Binding FilterTickerInfoListCommand}"
@@ -130,7 +130,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn >
+                                    <GridViewColumn>
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button
@@ -372,18 +372,18 @@ Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                                                         VerticalAlignment="Center"
                                                         materialDesign:HintAssist.Hint="Поиск"
                                                         materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
-                                                        BorderThickness="0" />
-                                                    <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
+                                                        BorderThickness="0"
+                                                        Text="{Binding FilterByTickerTradeRecordHistorical}" 
+                                                        TextChanged="FilterByTickerTradeRecordHistorial_TextChanged" 
+                                                        />
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Command="{Binding FilterTradingRecorsInfoListCommand}"
+                                                        Style="{StaticResource MaterialDesignToolButton}">
                                                         <materialDesign:PackIcon Kind="Search" Opacity=".56" />
                                                     </Button>
                                                 </Grid>
-                                            </materialDesign:ColorZone>
-                                            <!--<Button
-                                Margin="8,0,0,0"
-                                Panel.ZIndex="0"
-                                Style="{StaticResource MaterialDesignToolForegroundButton}">
-                                <materialDesign:PackIcon Kind="Send" />
-                            </Button>-->
+                                            </materialDesign:ColorZone>                                           
                                         </StackPanel>
                                     </Grid>
                                 </DockPanel>

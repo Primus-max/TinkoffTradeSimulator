@@ -103,7 +103,7 @@
                     <ComboBoxItem Content="Chocolate" />
                 </ComboBox>-->
 
-                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Cursor="">
                     <Button
                         Background="Transparent"
                         BorderBrush="Transparent"
@@ -111,7 +111,7 @@
                         CommandParameter="{Binding ElementName=QuantityTextBox, Path=Text}"
                         Content="Купить" />
                     <TextBox
-                        x:Name="QuantityTextBox"                        
+                        x:Name="QuantityTextBox"
                         Width="80"
                         Margin="10,0,20,0"
                         materialDesign:HintAssist.Hint="Сколько"
@@ -120,6 +120,7 @@
                     <Button
                         Background="Transparent"
                         BorderBrush="Transparent"
+                        Command="{Binding SellickerCommand}"
                         Content="Продать" />
                 </StackPanel>
                 <Separator />

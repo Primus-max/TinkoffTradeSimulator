@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinkoffTradeSimulator.Models.Interfaces;
 
 namespace TinkoffTradeSimulator.Models
 {
-    public class TradeRecordInfo
+    public class TradeRecordInfo : ITradeInfo
     {
         public int Id { get; set; } 
         public DateTime Date { get; set; } = DateTime.Now;// Дата и время сделки
