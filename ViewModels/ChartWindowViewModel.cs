@@ -265,10 +265,11 @@ namespace TinkoffTradeSimulator.ViewModels
 
 
         #region Методы по торговле (покупка/продажа)
-        private void BuyTicker()
+        private void ExecuteTrade(string operation)
         {
             string tickerName = Title;
             double price = 3444;
+            bool subtractVolume = operation == "Продажа"; // Проверяем, нужно ли вычитать объем
 
             // Поиск записи с тем же TickerName в _db.TradeRecordsInfo
             TradeRecordInfo tradeRecordInfo = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.TickerName == tickerName);
@@ -276,9 +277,26 @@ namespace TinkoffTradeSimulator.ViewModels
             if (tradeRecordInfo != null)
             {
                 // Запись найдена, обновляем Volume, Price и Operation
-                tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
                 tradeRecordInfo.Price = price; // Обновляем цену
-                tradeRecordInfo.Operation = "Покупка"; // Обновляем тип операции
+                tradeRecordInfo.Operation = operation; // Обновляем тип операции
+
+                if (subtractVolume)
+                {
+                    // Если нужно вычесть объем, убедимся, что объем не становится отрицательным
+                    if (tradeRecordInfo.Volume >= VolumeTradingTicker)
+                    {
+                        tradeRecordInfo.Volume -= VolumeTradingTicker;
+                    }
+                    else
+                    {
+                        // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
+                        // Можно добавить нужную логику здесь
+                    }
+                }
+                else
+                {
+                    tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
+                }
             }
             else
             {
@@ -287,9 +305,9 @@ namespace TinkoffTradeSimulator.ViewModels
                 {
                     TickerName = tickerName,
                     Price = price,
-                    IsBuy = true,
-                    Operation = "Покупка",
-                    Volume = VolumeTradingTicker // Устанавливаем Volume из параметра VolumeTradingTicker
+                    IsBuy = operation == "Покупка", // Определение типа операции
+                    Operation = operation,
+                    Volume = subtractVolume ? -VolumeTradingTicker : VolumeTradingTicker // Устанавливаем объем с учетом операции
                 };
 
                 // Добавляем запись в _db.TradeRecordsInfo
@@ -301,7 +319,7 @@ namespace TinkoffTradeSimulator.ViewModels
             {
                 TickerName = tickerName,
                 Price = price,
-                Operation = "Покупка",
+                Operation = operation,
                 Volume = VolumeTradingTicker, // Используем значение из VolumeTradingTicker
                 Date = DateTime.Now // Устанавливаем дату
             };
@@ -332,6 +350,19 @@ namespace TinkoffTradeSimulator.ViewModels
             // Опубликовываем событие для исторической коллекции
             EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
         }
+
+        // Метод для покупки
+        private void BuyTicker()
+        {
+            ExecuteTrade("Покупка");
+        }
+
+        // Метод для продажи
+        private void SellTicker()
+        {
+            ExecuteTrade("Продажа");
+        }
+
 
         #endregion
         // Метод покупки 

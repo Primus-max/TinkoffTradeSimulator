@@ -17,10 +17,7 @@ using TinkoffTradeSimulator.Views.Windows;
 namespace TinkoffTradeSimulator.ViewModels
 {
 
-    // TODO Выводить стоимость 
-
-    // TODO Создать таблицу с историей сделок. Если будет флаг IsClosed значит это уже история сделок
-    // TODO Добавить строку поиска по тикерам
+    // TODO Выводить стоимость    
     // TODO Добавить вкладку Избранное, в ней будут храниться тикеры 
     // TODO Реализовать принцип хранения тикеров в избранном
 
@@ -43,7 +40,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private decimal _accountBalance = 1000;
         private DateTime _currentDate = DateTime.Now;
         private decimal _dailyEarnings = 1200;
-        private string _filterByTickerName = string.Empty;     
+        private string _filterByTickerName = string.Empty;
         private readonly ObservableCollection<TickerInfo> _originalTickerInfoList = new ObservableCollection<TickerInfo>();
         #endregion
 
@@ -59,7 +56,6 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _tickerInfoList, value);
 
         }
-
         public ObservableCollection<TickerInfo> FilteredByTickerInfoList
         {
             get => _filteredByTickerInfoList;
@@ -71,13 +67,11 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _tradeHistoricalInfoList;
             set => Set(ref _tradeHistoricalInfoList, value);
         }
-
         public ObservableCollection<TradeRecordInfo> TradingInfoList
         {
             get => _tradingInfoList;
             set => Set(ref _tradingInfoList, value);
         }
-
         public TradeRecordInfo SelectedTradeInfo
         {
             get => _selectedTradeInfo;
@@ -88,7 +82,6 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _accountBalance;
             set => Set(ref _accountBalance, value);
         }
-
         public DateTime CurrentDate
         {
             get => _currentDate;
@@ -105,7 +98,7 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _filterByTickerName, value);
         }
         #endregion
-             
+
         #region Команды
         public ICommand OpenChartWindowCommand { get; }
 
@@ -164,7 +157,6 @@ namespace TinkoffTradeSimulator.ViewModels
             TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(); // Коллекция об исторических операциях
             #endregion
 
-
             _chartViewModel = new ChartWindowViewModel();
 
             #region Загрузка источников данных
@@ -178,8 +170,6 @@ namespace TinkoffTradeSimulator.ViewModels
             EventAggregator.TradingRecordInfoChanged += OnTradingInfoListChanged;
             #endregion
         }
-
-
 
         #region Методы
         #region Метод вызывающиеся подписчиками на события
