@@ -25,16 +25,16 @@ namespace TinkoffTradeSimulator.Data
             _db.Database.EnsureCreated();
             // загружаем данные из БД
             _db.TradeRecordsInfo.Load();
-            _db.HIstoricalTradeRecordsInfo.Load();
+            _db.HistoricalTradeRecordsInfo.Load();
 
             return _db;
         }
         
-        public static void SaveHistoricalData(TradeRecordInfo recordInfo)
-        {
-            _db.HIstoricalTradeRecordsInfo.Add(recordInfo);
-            _db.SaveChanges();
-        }
+        //public static void SaveHistoricalData(HistoricalTradeRecordInfo recordInfo)
+        //{
+        //    _db.HistoricalTradeRecordsInfo.Add(HistoricalTradeRecordInfo);
+        //    _db.SaveChanges();
+        //}
 
         public static void SaveTradingData(TradeRecordInfo recordInfo) 
         {

@@ -14,6 +14,7 @@ using TinkoffTradeSimulator.ApiServices.Tinkoff;
 using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
+using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.Utils;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
@@ -21,7 +22,7 @@ using Style = ScottPlot.Style;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
-    class ChartWindowViewModel : BaseViewModel
+    internal class ChartWindowViewModel : BaseViewModel
     {
 
         #region Приватные свойства
@@ -38,7 +39,9 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString()};
 
-        private double _volumeTradingTicker = 1!;
+        private int _volumeTradingTicker = 1!;
+
+        private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
 
         #endregion
 
@@ -68,7 +71,7 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _selectedTimeFrame;
             set => Set(ref _selectedTimeFrame, value);
         }
-        public double VolumeTradingTicker
+        public int VolumeTradingTicker
         {
             get => _volumeTradingTicker;
             set => Set(ref _volumeTradingTicker, value);
@@ -91,10 +94,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private bool CanBuyTickerCommandExecute(object p) => true;
 
         private void OnBuyTickerCommandExecuted(object sender)
-        {
-            double value = Convert.ToDouble(sender);
+        {         
 
-            BuyTicker(value);
+            BuyTicker();
         }
 
         
@@ -113,6 +115,10 @@ namespace TinkoffTradeSimulator.ViewModels
             #region Инициализация базы данных
             DbManager dbManager = new();
             _db = dbManager.InitializeDB();
+            #endregion
+
+            #region Инициализация источников данных
+            _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
             #endregion
 
             #region Подписки на события
@@ -255,17 +261,65 @@ namespace TinkoffTradeSimulator.ViewModels
 
 
         #region Методы по торговле (покупка/продажа)
-        private void BuyTicker(double value)
-        {
-            TradeRecordInfo tradeRecordInfo = new TradeRecordInfo();
+        private void BuyTicker()
+        {           
+            string tickerName = Title;
+            double price = 3444;
 
-            tradeRecordInfo.Price = 3444;
-            tradeRecordInfo.TickerName = Title;
-            tradeRecordInfo.IsBuy = true;
-            tradeRecordInfo.Operation = "Продажа";
+            // Поиск записи с тем же TickerName в _db.TradeRecordsInfo
+            TradeRecordInfo tradeRecordInfo = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.TickerName == tickerName);
 
-            DbManager.SaveTradingData(tradeRecordInfo);
+            if (tradeRecordInfo != null)
+            {
+                // Запись найдена, обновляем Volume, Price и Operation
+                tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
+                tradeRecordInfo.Price = price; // Обновляем цену
+                tradeRecordInfo.Operation = "Покупка"; // Обновляем тип операции
+            }
+            else
+            {
+                // Запись не найдена, создаем новую
+                tradeRecordInfo = new TradeRecordInfo
+                {
+                    TickerName = tickerName,
+                    Price = price,
+                    IsBuy = true,
+                    Operation = "Покупка",
+                    Volume = VolumeTradingTicker // Устанавливаем Volume из параметра VolumeTradingTicker
+                };
+
+                // Добавляем запись в _db.TradeRecordsInfo
+                _db.TradeRecordsInfo.Add(tradeRecordInfo);
+            }
+
+            // Создаем новую запись для истории торговли
+            HistoricalTradeRecordInfo historicalTradeRecordInfo = new HistoricalTradeRecordInfo
+            {
+                TickerName = tickerName,
+                Price = price,
+                Operation = "Покупка",
+                Volume = VolumeTradingTicker, // Используем значение из VolumeTradingTicker
+                Date = DateTime.Now // Устанавливаем дату
+            };
+
+            // Добавляем запись в _db.HistoricalTradeRecordsInfo
+            _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
+
+            // Сохраняем изменения в базе данных
+            _db.SaveChanges();
+
+            // Очищаем и обновляем _tradeHistoricalInfoList
+            _tradeHistoricalInfoList.Clear();
+            foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
+            {
+                _tradeHistoricalInfoList.Add(item);
+            }
+
+            // Опубликовываем событие
+            EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
+           
         }
+
         #endregion
         // Метод покупки 
 

@@ -10,6 +10,7 @@ using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
+using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
 
@@ -33,7 +34,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private InvestApiClient? _client = null;
         private ObservableCollection<TickerInfo>? _tickerInfoList = null!;
         private ObservableCollection<TickerInfo>? _filteredByTickerInfoList = null!;
-        private ObservableCollection<TradeRecordInfo>? _tradeHistoricalInfoList = null!;
+        private ObservableCollection<HistoricalTradeRecordInfo>? _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo>? _tradingInfoList = null!;
         private string _title = string.Empty;
         private ChartWindowViewModel _chartViewModel = null!;
@@ -65,7 +66,7 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _filteredByTickerInfoList, value);
 
         }
-        public ObservableCollection<TradeRecordInfo> TradeHistoricalInfoList
+        public ObservableCollection<HistoricalTradeRecordInfo> TradeHistoricalInfoList
         {
             get => _tradeHistoricalInfoList;
             set => Set(ref _tradeHistoricalInfoList, value);
@@ -159,21 +160,33 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Инициализация источников данных
             FilteredByTickerInfoList = new ObservableCollection<TickerInfo>();
-            TradingInfoList = new ObservableCollection<TradeRecordInfo>();
+            TradingInfoList = new ObservableCollection<TradeRecordInfo>(); // Коллекция о текущих операциях
+            TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(); // Коллекция об исторических операциях
             #endregion
 
-            
-            _chartViewModel = new ChartWindowViewModel();
 
+            _chartViewModel = new ChartWindowViewModel();
 
             #region Загрузка источников данных
             new Thread(async () => await LoadDataFromTinkoffApi()).Start();
             LoadHistorticalTradingData();
-            LoadTradingData(); 
+            LoadTradingData();
+            #endregion
+
+            #region Подписчики на события
+            EventAggregator.HistoricalTradeInfoChanged += OnHistoricalTradeInfoChanged;
             #endregion
         }
 
+
+
         #region Методы
+        // Метод оповещения об изменении источника данных для отображения во View
+        private void OnHistoricalTradeInfoChanged(ObservableCollection<HistoricalTradeRecordInfo> historicalTradeRecord)
+        {
+            TradeHistoricalInfoList = historicalTradeRecord;
+        }
+
         // Загружаю / отображаю актуальные данные из Tinkoff InvestAPI 
         public async Task LoadDataFromTinkoffApi()
         {
@@ -200,7 +213,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private void LoadHistorticalTradingData()
         {
             // Привожу у нужным данным коллекцию из базы данных
-            TradeHistoricalInfoList = new ObservableCollection<TradeRecordInfo>(_db.HIstoricalTradeRecordsInfo.ToList());
+            TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
         }
 
         // Загружаю / отображаю актуальные (торговые данные)

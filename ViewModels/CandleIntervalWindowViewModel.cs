@@ -9,6 +9,7 @@ using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
+using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
 

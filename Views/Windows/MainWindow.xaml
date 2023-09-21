@@ -266,7 +266,7 @@
 
                         <ListView
                             MinHeight="100"
-                            ItemsSource="{Binding TradingInfoList, UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSource="{Binding TradingInfoList}"
                             SelectedItem="{Binding SelectedTradeInfo}">
                             <ListView.View>
                                 <GridView>
@@ -415,5 +415,4 @@ Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
             </Grid>
         </Border>
     </Grid>
-
 </Window>
