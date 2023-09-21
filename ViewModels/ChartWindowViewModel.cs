@@ -42,6 +42,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private int _volumeTradingTicker = 1!;
 
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
+        private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
+
+        // _tradeCurrentInfoList
 
         #endregion
 
@@ -119,6 +122,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Инициализация источников данных
             _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
+            _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();
             #endregion
 
             #region Подписки на события
@@ -262,7 +266,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Методы по торговле (покупка/продажа)
         private void BuyTicker()
-        {           
+        {
             string tickerName = Title;
             double price = 3444;
 
@@ -315,9 +319,18 @@ namespace TinkoffTradeSimulator.ViewModels
                 _tradeHistoricalInfoList.Add(item);
             }
 
-            // Опубликовываем событие
+            // Очищаем и обновляем _tradeCurrentInfoList из базы данных
+            _tradeCurrentInfoList.Clear();
+            foreach (var item in _db.TradeRecordsInfo.ToList())
+            {
+                _tradeCurrentInfoList.Add(item);
+            }
+
+            // Опубликовываем событие для текущей коллекции
+            EventAggregator.PublishTradingInfoChanged(_tradeCurrentInfoList);
+
+            // Опубликовываем событие для исторической коллекции
             EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
-           
         }
 
         #endregion

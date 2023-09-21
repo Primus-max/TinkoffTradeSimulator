@@ -175,17 +175,25 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Подписчики на события
             EventAggregator.HistoricalTradeInfoChanged += OnHistoricalTradeInfoChanged;
+            EventAggregator.TradingRecordInfoChanged += OnTradingInfoListChanged;
             #endregion
         }
 
 
 
         #region Методы
+        #region Метод вызывающиеся подписчиками на события
+        // Метод оповещения об изменении источника данных для отображения во View
+        private void OnTradingInfoListChanged(ObservableCollection<TradeRecordInfo> tradingIndolist)
+        {
+            TradingInfoList = tradingIndolist;
+        }
         // Метод оповещения об изменении источника данных для отображения во View
         private void OnHistoricalTradeInfoChanged(ObservableCollection<HistoricalTradeRecordInfo> historicalTradeRecord)
         {
             TradeHistoricalInfoList = historicalTradeRecord;
         }
+        #endregion
 
         // Загружаю / отображаю актуальные данные из Tinkoff InvestAPI 
         public async Task LoadDataFromTinkoffApi()
