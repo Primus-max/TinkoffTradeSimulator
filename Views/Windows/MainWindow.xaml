@@ -245,8 +245,8 @@
                                                         VerticalAlignment="Center"
                                                         materialDesign:HintAssist.Hint="Поиск"
                                                         materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
-                                                        BorderThickness="0" TextChanged="FilterByTickerTradingRecord_TextChanged"
-                                                        />
+                                                        BorderThickness="0"
+                                                        TextChanged="FilterByTickerTradingRecord_TextChanged" />
                                                     <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
                                                         <materialDesign:PackIcon Kind="Search" Opacity=".56" />
                                                     </Button>
@@ -297,6 +297,32 @@
                                     </GridViewColumn>
                                 </GridView>
                             </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="Height" Value="40" />
+                                    <Setter Property="FontSize" Value="12" />
+                                    
+                                    <Setter Property="BorderThickness" Value="1" />
+                                    <Setter Property="BorderBrush" Value="#9a444444" />
+
+                                    <!--  Триггеры для изменения фона в зависимости от Operation  -->
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+
+                                        </Trigger>
+
+                                        <!--  Если элемент выбран  -->
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.ItemContainerStyle>
                         </ListView>
                     </DockPanel>
 
@@ -321,28 +347,11 @@
                         <StackPanel DockPanel.Dock="Top">
                             <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
                                 <DockPanel>
-                                    <!--<ToggleButton
-VerticalAlignment="Center"
-DockPanel.Dock="Right"
-Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                                     <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
                                         <TextBlock
                                             VerticalAlignment="Center"
                                             FontSize="18"
                                             Text="История сделок" />
-                                        <!--<ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" />-->
-                                        <!--<ComboBox
-    Margin="8,0,0,0"
-    materialDesign:ColorZoneAssist.Mode="Standard"
-    materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource MaterialDesignPaper}"
-    BorderBrush="{DynamicResource MaterialDesignPaper}"
-    BorderThickness="0"
-    SelectedIndex="0">
-    <ComboBoxItem Content="Android" />
-    <ComboBoxItem Content="iOS" />
-    <ComboBoxItem Content="Linux" />
-    <ComboBoxItem Content="Windows" />
-</ComboBox>-->
                                     </StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -374,9 +383,8 @@ Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                                                         materialDesign:HintAssist.Hint="Поиск"
                                                         materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                                                         BorderThickness="0"
-                                                        Text="{Binding FilterByTickerTradeRecordHistorical}" 
-                                                        TextChanged="FilterByTickerTradeRecordHistorial_TextChanged" 
-                                                        />
+                                                        Text="{Binding FilterByTickerTradeRecordHistorical}"
+                                                        TextChanged="FilterByTickerTradeRecordHistorial_TextChanged" />
                                                     <Button
                                                         Grid.Column="1"
                                                         Command="{Binding FilterTradingRecorsInfoListCommand}"
@@ -384,14 +392,18 @@ Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                                                         <materialDesign:PackIcon Kind="Search" Opacity=".56" />
                                                     </Button>
                                                 </Grid>
-                                            </materialDesign:ColorZone>                                           
+                                            </materialDesign:ColorZone>
                                         </StackPanel>
                                     </Grid>
                                 </DockPanel>
                             </materialDesign:ColorZone>
                         </StackPanel>
 
-                        <ListView MinHeight="100" ItemsSource="{Binding TradeHistoricalInfoList}">
+                        <ListView
+                            Width="Auto"
+                            MinHeight="100"
+                            ItemsSource="{Binding TradeHistoricalInfoList}">
+
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
@@ -400,16 +412,35 @@ Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Operation}" Header="Операция" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding Operation}" Header="Объём" />
-                                    <GridViewColumn>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <!--<Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Удалить" />-->
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
                                 </GridView>
                             </ListView.View>
+                            <!--  Стили для всех элементов ListViewItem  -->
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="Height" Value="50" />
+                                    <Setter Property="FontSize" Value="14" />
+
+                                    <!--  Триггеры для изменения фона в зависимости от Operation  -->
+                                    <Style.Triggers>
+                                        <!--  Если Operation равно "Покупка", окрасить фон в зеленый  -->
+                                        <DataTrigger Binding="{Binding Operation}" Value="Покупка">
+                                            <Setter Property="Background" Value="#4000ff00" />
+                                        </DataTrigger>
+                                        <!--  Если Operation равно "Продажа", окрасить фон в красный  -->
+                                        <DataTrigger Binding="{Binding Operation}" Value="Продажа">
+                                            <Setter Property="Background" Value="#75ff0000" />
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#9A575757" />
+                                            <!--  Желтый фон при наведении  -->
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
                         </ListView>
                     </DockPanel>
                 </Border>
