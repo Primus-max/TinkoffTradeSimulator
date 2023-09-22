@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -138,10 +139,19 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             if (sender is TradeRecordInfo tradeRecordInfo)
             {
-                // Создаем объект HistoricalTradeRecordInfo и копируем поля из объекта TradeRecordInfo
+                // Найдите объект TradeRecordInfo в базе данных и удалите его
+                var tradeRecordToDelete = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.Id == tradeRecordInfo.Id);
+                if (tradeRecordToDelete != null)
+                {
+                    _db.TradeRecordsInfo.Remove(tradeRecordToDelete);
+                    _db.SaveChanges();
+
+                    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList()) ;
+                }
+
+                // Создайте объект HistoricalTradeRecordInfo и скопируйте данные
                 var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
                 {
-                    Id = tradeRecordInfo.Id,
                     Date = DateTime.Now,
                     TickerName = tradeRecordInfo.TickerName,
                     Price = tradeRecordInfo.Price,
@@ -152,7 +162,7 @@ namespace TinkoffTradeSimulator.ViewModels
                     IsClosed = tradeRecordInfo.IsClosed
                 };
 
-                // Закрываем сделку и добавляем в базу
+                // Добавьте новый объект HistoricalTradeRecordInfo в базу данных
                 _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
                 _db.SaveChanges();
             }

@@ -298,7 +298,7 @@ namespace TinkoffTradeSimulator.ViewModels
                     else
                     {
                         // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
-                        // Можно добавить нужную логику здесь
+                        MessageBox.Show("Недостаточно объема для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         return; // Выходим из метода, так как объем недостаточный
                     }
                 }
@@ -313,9 +313,15 @@ namespace TinkoffTradeSimulator.ViewModels
                     _db.TradeRecordsInfo.Remove(tradeRecordInfo);
                 }
             }
+            else if (subtractVolume)
+            {
+                // Запись не найдена и мы пытаемся продать, отображаем сообщение об ошибке
+                MessageBox.Show("Нет записи для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             else
             {
-                // Запись не найдена, создаем новую
+                // Запись не найдена и мы пытаемся купить, создаем новую запись
                 tradeRecordInfo = new TradeRecordInfo
                 {
                     TickerName = tickerName,
@@ -366,7 +372,6 @@ namespace TinkoffTradeSimulator.ViewModels
             EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
         }
 
-
         // Метод для покупки
         private void BuyTicker()
         {
@@ -379,11 +384,7 @@ namespace TinkoffTradeSimulator.ViewModels
             ExecuteTrade("Продажа");
         }
 
-
-        #endregion
-        // Метод покупки 
-
-
+        #endregion        
         // Метод установки стилей для графика
         private void SetPlotStyle(string tickerName)
         {

@@ -192,29 +192,12 @@
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Top">
                             <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
-                                <DockPanel>
-                                    <!--<ToggleButton
-                VerticalAlignment="Center"
-                DockPanel.Dock="Right"
-                Style="{StaticResource MaterialDesignSwitchAccentToggleButton}" />-->
+                                <DockPanel>                                   
                                     <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
                                         <TextBlock
                                             VerticalAlignment="Center"
                                             FontSize="18"
-                                            Text="Открытые сделки" />
-                                        <!--<ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" />-->
-                                        <!--<ComboBox
-                    Margin="8,0,0,0"
-                    materialDesign:ColorZoneAssist.Mode="Standard"
-                    materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource MaterialDesignPaper}"
-                    BorderBrush="{DynamicResource MaterialDesignPaper}"
-                    BorderThickness="0"
-                    SelectedIndex="0">
-                    <ComboBoxItem Content="Android" />
-                    <ComboBoxItem Content="iOS" />
-                    <ComboBoxItem Content="Linux" />
-                    <ComboBoxItem Content="Windows" />
-                </ComboBox>-->
+                                            Text="Открытые сделки" />                                        
                                     </StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -276,7 +259,7 @@
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
-                                    <GridViewColumn>
+                                    <GridViewColumn Header="Закрыть" Width="120">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button
@@ -301,9 +284,9 @@
                                 <Style TargetType="ListViewItem">
                                     <Setter Property="HorizontalContentAlignment" Value="Center" />
                                     <Setter Property="VerticalContentAlignment" Value="Center" />
-                                    <Setter Property="Height" Value="40" />
-                                    <Setter Property="FontSize" Value="12" />
-                                    
+                                    <Setter Property="Height" Value="50" />
+                                    <Setter Property="FontSize" Value="14" />
+
                                     <Setter Property="BorderThickness" Value="1" />
                                     <Setter Property="BorderBrush" Value="#9a444444" />
 
@@ -434,8 +417,13 @@
                                             <Setter Property="Background" Value="#75ff0000" />
                                         </DataTrigger>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#9A575757" />
-                                            <!--  Желтый фон при наведении  -->
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                        </Trigger>
+                                        <!--  Если элемент выбран  -->
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
