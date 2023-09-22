@@ -98,7 +98,7 @@
                             materialDesign:HintAssist.Hint="Поиск"
                             materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                             BorderThickness="0"
-                            Text="{Binding FilterByTickerName, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding FilterByTickerNameAll, UpdateSourceTrigger=PropertyChanged}"
                             TextChanged="FilterByTickerAll_TextChanged" />
                         <Button
                             Grid.Column="1"

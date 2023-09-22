@@ -47,12 +47,12 @@
                                 Width="60"
                                 Margin="0,0,10,0"
                                 FontSize="18"
-                                Text="Имя:" />
+                                Text="Тикер:" />
                             <TextBlock
                                 FontSize="18"
                                 FontWeight="Bold"
                                 Foreground="Green"
-                                Text="{Binding Title}" />
+                                Text="{Binding Ticker}" />
                         </StackPanel>
                         <!--  Текущая цена  -->
                         <StackPanel Orientation="Horizontal">
@@ -75,11 +75,17 @@
 
                     <StackPanel Margin="40,0,0,0">
                         <!--  Цена на сколько в плюс или минус  -->
-                        <TextBlock Text="Открытие: $60,000" />
+                        <TextBlock Text="{Binding StockInfo.Open}">
+                            
+                        </TextBlock>
                         <!--  Максимальная цена  -->
-                        <TextBlock Text="Максимальная: $60,000" />
+                        <TextBlock Text="Максимальная:">
+                            <Run Text="{Binding StockInfo.MaxPrice}" />
+                        </TextBlock>
                         <!--  Минимальная цена  -->
-                        <TextBlock Text="Минимальная: $45,000" />
+                        <TextBlock Text="Минимальная:">
+                            <Run Text="{Binding StockInfo.MinPrice}" />
+                        </TextBlock>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -103,7 +109,10 @@
                     <ComboBoxItem Content="Chocolate" />
                 </ComboBox>-->
 
-                <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Cursor="">
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Cursor=""
+                    Orientation="Horizontal">
                     <Button
                         Background="Transparent"
                         BorderBrush="Transparent"

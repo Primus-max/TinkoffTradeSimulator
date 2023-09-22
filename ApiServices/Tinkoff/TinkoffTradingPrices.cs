@@ -99,10 +99,10 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             try
             {
                 TinkoffTradingPrices tinkoff = new(_client);
-                Share instrument = await GetShareByTicker(_currentTicker);
+                Share instrument = await GetShareByTicker(_currentTicker); // Метод получения информации по тикеру
 
                 // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex);
+                TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
 
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 CandleInterval interval = candleInterval ?? CandleInterval._1Min;
@@ -128,7 +128,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                         low: lowPriceCandle,
                         close: closePriceCandle,
                         timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex));
+                        timeSpan: TimeSpan.FromMinutes(1000));
 
                     prices.Add(price);
                 }

@@ -8,8 +8,11 @@ namespace TinkoffTradeSimulator.Views.Windows
     public partial class MainWindow : Window
     {
         MainWindowViewModel _mainWindowViewModel = null!;
+
+
         public MainWindow()
         {
+            
             InitializeComponent();
             _mainWindowViewModel = new MainWindowViewModel();
             DataContext = _mainWindowViewModel;                

@@ -2,8 +2,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
@@ -39,8 +42,9 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
+        private TickerInfo _stockInfo = null!;
 
-        // _tradeCurrentInfoList
+        private string _ticker = string.Empty;
 
         #endregion
 
@@ -75,6 +79,17 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _volumeTradingTicker;
             set => Set(ref _volumeTradingTicker, value);
         }
+        public TickerInfo StockInfo
+        {
+            get => _stockInfo;
+            set => Set(ref _stockInfo, value);
+        }
+
+        public string Ticker
+        {
+            get => _ticker;
+            set => Set(ref _ticker, value);
+        }
         #endregion
 
         #region Команды
@@ -107,7 +122,6 @@ namespace TinkoffTradeSimulator.ViewModels
             SellTicker();
         }
 
-
         #endregion
 
         // Пустой (необходимый) конструктор
@@ -136,6 +150,19 @@ namespace TinkoffTradeSimulator.ViewModels
             // Подписываемся на событие CandleIntervalSelected
             EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
             #endregion
+
+            StockInfo = new TickerInfo();
+
+            // Тестовые данные
+            //StockInfo = new TickerInfo
+            //{
+            //    Close = "23r",
+            //    MaxPrice = "345",
+            //    MinPrice = "sfdgdf",
+            //    TickerName = "adfgad",
+            //    Open = "sdfsfd",
+              
+            //};
         }
 
         // Коснтурктор с перегрузами
@@ -169,7 +196,6 @@ namespace TinkoffTradeSimulator.ViewModels
             LoadAsyncData();
         }
 
-
         #region Методы
 
         // Метод получения выбранно кнопки для отображения имени
@@ -179,16 +205,65 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод загрузки асинхронных данных для вызова из конструктора
-        private async void LoadAsyncData()
+        private  async void LoadAsyncData()
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
 
+            
+
             // Получаю обновлённый список свечей c задаными параметрами
             OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
-            // Получаю данные по тикерам (передаю именованные параметры)
+
+            Share instrument = await TinkoffTradingPrices.GetShareByTicker(Title);
+
+            Ticker = instrument.Ticker;
+
+            
+            // Устанавливаю данные в окно (цены, максимальная, минимальная и т.д.)            
+            // await SetStockInfo(pricesArray);
+
+            // Устанавливаю данные для для окна (график свечей)
             UpdateChartWindow(pricesArray);
         }
+
+
+        // Метод для установки значени в окне (Прайс, минимальная, максимальная)
+        private async Task SetStockInfo(OHLC[] pricesArray)
+        {
+            if (pricesArray == null || pricesArray.Length == 0)
+            {
+                // Если массив свечей пуст, выход из метода
+                return;
+            }
+
+            // Получаем первую свечу (первое значение в массиве)
+            OHLC firstCandle = pricesArray[0];
+
+            // Получаем максимальную и минимальную цену из всех свечей
+            decimal maxPrice = (decimal)pricesArray.Max(candle => candle.High);
+            decimal minPrice = (decimal)pricesArray.Min(candle => candle.Low);
+
+            // Далее вы можете получить данные о валюте и стоимости акции
+            Share instrument = await TinkoffTradingPrices.GetShareByTicker(Title);
+            
+
+            // Создаем объект TickerInfo и заполняем его данными
+            TickerInfo tickerInfo = new TickerInfo
+            {
+                TickerName = instrument.Ticker,
+                Open = firstCandle.Open.ToString("C"), // Форматируем валюту
+                Close = firstCandle.Close.ToString("C"), // Форматируем валюту
+               // Price = instrument.Price.ToString("C"), // Форматируем валюту
+                                                        // Здесь вы также можете добавить данные о максимальной и минимальной цене
+                MaxPrice = maxPrice.ToString("C"), // Форматируем валюту
+                MinPrice = minPrice.ToString("C") // Форматируем валюту
+            };
+
+            // Устанавливаем TickerInfo как свойство вашей ViewModel
+            StockInfo = tickerInfo;
+        }
+
 
         // Метод обновления окна с данными
         public void UpdateChartWindow(OHLC[] prices)
