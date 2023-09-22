@@ -245,7 +245,8 @@
                                                         VerticalAlignment="Center"
                                                         materialDesign:HintAssist.Hint="Поиск"
                                                         materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
-                                                        BorderThickness="0" />
+                                                        BorderThickness="0" TextChanged="FilterByTickerTradingRecord_TextChanged"
+                                                        />
                                                     <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
                                                         <materialDesign:PackIcon Kind="Search" Opacity=".56" />
                                                     </Button>
@@ -282,7 +283,7 @@
                                                     Background="Transparent"
                                                     BorderBrush="Transparent"
                                                     BorderThickness="0"
-                                                    Command="{Binding DataContext.DeleteTradingTickerInfoCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{Binding DataContext.CloseTradingDealCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
                                                     Foreground="White"
                                                     ToolTip="Закрыть сделку">

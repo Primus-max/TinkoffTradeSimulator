@@ -47,7 +47,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _filterByTickerNameAll = string.Empty;
         private readonly ObservableCollection<TickerInfo> _originalTickerInfoList = new ObservableCollection<TickerInfo>();
         private string _filterByTickerTradeRecordHistorical = string.Empty;
-        private ObservableCollection<object> _originalTradeInfoList = new ObservableCollection<object>();
+        private ObservableCollection<HistoricalTradeRecordInfo> _originalHistoricalTradeRecordInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
+        private ObservableCollection<TradeRecordInfo>? _originalTradingRecordInfoList = new ObservableCollection<TradeRecordInfo>();
+        #endregion
 
         #region Публичные поля
         public string Title
@@ -134,11 +136,28 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnCloseTradingDealCommandExecuted(object sender)
         {
-            TradeRecordInfo? tickerInfo = sender as TradeRecordInfo;
+            if (sender is TradeRecordInfo tradeRecordInfo)
+            {
+                // Создаем объект HistoricalTradeRecordInfo и копируем поля из объекта TradeRecordInfo
+                var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
+                {
+                    Id = tradeRecordInfo.Id,
+                    Date = DateTime.Now,
+                    TickerName = tradeRecordInfo.TickerName,
+                    Price = tradeRecordInfo.Price,
+                    Operation = tradeRecordInfo.Operation,
+                    Volume = tradeRecordInfo.Volume,
+                    IsBuy = tradeRecordInfo.IsBuy,
+                    IsSell = tradeRecordInfo.IsSell,
+                    IsClosed = tradeRecordInfo.IsClosed
+                };
 
-            DbManager.Delete(tickerInfo);
-
+                // Закрываем сделку и добавляем в базу
+                _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
+                _db.SaveChanges();
+            }
         }
+
         public ICommand? FilterTickerInfoListCommand { get; } = null;
 
         private bool CanFilterTickerInfoListCommandCommandExecute(object p) => true;
@@ -212,6 +231,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
         #endregion
 
+        #region Методы загрузки данных при инициализации приложения
         // Загружаю / отображаю актуальные данные из Tinkoff InvestAPI 
         public async Task LoadDataFromTinkoffApi()
         {
@@ -238,15 +258,19 @@ namespace TinkoffTradeSimulator.ViewModels
         private void LoadHistorticalTradingData()
         {
             // Привожу у нужным данным коллекцию из базы данных
-            TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
+            _originalHistoricalTradeRecordInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
+            UpdateFilterTradeHistoricalInfoListByTicker(string.Empty);
         }
 
         // Загружаю / отображаю актуальные (торговые данные)
         private void LoadTradingData()
         {
             // Привожу у нужным данным коллекцию из базы данных
-            TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+            _originalTradingRecordInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+
+            UpdateFilterTradingInfoListByTicker(string.Empty);
         }
+        #endregion
 
         // Открываю окно и строю в нём график
         private void OpenChartWindow(string tickerName)
@@ -293,48 +317,56 @@ namespace TinkoffTradeSimulator.ViewModels
             });
         }
 
-        // Обобщенный метод для фильтрации
-        public ObservableCollection<T> FilterTradeInfoListByTicker<T>(string tickerNameFilter) where T : ITradeInfo
+        // Метод фильтрации по историческим сделкам        
+        public void UpdateFilterTradeHistoricalInfoListByTicker(string tickerNameFilter)
         {
-            if (string.IsNullOrWhiteSpace(tickerNameFilter))
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                // Если фильтр пустой или null, возвращаем исходную коллекцию без фильтрации
-                return new ObservableCollection<T>(_originalTradeInfoList.OfType<T>());
-            }
+                TradeHistoricalInfoList.Clear();
 
-            // Очищаем фильтрованную коллекцию
-            var filteredList = new ObservableCollection<T>();
-
-            foreach (var item in _originalTradeInfoList.OfType<T>())
-            {
-                if (item.TickerName.Contains(tickerNameFilter, StringComparison.OrdinalIgnoreCase))
+                if (string.IsNullOrWhiteSpace(tickerNameFilter))
                 {
-                    // Если элемент соответствует фильтру, добавляем его в фильтрованную коллекцию
-                    filteredList.Add(item);
+                    foreach (var tickerInfo in _originalHistoricalTradeRecordInfoList)
+                    {
+                        TradeHistoricalInfoList.Add(tickerInfo);
+                    }
                 }
-            }
-
-            return filteredList;
+                else
+                {
+                    foreach (var tickerInfo in _originalHistoricalTradeRecordInfoList.Where(info => info.TickerName.Contains(tickerNameFilter, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        TradeHistoricalInfoList.Add(tickerInfo);
+                    }
+                }
+            });
         }
-        public void FilterTradeHistoricalInfoListByTicker(string tickerNameFilter)
+
+        // Метод фильтрации по открытым сделкам
+        public void UpdateFilterTradingInfoListByTicker(string tickerNameFilter)
         {
-            // Используем обобщенный метод для фильтрации TradeHistoricalInfoList
-            TradeHistoricalInfoList = FilterTradeInfoListByTicker<HistoricalTradeRecordInfo>(tickerNameFilter);
-        }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                TradingInfoList.Clear();
 
-        public void FilterTradingInfoListByTicker(string tickerNameFilter)
-        {
-            // Используем обобщенный метод для фильтрации TradingInfoList
-            TradingInfoList = FilterTradeInfoListByTicker<TradeRecordInfo>(tickerNameFilter);
+                if (string.IsNullOrWhiteSpace(tickerNameFilter))
+                {
+                    foreach (var tickerInfo in _originalTradingRecordInfoList)
+                    {
+                        TradingInfoList.Add(tickerInfo);
+                    }
+                }
+                else
+                {
+                    foreach (var tickerInfo in _originalTradingRecordInfoList.Where(info => info.TickerName.Contains(tickerNameFilter, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        TradingInfoList.Add(tickerInfo);
+                    }
+                }
+            });
         }
-
+        #endregion
+        #endregion
     }
-
-    #endregion
-
-
-    #endregion
 }
 
 
-#endregion

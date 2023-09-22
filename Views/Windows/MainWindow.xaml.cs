@@ -15,12 +15,13 @@ namespace TinkoffTradeSimulator.Views.Windows
             DataContext = _mainWindowViewModel;                
         }
 
+        #region ФИЛЬТРЫ
         private void FilterByTickerAll_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Получите текст из TextBox
             string filterText = ((TextBox)sender).Text;
 
-            // Вызовите метод фильтрации
+            // Вызываю метод фильрации метод фильтрации
             _mainWindowViewModel.UpdateFilteredTickerInfoList(filterText);
         }
 
@@ -29,11 +30,18 @@ namespace TinkoffTradeSimulator.Views.Windows
             // Получите текст из TextBox
             string filterText = ((TextBox)sender).Text;
 
-            // Вызываем метод фильтрации для TradeHistoricalInfoList в вашей ViewModel
-            _mainWindowViewModel.FilterTradeHistoricalInfoListByTicker(filterText);
+            // Вызываю метод фильрации метод фильтрации
+            _mainWindowViewModel.UpdateFilterTradeHistoricalInfoListByTicker(filterText);
+        }
+        #endregion
 
-            // Вызываем метод фильтрации для TradingInfoList в вашей ViewModel
-            //ViewModel.FilterTradingInfoListByTicker(filterText);
+        private void FilterByTickerTradingRecord_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Получите текст из TextBox
+            string filterText = ((TextBox)sender).Text;
+
+            // Вызываю метод фильрации метод фильтрации
+            _mainWindowViewModel.UpdateFilterTradingInfoListByTicker(filterText);
         }
     }
 }
