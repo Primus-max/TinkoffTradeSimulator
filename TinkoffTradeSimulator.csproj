@@ -6,6 +6,17 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Converters\**" />
+    <Compile Remove="Test\**" />
+    <EmbeddedResource Remove="Converters\**" />
+    <EmbeddedResource Remove="Test\**" />
+    <None Remove="Converters\**" />
+    <None Remove="Test\**" />
+    <Page Remove="Converters\**" />
+    <Page Remove="Test\**" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.57.0" />
@@ -15,6 +26,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.11" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.1.2" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.67" />
     <PackageReference Include="SQLite" Version="3.13.0" />
     <PackageReference Include="Tinkoff.InvestApi" Version="0.6.2" />
@@ -35,10 +47,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Converters\" />
-	</ItemGroup>
 
  
 </Project>

@@ -35,17 +35,12 @@ namespace TinkoffTradeSimulator.ViewModels
 
         // Приватное свойство для хранения данных свечей
         private ObservableCollection<OHLC>? _candlestickData = null;
-
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
-
-        private int _volumeTradingTicker = 1!;
-
+        private int _volumeTradingTicker = 1;
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
         private TickerInfo _stockInfo = null!;
-
-        private string _ticker = string.Empty;
-
+        private string _ticker = string.Empty;        
         #endregion
 
         #region Публичные свойства
@@ -54,21 +49,18 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _title;
             set => Set(ref _title, value);
         }
-
         // Публичное свойство для хранения данных свечей
         public ObservableCollection<OHLC> CandlestickData
         {
             get => _candlestickData;
             set => Set(ref _candlestickData, value);
         }
-
         // Публичное свойство для определения индекса по которому будет выбран CandleInterval
         public int SelectedHistoricalTimeCandleIndex
         {
             get => (int)_selectedHistoricalTimeCandleIndex;
             set => Set(ref _selectedHistoricalTimeCandleIndex, value);
         }
-
         public CandleTimeFrameButton SelectedTimeFrame
         {
             get => _selectedTimeFrame;
@@ -84,12 +76,11 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _stockInfo;
             set => Set(ref _stockInfo, value);
         }
-
         public string Ticker
         {
             get => _ticker;
             set => Set(ref _ticker, value);
-        }
+        }        
         #endregion
 
         #region Команды
