@@ -32,13 +32,6 @@ namespace TinkoffTradeSimulator.Views.Windows
 
             InitializePlot();
 
-            //// Отключаю события скролла от ScottPlot
-            //WpfPlot1.Configuration.ScrollWheelZoom = false;
-
-            //// Добавляю своё событие скролла
-            //WpfPlot1.MouseWheel += OnMouseWheel;
-
-           
         }
 
         private void InitializePlot()
@@ -58,45 +51,20 @@ namespace TinkoffTradeSimulator.Views.Windows
             )));
             plotModel.Series.Add(candlestickSeries);
             candlestickPlot.Model = plotModel;
-        }       
-
-
-        // Событие сролла мышки для масштабирования таймфрейма свечи
-        private void OnMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-
-            if (e.Delta > 0)
-            {
-                // Скролл вперёд (увеличение интервала)
-                _chartViewModel.IncreaseCandleHistorical();
-            }
-            else
-            {
-                // Скролл назад (уменьшение интервала)
-                _chartViewModel.DecreaseCandleIHistorical();
-            }
-
-            // Обновляем график с новым интервалом свечей
-            // WpfPlot1.Refresh();
-
-            // Отменим дальнейшую обработку события, чтобы избежать дополнительной прокрутки
-            e.Handled = true;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            // Создаю экземпляр класса и передаю в конструкторе WpfPlot который создан во View,
-            // имя тикера (заголовок окна надо передавать по другому)
-            //_chartViewModel = new ChartWindowViewModel(WpfPlot1, Title);
-        }
-    }
 
-    public class CandlestickData
-    {
-        public DateTime Date { get; set; }
-        public double High { get; set; }
-        public double Low { get; set; }
-        public double Open { get; set; }
-        public double Close { get; set; }
-    }
+        // Открытие окна с выбором таймфрема
+        //private void UpdateButtonClick(object sender, RoutedEventArgs e)
+        //{
+        //    var intervalSelectionWindow = new IntervalSelectionWindow();
+        //    intervalSelectionWindow.Owner = this; // Устанавливаем текущее окно как владельца для модального диалогового окна
+        //    intervalSelectionWindow.ShowDialog();
+
+        //    // После закрытия окна выбора интервала, обновляем данные и график
+        //    int selectedInterval = intervalSelectionWindow.SelectedInterval;
+        //    viewModel.UpdateData(selectedInterval);
+        //    InitializePlot();
+        //}
+    }  
 }

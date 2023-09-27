@@ -147,16 +147,8 @@ namespace TinkoffTradeSimulator.ViewModels
 
             StockInfo = new TickerInfo();
 
-            // Тестовые данные
-            //StockInfo = new TickerInfo
-            //{
-            //    Close = "23r",
-            //    MaxPrice = "345",
-            //    MinPrice = "sfdgdf",
-            //    TickerName = "adfgad",
-            //    Open = "sdfsfd",
-              
-            //};
+            // Ваша логика загрузки данных о свечах должна быть здесь
+            CandlestickData = LoadCandlestickData();
         }
 
         // Коснтурктор с перегрузами
@@ -191,6 +183,68 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Методы
+
+        // Метод обновления данных для отображения OxyPlot
+        public void UpdateData(int hoursInterval)
+        {
+            // Здесь обновите данные свечей с новым временным интервалом
+            // Просто для примера, мы снова создадим случайные данные.
+            var random = new Random();
+            var data = new List<CandlestickData>();
+            var currentDate = DateTime.Now.Date;
+
+            for (int i = 0; i < 30; i++)
+            {
+                var high = random.Next(100, 200);
+                var low = random.Next(50, 100);
+                var open = random.Next(100, 150);
+                var close = random.Next(100, 150);
+
+                data.Add(new CandlestickData
+                {
+                    Date = currentDate,
+                    High = high,
+                    Low = low,
+                    Open = open,
+                    Close = close
+                });
+
+                currentDate = currentDate.AddHours(hoursInterval);
+            }
+
+            CandlestickData = data;
+        }
+
+        // Загружаю данные для графика
+        private List<CandlestickData> LoadCandlestickData()
+        {
+            // Здесь загрузите и верните данные о свечах из вашего источника данных.
+            // Просто для примера, создадим случайные данные.
+            var random = new Random();
+            var data = new List<CandlestickData>();
+            var currentDate = DateTime.Now.Date;
+
+            for (int i = 0; i < 30; i++)
+            {
+                var high = random.Next(100, 200);
+                var low = random.Next(50, 100);
+                var open = random.Next(100, 150);
+                var close = random.Next(100, 150);
+
+                data.Add(new CandlestickData
+                {
+                    Date = currentDate,
+                    High = high,
+                    Low = low,
+                    Open = open,
+                    Close = close
+                });
+
+                currentDate = currentDate.AddDays(1);
+            }
+
+            return data;
+        }
 
         // Метод получения выбранно кнопки для отображения имени
         private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
