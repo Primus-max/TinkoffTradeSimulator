@@ -8,7 +8,8 @@
     xmlns:local="clr-namespace:TinkoffTradeSimulator.Views.Windows"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels" xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="{Binding Title}"
     Width="900"
     Height="600"
@@ -75,9 +76,7 @@
 
                     <StackPanel Margin="40,0,0,0">
                         <!--  Цена на сколько в плюс или минус  -->
-                        <TextBlock Text="{Binding StockInfo.Open}">
-                            
-                        </TextBlock>
+                        <TextBlock Text="{Binding StockInfo.Open}" />
                         <!--  Максимальная цена  -->
                         <TextBlock Text="Максимальная:">
                             <Run Text="{Binding StockInfo.MaxPrice}" />
@@ -146,7 +145,10 @@
 
         <!--  Основная область с графиком  -->
         <!--<ScottPlot:WpfPlot x:Name="WpfPlot1" Grid.Row="2" />-->
-        <oxy:PlotView Name="myPlotView" Grid.Row="2"/>
+        <oxy:PlotView
+            x:Name="candlestickPlot"
+            Grid.Row="2"
+            Model="{Binding PlotModel}" />
     </Grid>
 
 </Window>

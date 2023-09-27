@@ -1,5 +1,6 @@
 ﻿using ScottPlot;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,13 +35,14 @@ namespace TinkoffTradeSimulator.ViewModels
         private int _selectedHistoricalTimeCandleIndex = 10;
 
         // Приватное свойство для хранения данных свечей
-        private ObservableCollection<OHLC>? _candlestickData = null;
+        
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
         private int _volumeTradingTicker = 1;
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
         private TickerInfo _stockInfo = null!;
-        private string _ticker = string.Empty;        
+        private string _ticker = string.Empty;
+        private List<CandlestickData> _candlestickData;
         #endregion
 
         #region Публичные свойства
@@ -50,10 +52,11 @@ namespace TinkoffTradeSimulator.ViewModels
             set => Set(ref _title, value);
         }
         // Публичное свойство для хранения данных свечей
-        public ObservableCollection<OHLC> CandlestickData
+        public List<CandlestickData> CandlestickData
         {
             get => _candlestickData;
             set => Set(ref _candlestickData, value);
+            
         }
         // Публичное свойство для определения индекса по которому будет выбран CandleInterval
         public int SelectedHistoricalTimeCandleIndex

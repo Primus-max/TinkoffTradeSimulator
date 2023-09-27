@@ -4,6 +4,7 @@ using OxyPlot.Series;
 using OxyPlot.Wpf;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using TinkoffTradeSimulator.ViewModels;
@@ -20,10 +21,16 @@ namespace TinkoffTradeSimulator.Views.Windows
 
         private ChartWindowViewModel _chartViewModel = null;
 
+            
         public ChartWindow()
         {
             InitializeComponent();
 
+
+            _chartViewModel = new ChartWindowViewModel();
+            DataContext = _chartViewModel;
+
+            InitializePlot();
 
             //// Отключаю события скролла от ScottPlot
             //WpfPlot1.Configuration.ScrollWheelZoom = false;
@@ -31,87 +38,27 @@ namespace TinkoffTradeSimulator.Views.Windows
             //// Добавляю своё событие скролла
             //WpfPlot1.MouseWheel += OnMouseWheel;
 
-            PlotModel plot =  InitializePlotModel();
-
            
-            var asdf = "";
         }
 
-
-        public static PlotModel InitializePlotModel()
+        private void InitializePlot()
         {
-            var model = new PlotModel { Title = "" };
-
-            var axisColor = OxyColor.FromRgb(227, 227, 227);
-            var gridLineColor = OxyColor.FromRgb(81, 81, 81);
-
-            //title
-            model.TitleColor = OxyColors.DodgerBlue;
-            model.TitleFont = "Segoe UI Semibold";
-
-            //Legend
-            //model.LegendFont = "Segoe UI Semibold";
-            //model.LegendTextColor = axisColor;
-            //model.LegendBorder = gridLineColor;
-
-            //plot border
-            model.PlotAreaBorderColor = axisColor;
-
-            //axes
-            model.Axes.Add(new LinearAxis
+            var plotModel = new PlotModel { Title = "Candlestick Chart" };
+            var candlestickSeries = new CandleStickSeries
             {
-                Position = AxisPosition.Right,
-                TextColor = axisColor,
-                AxislineColor = axisColor,
-                TicklineColor = axisColor,
-                MajorGridlineColor = gridLineColor,
-                MajorGridlineStyle = LineStyle.Dash,
-                MinorGridlineColor = gridLineColor,
-                MinorGridlineStyle = LineStyle.Dash,
-                Font = "Segoe UI Semibold",
-                AbsoluteMinimum = 0
-            });
-
-            model.Axes.Add(new DateTimeAxis
-            {
-                Position = AxisPosition.Bottom,
-                TextColor = axisColor,
-                AxislineColor = axisColor,
-                TicklineColor = axisColor,
-                MajorGridlineColor = gridLineColor,
-                MinorTickSize = 0,
-                Font = "Segoe UI Semibold"
-            });
-
-            //prices
-            model.Series.Add(new CandleStickSeries
-            {
-                CandleWidth = .4,
-                Color = OxyColors.DimGray,
-                IncreasingColor = OxyColor.FromRgb(0, 192, 0),
-                DecreasingColor = OxyColor.FromRgb(255, 0, 0),
-                StrokeThickness = 1
-            });
-
-            //buys and sells (markers)
-            model.Series.Add(new ScatterSeries
-            {
-                Title = "Buys",
-                MarkerFill = OxyColors.DodgerBlue,
-                MarkerType = MarkerType.Triangle,
-                MarkerSize = 3
-            });
-
-            model.Series.Add(new ScatterSeries
-            {
-                Title = "Sells",
-                MarkerFill = OxyColor.FromRgb(222, 222, 222),
-                MarkerType = MarkerType.Circle,
-                MarkerSize = 3
-            });
-
-            return model;
-        }
+                Title = "Candlesticks",
+                TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
+            };
+            candlestickSeries.Items.AddRange(_chartViewModel.CandlestickData.Select(data => new HighLowItem(
+                DateTimeAxis.ToDouble(data.Date),
+                data.High,
+                data.Low,
+                data.Open,
+                data.Close
+            )));
+            plotModel.Series.Add(candlestickSeries);
+            candlestickPlot.Model = plotModel;
+        }       
 
 
         // Событие сролла мышки для масштабирования таймфрейма свечи
@@ -142,5 +89,14 @@ namespace TinkoffTradeSimulator.Views.Windows
             // имя тикера (заголовок окна надо передавать по другому)
             //_chartViewModel = new ChartWindowViewModel(WpfPlot1, Title);
         }
+    }
+
+    public class CandlestickData
+    {
+        public DateTime Date { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Open { get; set; }
+        public double Close { get; set; }
     }
 }
