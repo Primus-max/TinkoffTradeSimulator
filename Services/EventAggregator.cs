@@ -26,5 +26,14 @@ namespace TinkoffTradeSimulator.Services
         {
             TradingRecordInfoChanged?.Invoke(tradingRecordInfo);
         }
+
+        // Событие, которое будет вызываться при запросе обновления данных
+        public static event Action? UpdateDataRequested;
+
+        // Метод для опубликования запроса на обновление данных
+        public static void PublishUpdateDataRequested()
+        {
+            UpdateDataRequested?.Invoke();
+        }
     }
 }

@@ -1,13 +1,14 @@
-﻿using ScottPlot;
+﻿using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
+using OxyPlot.Wpf;
+using ScottPlot;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
@@ -18,7 +19,6 @@ using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
-using Style = ScottPlot.Style;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
@@ -30,19 +30,20 @@ namespace TinkoffTradeSimulator.ViewModels
         private WpfPlot? _wpfPlot = null;
         private string _title = string.Empty;
         private AppContext _db = null!;
+        private PlotView _plotModel = null!;
 
         // Приватное свойство для определения временно интервала свечей
         private int _selectedHistoricalTimeCandleIndex = 10;
 
         // Приватное свойство для хранения данных свечей
-        
+
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
         private int _volumeTradingTicker = 1;
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
         private TickerInfo _stockInfo = null!;
         private string _ticker = string.Empty;
-        private List<CandlestickData> _candlestickData;
+        private ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData> _candlestickData = null!;
         #endregion
 
         #region Публичные свойства
@@ -51,14 +52,12 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _title;
             set => Set(ref _title, value);
         }
-        // Публичное свойство для хранения данных свечей
-        public List<CandlestickData> CandlestickData
+        public ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData> CandlestickData
         {
             get => _candlestickData;
             set => Set(ref _candlestickData, value);
-            
+
         }
-        // Публичное свойство для определения индекса по которому будет выбран CandleInterval
         public int SelectedHistoricalTimeCandleIndex
         {
             get => (int)_selectedHistoricalTimeCandleIndex;
@@ -83,7 +82,13 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _ticker;
             set => Set(ref _ticker, value);
-        }        
+        }
+
+        public PlotView PlotModel
+        {
+            get => _plotModel;
+            set => Set(ref _plotModel, value);
+        }
         #endregion
 
         #region Команды
@@ -146,22 +151,15 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             StockInfo = new TickerInfo();
-
+            PlotModel = new PlotView();
             // Ваша логика загрузки данных о свечах должна быть здесь
-            CandlestickData = LoadCandlestickData();
+            CandlestickData = new ObservableCollection<CandlestickData>();
+            UpdateData(1);
         }
 
         // Коснтурктор с перегрузами
-        public ChartWindowViewModel(WpfPlot plot, string ticker)
+        public ChartWindowViewModel(string ticker)
         {
-
-            // Делаю доступным в этой области видимости полученный объект из конструктора
-            _wpfPlot = plot;
-
-
-            // Устанавливаю стили для графика
-            SetPlotStyle(ticker);
-
 
             // TODO найти в чём причина обнуления Title при определённых сценариях
             // Обновляю заголовок окна на актуальный 
@@ -177,6 +175,7 @@ namespace TinkoffTradeSimulator.ViewModels
             _db = dbManager.InitializeDB();
             #endregion
 
+          
 
             // Загрузка каких-нибудь асинхронных данных
             LoadAsyncData();
@@ -190,8 +189,10 @@ namespace TinkoffTradeSimulator.ViewModels
             // Здесь обновите данные свечей с новым временным интервалом
             // Просто для примера, мы снова создадим случайные данные.
             var random = new Random();
-            var data = new List<CandlestickData>();
+            var data = new ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData>();
             var currentDate = DateTime.Now.Date;
+            var plotModel = new PlotModel { Title = "Candlestick Chart" };
+          
 
             for (int i = 0; i < 30; i++)
             {
@@ -213,15 +214,38 @@ namespace TinkoffTradeSimulator.ViewModels
             }
 
             CandlestickData = data;
+
+            // Очистите старые серии данных из PlotModel
+            plotModel.Series.Clear();
+
+            var candlestickSeries = new CandleStickSeries
+            {
+                Title = "Candlesticks",
+                TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
+            };
+            candlestickSeries.Items.AddRange(CandlestickData.Select(data => new HighLowItem(
+                DateTimeAxis.ToDouble(data.Date),
+                data.High,
+                data.Low,
+                data.Open,
+                data.Close
+            )));
+
+            plotModel.Series.Add(candlestickSeries);
+            PlotModel.Model = plotModel;
+
+            // Обновите PlotModel, чтобы обновить график
+            PlotModel.InvalidatePlot(true);
         }
 
+
         // Загружаю данные для графика
-        private List<CandlestickData> LoadCandlestickData()
+        private ObservableCollection<CandlestickData> LoadCandlestickData()
         {
             // Здесь загрузите и верните данные о свечах из вашего источника данных.
             // Просто для примера, создадим случайные данные.
             var random = new Random();
-            var data = new List<CandlestickData>();
+            var data = new ObservableCollection<CandlestickData>();
             var currentDate = DateTime.Now.Date;
 
             for (int i = 0; i < 30; i++)
@@ -253,12 +277,12 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод загрузки асинхронных данных для вызова из конструктора
-        private  async void LoadAsyncData()
+        private async void LoadAsyncData()
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
 
-            
+
 
             // Получаю обновлённый список свечей c задаными параметрами
             OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
@@ -267,14 +291,13 @@ namespace TinkoffTradeSimulator.ViewModels
 
             Ticker = instrument.Ticker;
 
-            
+
             // Устанавливаю данные в окно (цены, максимальная, минимальная и т.д.)            
             // await SetStockInfo(pricesArray);
 
             // Устанавливаю данные для для окна (график свечей)
-            UpdateChartWindow(pricesArray);
+            //UpdateChartWindow(pricesArray);
         }
-
 
         // Метод для установки значени в окне (Прайс, минимальная, максимальная)
         private async Task SetStockInfo(OHLC[] pricesArray)
@@ -294,7 +317,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Далее вы можете получить данные о валюте и стоимости акции
             Share instrument = await TinkoffTradingPrices.GetShareByTicker(Title);
-            
+
 
             // Создаем объект TickerInfo и заполняем его данными
             TickerInfo tickerInfo = new TickerInfo
@@ -302,8 +325,8 @@ namespace TinkoffTradeSimulator.ViewModels
                 TickerName = instrument.Ticker,
                 Open = firstCandle.Open.ToString("C"), // Форматируем валюту
                 Close = firstCandle.Close.ToString("C"), // Форматируем валюту
-               // Price = instrument.Price.ToString("C"), // Форматируем валюту
-                                                        // Здесь вы также можете добавить данные о максимальной и минимальной цене
+                                                         // Price = instrument.Price.ToString("C"), // Форматируем валюту
+                                                         // Здесь вы также можете добавить данные о максимальной и минимальной цене
                 MaxPrice = maxPrice.ToString("C"), // Форматируем валюту
                 MinPrice = minPrice.ToString("C") // Форматируем валюту
             };
@@ -312,19 +335,6 @@ namespace TinkoffTradeSimulator.ViewModels
             StockInfo = tickerInfo;
         }
 
-
-        // Метод обновления окна с данными
-        public void UpdateChartWindow(OHLC[] prices)
-        {
-            // Очищаем текущий график перед добавлением новых свечей
-            _wpfPlot?.Plot.Clear();
-
-            // Добавляю полученный список через специальный метод ScottPlot
-            _wpfPlot?.Plot.AddCandlesticks(prices);
-
-            // Обновляю view
-            _wpfPlot?.Refresh();
-        }
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее
         private static int GetCandleIntervalByIndex(int index)
@@ -507,15 +517,8 @@ namespace TinkoffTradeSimulator.ViewModels
             ExecuteTrade("Продажа");
         }
 
-        #endregion        
+        #endregion
         // Метод установки стилей для графика
-        private void SetPlotStyle(string tickerName)
-        {
-            _wpfPlot.Plot.Style(Style.Gray1);
-            _wpfPlot.Plot.Title($"График свечей для {tickerName}");
-            _wpfPlot.Plot.XLabel("Ось Х");
-            _wpfPlot.Plot.YLabel("Ось Y");
-        }
 
         #endregion
     }
