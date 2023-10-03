@@ -137,6 +137,8 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnCloseTradingDealCommandExecuted(object sender)
         {
+            // Закрываю сделку
+
             if (sender is TradeRecordInfo tradeRecordInfo)
             {
                 // Найдите объект TradeRecordInfo в базе данных и удалите его
@@ -228,7 +230,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Методы
-        #region Метод вызывающиеся подписчиками на события
+        #region Методы подписчиков на события
         // Метод оповещения об изменении источника данных для отображения во View
         private void OnTradingInfoListChanged(ObservableCollection<TradeRecordInfo> tradingIndolist)
         {

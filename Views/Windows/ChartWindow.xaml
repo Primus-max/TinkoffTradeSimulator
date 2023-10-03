@@ -14,7 +14,8 @@
     Width="900"
     Height="600"
     Background="#A5424B51"
-    mc:Ignorable="d" Closed="ChartWindow_Closed">
+    Closed="ChartWindow_Closed"
+    mc:Ignorable="d">
     <Window.DataContext>
         <vm:ChartWindowViewModel />
     </Window.DataContext>
@@ -131,23 +132,12 @@
                         Content="Продать" />
                 </StackPanel>
                 <Separator />
-                <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">
-    <ComboBoxItem Content="Fries" IsSelected="True" />
-    <ComboBoxItem Content="Waffles" />
-    <ComboBoxItem Content="Chocolate" />
-</ComboBox>-->
-
-
+                
 
             </ToolBar>
         </ToolBarTray>
-        <Button Content="Update" />
-        <!--  Основная область с графиком  -->
-        <!--<ScottPlot:WpfPlot x:Name="WpfPlot1" Grid.Row="2" />-->
-        <oxy:PlotView
-            x:Name="CandlestickPlot"
-            Grid.Row="2"
-             />
+       
+        <oxy:PlotView x:Name="CandlestickPlot" Grid.Row="2" />
     </Grid>
 
 </Window>

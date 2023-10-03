@@ -4,6 +4,7 @@ using OxyPlot.Series;
 using OxyPlot.Wpf;
 using ScottPlot;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -155,6 +156,10 @@ namespace TinkoffTradeSimulator.ViewModels
             // Ваша логика загрузки данных о свечах должна быть здесь
             CandlestickData = new ObservableCollection<CandlestickData>();
             UpdateData(1);
+
+
+            // Загрузка каких-нибудь асинхронных данных
+            LoadAsyncData();
         }
 
         // Коснтурктор с перегрузами
@@ -239,38 +244,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
 
-        // Загружаю данные для графика
-        private ObservableCollection<CandlestickData> LoadCandlestickData()
-        {
-            // Здесь загрузите и верните данные о свечах из вашего источника данных.
-            // Просто для примера, создадим случайные данные.
-            var random = new Random();
-            var data = new ObservableCollection<CandlestickData>();
-            var currentDate = DateTime.Now.Date;
-
-            for (int i = 0; i < 30; i++)
-            {
-                var high = random.Next(100, 200);
-                var low = random.Next(50, 100);
-                var open = random.Next(100, 150);
-                var close = random.Next(100, 150);
-
-                data.Add(new CandlestickData
-                {
-                    Date = currentDate,
-                    High = high,
-                    Low = low,
-                    Open = open,
-                    Close = close
-                });
-
-                currentDate = currentDate.AddDays(1);
-            }
-
-            return data;
-        }
-
-        // Метод получения выбранно кнопки для отображения имени
+        // Метод получения выбранной кнопки для отображения имени
         private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
         {
             SelectedTimeFrame = selectedButton;
@@ -282,59 +256,13 @@ namespace TinkoffTradeSimulator.ViewModels
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
 
-
+            TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
 
             // Получаю обновлённый список свечей c задаными параметрами
-            OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+           List<HistoricCandle> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
 
-            Share instrument = await TinkoffTradingPrices.GetShareByTicker(Title);
-
-            Ticker = instrument.Ticker;
-
-
-            // Устанавливаю данные в окно (цены, максимальная, минимальная и т.д.)            
-            // await SetStockInfo(pricesArray);
-
-            // Устанавливаю данные для для окна (график свечей)
-            //UpdateChartWindow(pricesArray);
+             
         }
-
-        // Метод для установки значени в окне (Прайс, минимальная, максимальная)
-        private async Task SetStockInfo(OHLC[] pricesArray)
-        {
-            if (pricesArray == null || pricesArray.Length == 0)
-            {
-                // Если массив свечей пуст, выход из метода
-                return;
-            }
-
-            // Получаем первую свечу (первое значение в массиве)
-            OHLC firstCandle = pricesArray[0];
-
-            // Получаем максимальную и минимальную цену из всех свечей
-            decimal maxPrice = (decimal)pricesArray.Max(candle => candle.High);
-            decimal minPrice = (decimal)pricesArray.Min(candle => candle.Low);
-
-            // Далее вы можете получить данные о валюте и стоимости акции
-            Share instrument = await TinkoffTradingPrices.GetShareByTicker(Title);
-
-
-            // Создаем объект TickerInfo и заполняем его данными
-            TickerInfo tickerInfo = new TickerInfo
-            {
-                TickerName = instrument.Ticker,
-                Open = firstCandle.Open.ToString("C"), // Форматируем валюту
-                Close = firstCandle.Close.ToString("C"), // Форматируем валюту
-                                                         // Price = instrument.Price.ToString("C"), // Форматируем валюту
-                                                         // Здесь вы также можете добавить данные о максимальной и минимальной цене
-                MaxPrice = maxPrice.ToString("C"), // Форматируем валюту
-                MinPrice = minPrice.ToString("C") // Форматируем валюту
-            };
-
-            // Устанавливаем TickerInfo как свойство вашей ViewModel
-            StockInfo = tickerInfo;
-        }
-
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее
         private static int GetCandleIntervalByIndex(int index)

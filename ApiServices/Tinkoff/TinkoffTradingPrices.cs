@@ -1,11 +1,8 @@
 ﻿using Google.Protobuf.WellKnownTypes;
-using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 
@@ -15,22 +12,15 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
     {
         private static InvestApiClient? _client = null;
         private static string _currentTicker = string.Empty;
-        private static double _currentCandleHistoricalIntervalIndex = 10; 
+        private static double _currentCandleHistoricalIntervalIndex = 10;
 
         public TinkoffTradingPrices(InvestApiClient client)
         {
-
-            // Создаю клиента
-            LoadClientAsync();
+            _client = client;
         }
+               
 
-        private static async void LoadClientAsync()
-        {
-            // Создаю клиента Тинькофф 
-            _client = await TinkoffClient.CreateAsync();            
-        }
-
-        // Получае Share по тикеру
+        // Получаем Share по тикеру
         public static async Task<Share> GetShareByTicker(string ticker)
         {
             Share share = new();
@@ -40,7 +30,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 SharesResponse sharesResponse = await _client?.Instruments.SharesAsync();
                 share = sharesResponse?.Instruments?.FirstOrDefault(x => x.Ticker == ticker) ?? new Share();
             }
-            catch (Exception )
+            catch (Exception)
             {
                 //MessageBox.Show($"Не удалось получить инструмент. Причина: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -50,7 +40,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
         // Получаю исторические свечи по Share и временному промежутку
         public static async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, CandleInterval candleIndexInterval)
-        {            
+        {
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset intervalAgo = now.Subtract(timeFrame);
             Timestamp nowTimestamp = Timestamp.FromDateTimeOffset(now);
@@ -81,10 +71,11 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             }
         }
 
-        // Метод обновления и получения данных по свечам, учитывая имя тикера, таймфрем, временной интервал 
-        public static async Task<OHLC[]> GetCandlesData(string ticker = null, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
+        // Метод обновления и получения данных по свечам, учитывая имя тикера, таймфрем, временной интервал (именовыные параметры)
+        public static async Task<List<HistoricCandle>> GetCandlesData( string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
         {
-            
+            if(_client == null) return new List<HistoricCandle>();
+
             // Обновляем текущие значения, если параметры были переданы
             if (ticker != null)
             {
@@ -94,12 +85,12 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             if (candleHistoricalIntervalIndex != null)
             {
                 _currentCandleHistoricalIntervalIndex = candleHistoricalIntervalIndex.Value;
-            }            
+            }
 
             try
             {
-                TinkoffTradingPrices tinkoff = new(_client);
-                Share instrument = await GetShareByTicker(_currentTicker); // Метод получения информации по тикеру
+                // Метод получения информации по тикеру
+                Share instrument = await GetShareByTicker(_currentTicker); 
 
                 // Определяем временной интервал для запроса свечей
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
@@ -109,40 +100,15 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
                 List<HistoricCandle> candles = await GetCandles(instrument, timeFrame, interval);
 
-                List<OHLC> prices = new List<OHLC>();
-
-                foreach (var candle in candles)
-                {
-                    // Преобразовываем данные в OHLC
-                    double openPriceCandle = Convert.ToDouble(candle.Open);
-                    double highPriceCandle = Convert.ToDouble(candle.High);
-                    double lowPriceCandle = Convert.ToDouble(candle.Low);
-                    double closePriceCandle = Convert.ToDouble(candle.Close);
-
-                    // Преобразуем Timestamp в DateTime
-                    DateTime candleTime = candle.Time.ToDateTime();
-
-                    OHLC price = new OHLC(
-                        open: openPriceCandle,
-                        high: highPriceCandle,
-                        low: lowPriceCandle,
-                        close: closePriceCandle,
-                        timeStart: candleTime,
-                        timeSpan: TimeSpan.FromMinutes(1000));
-
-                    prices.Add(price);
-                }
-
-                OHLC[] pricesArray = prices.ToArray();
-
-                return pricesArray;
+                return candles;
             }
             catch (Exception)
             {
                 // Обработка ошибок
-                return null; // Или выбросить исключение, в зависимости от вашей логики
+                return  new List<HistoricCandle>(); // Или выбросить исключение, в зависимости от вашей логики
             }
         }
+
 
         //  Метод получения свойства из CandleInterval по индексу, который получаем при скролле, чтобы сформировать таймфрейм свечи
         public static CandleInterval GetCandleIntervalByIndex(int index)
