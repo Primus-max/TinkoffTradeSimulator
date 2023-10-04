@@ -14,6 +14,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         private static InvestApiClient? _client = null;
         private static string _currentTicker = string.Empty;
         private static double _currentCandleHistoricalIntervalIndex = 10;
+        private static CandleInterval _currentCandleInterval = CandleInterval._1Min;
 
         public TinkoffTradingPrices(InvestApiClient client)
         {
@@ -40,7 +41,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         }
 
         // Получаю исторические свечи по Share и временному промежутку
-        public static async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, CandleInterval candleIndexInterval)
+        public static async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, CandleInterval candlInterval)
         {
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset intervalAgo = now.Subtract(timeFrame);
@@ -53,7 +54,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 InstrumentId = instrument.Uid,
                 From = intervalAgoTimestamp,
                 To = nowTimestamp,
-                Interval = CandleInterval._3Min
+                Interval = candlInterval
             };
 
             try
@@ -85,7 +86,12 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
             if (candleHistoricalIntervalIndex != null)
             {
-                _currentCandleHistoricalIntervalIndex = candleHistoricalIntervalIndex.Value;
+                _currentCandleHistoricalIntervalIndex = (double)candleHistoricalIntervalIndex;
+            }
+
+            if(candleInterval != null)
+            {
+                _currentCandleInterval = (CandleInterval)candleInterval;
             }
 
             try
@@ -94,12 +100,12 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 Share instrument = await GetShareByTicker(_currentTicker);
 
                 // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes((double)candleHistoricalIntervalIndex);
+                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex);
 
                 // Определение CandleInterval на основе параметра или значения по умолчанию
-                CandleInterval interval = candleInterval ?? CandleInterval._1Min;
+                //CandleInterval interval = candleInterval ?? CandleInterval._1Min;
 
-                List<HistoricCandle> candles = await GetCandles(instrument, timeFrame, interval);
+                List<HistoricCandle> candles = await GetCandles(instrument, timeFrame, _currentCandleInterval);
 
                 List<CandlestickData> candlestickData = new List<CandlestickData>();
 

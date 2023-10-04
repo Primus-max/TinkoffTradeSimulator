@@ -236,7 +236,7 @@ namespace TinkoffTradeSimulator.ViewModels
             plotModel.Axes.Add(new LinearAxis() { IsPanEnabled = false, IsZoomEnabled = false, Position = AxisPosition.Bottom });
 
 
-            List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+            List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex, candleInterval: candleInterval);
 
             // Очистите старые серии данных из PlotModel
             plotModel.Series.Clear();
@@ -267,10 +267,36 @@ namespace TinkoffTradeSimulator.ViewModels
 
 
         // Метод получения выбранной кнопки для отображения имени
-        private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
+        private async void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
         {
             SelectedTimeFrame = selectedButton;
+            string? intervalName = SelectedTimeFrame.Name;
+
+            CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName);
+
+            await SetAndUpdateCandlesChartWindow(candleInterval: candleInterval);
         }
+
+        public static CandleInterval ParseCandleInterval(string candleIntervalName)
+        {
+            switch (candleIntervalName)
+            {
+                case "_1Min":
+                    return CandleInterval._1Min;
+                case "_2Min":
+                    return CandleInterval._2Min;
+                case "_3Min":
+                    return CandleInterval._3Min;
+                case "_5Min":
+                    return CandleInterval._5Min;
+                case "Hour":
+                    return CandleInterval.Hour;
+                // Другие возможные значения CandleInterval
+                default:
+                    throw new ArgumentException("Недопустимое значение для CandleInterval");
+            }
+        }
+
 
         // Метод загрузки асинхронных данных для вызова из конструктора
         public async void LoadAsyncData()
@@ -355,7 +381,6 @@ namespace TinkoffTradeSimulator.ViewModels
         }
         // Метод продажи
         #endregion
-
 
         #region Методы по торговле (покупка/продажа)
         // Общий метод покупки и продажи

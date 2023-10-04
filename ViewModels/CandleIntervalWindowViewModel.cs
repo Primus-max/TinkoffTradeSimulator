@@ -74,6 +74,8 @@ namespace TinkoffTradeSimulator.ViewModels
             HandleTimeFrameButtonClicked((CandleTimeFrameButton)sender);
 
             EventAggregator.PublishUpdateDataRequested();
+
+            CloseCandleIntervalWindow();
         }
         #endregion
 
@@ -82,40 +84,8 @@ namespace TinkoffTradeSimulator.ViewModels
         public void HandleTimeFrameButtonClicked(CandleTimeFrameButton selectedButton)
         {
             SelectedTimeFrame = selectedButton;
-
-            Random random = new Random();
-
-
-            int CandleInterval = random.Next(1, 8);
-
             // Публикация события об изменении таймфрема из которого берём имя для кнопки
             EventAggregator.PublishCandleIntervalSelected(SelectedTimeFrame);
-
-            if (SelectedTimeFrame != null)
-            {
-                // Преобразование Name из SelectedTimeFrame в CandleInterval
-                if (Enum.TryParse(SelectedTimeFrame.Name, out CandleInterval candleInterval))
-                {
-                    // Закрываю окно после выбора таймфрейма
-                    CloseCandleIntervalWindow();
-
-                    ChartWindowViewModel chartWindowViewModel = new();
-
-                    //// Получаю обновлённый список свечей
-                    //OHLC[] pricesArray = await TinkoffTradingPrices.GetCandlesData(candleInterval: candleInterval);
-
-
-
-
-                    // ОБновляю view
-                    //chartWindowViewModel.UpdateData(CandleInterval);
-                }
-                else
-                {
-                    // Обработка ошибки преобразования
-                    // Возможно, вы захотите вывести сообщение об ошибке или выполнить другие действия.
-                }
-            }
         }
 
         // Наполняю окно кнопками с таймфреймами
