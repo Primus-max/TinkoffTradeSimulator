@@ -98,7 +98,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private bool CanOpenCandleIntervalWindowCommandExecute(object p) => true;
 
         private void OnOpenCandleIntervalWindowCommandExecuted(object sender)
-        {
+        {            
             // Открываю окно с выбором таймфрема для свечи
             OpenCandleIntervalWindow();
         }
@@ -109,7 +109,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
         private void OnBuyTickerCommandExecuted(object sender)
         {
-
             BuyTicker();
         }
 
@@ -155,36 +154,28 @@ namespace TinkoffTradeSimulator.ViewModels
             PlotModel = new PlotView();
             // Ваша логика загрузки данных о свечах должна быть здесь
             CandlestickData = new ObservableCollection<CandlestickData>();
-            UpdateData(1);
-
-
-            // Загрузка каких-нибудь асинхронных данных
+            //UpdateData(1);
             LoadAsyncData();
         }
 
         // Коснтурктор с перегрузами
-        public ChartWindowViewModel(string ticker)
-        {
+        //public ChartWindowViewModel(string ticker)
+        //{
 
-            // TODO найти в чём причина обнуления Title при определённых сценариях
-            // Обновляю заголовок окна на актуальный 
-            Title = ticker;
+        //    // TODO найти в чём причина обнуления Title при определённых сценариях
+        //    // Обновляю заголовок окна на актуальный 
+        //    Title = ticker;
 
-            // TODO разобраться какая инициализация лишняя
-            #region Инициализация команд
-            OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
-            #endregion
+        //    // TODO разобраться какая инициализация лишняя
+        //    #region Инициализация команд
+        //    OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
+        //    #endregion
 
-            #region Инициализация базы данных
-            DbManager dbManager = new();
-            _db = dbManager.InitializeDB();
-            #endregion
-
-          
-
-            // Загрузка каких-нибудь асинхронных данных
-            LoadAsyncData();
-        }
+        //    #region Инициализация базы данных
+        //    DbManager dbManager = new();
+        //    _db = dbManager.InitializeDB();
+        //    #endregion
+        //}
 
         #region Методы
 
@@ -197,7 +188,7 @@ namespace TinkoffTradeSimulator.ViewModels
             var data = new ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData>();
             var currentDate = DateTime.Now.Date;
             var plotModel = new PlotModel { Title = "Candlestick Chart" };
-          
+
 
             for (int i = 0; i < 30; i++)
             {
@@ -243,6 +234,40 @@ namespace TinkoffTradeSimulator.ViewModels
             PlotModel.InvalidatePlot(true);
         }
 
+        public async Task UpdateData1(string ticker)
+        {
+            var asdfa = Title;
+            var plotModel = new PlotModel { Title = "Candlestick Chart" };
+
+            List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+
+            // Очистите старые серии данных из PlotModel
+            plotModel.Series.Clear();
+
+            var candlestickSeries = new CandleStickSeries
+            {
+                Title = "Candlesticks",
+                TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
+            };
+
+            foreach (var candle in candlestickData)
+            {
+                candlestickSeries.Items.Add(new HighLowItem(
+                    DateTimeAxis.ToDouble(candle.Date),
+                    candle.Open,
+                    candle.High,
+                    candle.Low,
+                    candle.Close
+                ));
+            }
+
+            plotModel.Series.Add(candlestickSeries);
+            PlotModel.Model = plotModel;
+
+            // Обновите PlotModel, чтобы обновить график
+            PlotModel.InvalidatePlot(true);
+        }
+
 
         // Метод получения выбранной кнопки для отображения имени
         private void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
@@ -251,7 +276,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         // Метод загрузки асинхронных данных для вызова из конструктора
-        private async void LoadAsyncData()
+        public async void LoadAsyncData()
         {
             // Создаю клиента Тинькофф 
             _client = await TinkoffClient.CreateAsync();
@@ -259,9 +284,9 @@ namespace TinkoffTradeSimulator.ViewModels
             TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
 
             // Получаю обновлённый список свечей c задаными параметрами
-           List<HistoricCandle> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+          // List<CandlestickData> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
 
-             
+            //UpdateData(candles);
         }
 
         // Получаю колличество минут для таймфрема по индексу который получаем при скролее

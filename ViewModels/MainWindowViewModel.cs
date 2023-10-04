@@ -125,7 +125,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private void OnOpenChartWindowCommandExecuted(object sender)
         {
             // Получаю имя тикера из параметра который передаю из view по CommandParameter
-            string tickerName = sender?.ToString();
+            string? tickerName = sender?.ToString();
 
             // Открываю окно
             OpenChartWindow(tickerName);

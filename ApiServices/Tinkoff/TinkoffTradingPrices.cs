@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
+using TinkoffTradeSimulator.Models;
 
 namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 {
@@ -18,7 +19,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         {
             _client = client;
         }
-               
+
 
         // Получаем Share по тикеру
         public static async Task<Share> GetShareByTicker(string ticker)
@@ -72,9 +73,9 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         }
 
         // Метод обновления и получения данных по свечам, учитывая имя тикера, таймфрем, временной интервал (именовыные параметры)
-        public static async Task<List<HistoricCandle>> GetCandlesData( string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
+        public static async Task<List<CandlestickData>> GetCandlesData(string ticker = null!,  int? candleHistoricalIntervalIndex = null,  CandleInterval? candleInterval = null)
         {
-            if(_client == null) return new List<HistoricCandle>();
+            if (_client == null) return new List<CandlestickData>();
 
             // Обновляем текущие значения, если параметры были переданы
             if (ticker != null)
@@ -90,7 +91,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             try
             {
                 // Метод получения информации по тикеру
-                Share instrument = await GetShareByTicker(_currentTicker); 
+                Share instrument = await GetShareByTicker(_currentTicker);
 
                 // Определяем временной интервал для запроса свечей
                 TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
@@ -100,14 +101,40 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
                 List<HistoricCandle> candles = await GetCandles(instrument, timeFrame, interval);
 
-                return candles;
+                List<CandlestickData> candlestickData = new List<CandlestickData>();
+
+                foreach (var candle in candles)
+                {
+                    // Преобразовываем данные в TinkoffTradeSimulator.Models.CandlestickData
+                    double openPriceCandle = Convert.ToDouble(candle.Open);
+                    double highPriceCandle = Convert.ToDouble(candle.High);
+                    double lowPriceCandle = Convert.ToDouble(candle.Low);
+                    double closePriceCandle = Convert.ToDouble(candle.Close);
+
+                    // Преобразуем Timestamp в DateTime
+                    DateTime candleTime = candle.Time.ToDateTime();
+
+                    var candlestick = new TinkoffTradeSimulator.Models.CandlestickData
+                    {
+                        Date = candleTime,
+                        High = highPriceCandle,
+                        Low = lowPriceCandle,
+                        Open = openPriceCandle,
+                        Close = closePriceCandle
+                    };
+
+                    candlestickData.Add(candlestick);
+                }
+
+                return candlestickData;
             }
             catch (Exception)
             {
                 // Обработка ошибок
-                return  new List<HistoricCandle>(); // Или выбросить исключение, в зависимости от вашей логики
+                return new List<CandlestickData>();
             }
         }
+
 
 
         //  Метод получения свойства из CandleInterval по индексу, который получаем при скролле, чтобы сформировать таймфрейм свечи

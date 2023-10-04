@@ -36,7 +36,7 @@ namespace TinkoffTradeSimulator.Views.Windows
 
             EventAggregator.UpdateDataRequested += EventAggregator_UpdateDataRequested;
 
-            _chartViewModel.UpdateData(1);
+            //_chartViewModel.UpdateData(1);
         }
 
      
@@ -64,10 +64,11 @@ namespace TinkoffTradeSimulator.Views.Windows
         //    _chartViewModel.UpdateData(1);
         //}
 
-        private void EventAggregator_UpdateDataRequested()
+        private async void EventAggregator_UpdateDataRequested()
         {
+            string? ticker = Title;
             // Вызываем метод UpdateData, когда требуется обновление данных
-            _chartViewModel.UpdateData(1);
+            await _chartViewModel.UpdateData1(ticker);
         }
 
         private void ChartWindow_Closed(object sender, EventArgs e)

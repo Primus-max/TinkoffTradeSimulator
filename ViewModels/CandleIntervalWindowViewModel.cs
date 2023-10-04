@@ -108,7 +108,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
 
                     // ОБновляю view
-                    chartWindowViewModel.UpdateData(CandleInterval);
+                    //chartWindowViewModel.UpdateData(CandleInterval);
                 }
                 else
                 {
