@@ -157,62 +157,6 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Методы
-
-        // Метод обновления данных для отображения OxyPlot
-        //public void UpdateData(int hoursInterval)
-        //{
-        //    // Здесь обновите данные свечей с новым временным интервалом
-        //    // Просто для примера, мы снова создадим случайные данные.
-        //    var random = new Random();
-        //    var data = new ObservableCollection<CandlestickData>();
-        //    var currentDate = DateTime.Now.Date;
-        //    var plotModel = new PlotModel { Title = "Candlestick Chart" };
-
-
-        //    for (int i = 0; i < 30; i++)
-        //    {
-        //        var high = random.Next(100, 200);
-        //        var low = random.Next(50, 100);
-        //        var open = random.Next(100, 150);
-        //        var close = random.Next(100, 150);
-
-        //        data.Add(new CandlestickData
-        //        {
-        //            Date = currentDate,
-        //            High = high,
-        //            Low = low,
-        //            Open = open,
-        //            Close = close
-        //        });
-
-        //        currentDate = currentDate.AddHours(hoursInterval);
-        //    }
-
-        //    CandlestickData = data;
-
-        //    // Очистите старые серии данных из PlotModel
-        //    plotModel.Series.Clear();
-
-        //    var candlestickSeries = new CandleStickSeries
-        //    {
-        //        Title = "Candlesticks",
-        //        TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
-        //    };
-        //    candlestickSeries.Items.AddRange(CandlestickData.Select(data => new HighLowItem(
-        //        DateTimeAxis.ToDouble(data.Date),
-        //        data.High,
-        //        data.Low,
-        //        data.Open,
-        //        data.Close
-        //    )));
-
-        //    plotModel.Series.Add(candlestickSeries);
-        //    PlotModel.Model = plotModel;
-
-        //    // Обновите PlotModel, чтобы обновить график
-        //    PlotModel.InvalidatePlot(true);
-        //}
-
         public async Task SetAndUpdateCandlesChartWindow(string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
         {
             // Проверка на null перед использованием параметров
@@ -275,27 +219,7 @@ namespace TinkoffTradeSimulator.ViewModels
             CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName);
 
             await SetAndUpdateCandlesChartWindow(candleInterval: candleInterval);
-        }
-
-        public static CandleInterval ParseCandleInterval(string candleIntervalName)
-        {
-            switch (candleIntervalName)
-            {
-                case "_1Min":
-                    return CandleInterval._1Min;
-                case "_2Min":
-                    return CandleInterval._2Min;
-                case "_3Min":
-                    return CandleInterval._3Min;
-                case "_5Min":
-                    return CandleInterval._5Min;
-                case "Hour":
-                    return CandleInterval.Hour;
-                // Другие возможные значения CandleInterval
-                default:
-                    throw new ArgumentException("Недопустимое значение для CandleInterval");
-            }
-        }
+        }     
 
 
         // Метод загрузки асинхронных данных для вызова из конструктора
@@ -310,29 +234,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // List<CandlestickData> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
 
             //UpdateData(candles);
-        }
-
-        // Получаю колличество минут для таймфрема по индексу который получаем при скролее
-        private static int GetCandleIntervalByIndex(int index)
-        {
-            // Перечень интервалов свечей в минутах
-            int[] candleIntervalsInMinutes = new int[] { 1, 2, 3, 5, 10, 15 };
-
-            // Убедимся, что индекс в допустимом диапазоне
-            if (index < 1)
-            {
-                index = 1;
-            }
-            else if (index > candleIntervalsInMinutes.Length)
-            {
-                index = candleIntervalsInMinutes.Length;
-            }
-
-            // Получим интервал в минутах
-            int candleInterval = candleIntervalsInMinutes[index - 1];
-
-            return candleInterval;
-        }
+        }       
 
         // Открываю окно с выбором таймфрема
         private static void OpenCandleIntervalWindow()
