@@ -2,7 +2,6 @@
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using OxyPlot.Wpf;
-using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +26,7 @@ namespace TinkoffTradeSimulator.ViewModels
     {
 
         #region Приватные свойства
-        private InvestApiClient? _client = null;        
+        private InvestApiClient? _client = null;
         private string _title = string.Empty;
         private AppContext _db = null!;
         private PlotView _plotModel = null!;
@@ -72,7 +71,7 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _stockInfo;
             set => Set(ref _stockInfo, value);
-        }        
+        }
 
         public PlotView PlotModel
         {
@@ -137,7 +136,7 @@ namespace TinkoffTradeSimulator.ViewModels
             EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
             #endregion
 
-            StockInfo = new TickerInfo();
+            //StockInfo = new TickerInfo();
             PlotModel = new PlotView();
             // Ваша логика загрузки данных о свечах должна быть здесь
             CandlestickData = new ObservableCollection<CandlestickData>();
@@ -170,8 +169,6 @@ namespace TinkoffTradeSimulator.ViewModels
             plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
 
 
-
-
             List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex, candleInterval: candleInterval);
 
             // Очистите старые серии данных из PlotModel
@@ -180,11 +177,14 @@ namespace TinkoffTradeSimulator.ViewModels
             var candlestickSeries = new CandleStickSeries
             {
                 Title = "Candlesticks",
-                TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
+                Background = OxyColor.FromAColor(128, OxyColor.Parse("#A5424B51")) // Темный полупрозрачный фон               
             };
 
             foreach (var candle in candlestickData)
             {
+                // Устанавливаем формат ToolTip для каждой свечи
+                candlestickSeries.TrackerFormatString = $"Date: {candle.Date:yyyy-MM-dd HH:mm}\nOpen: {candle.Open}\nHigh: {candle.High}\nLow: {candle.Low}\nClose: {candle.Close}";
+
                 candlestickSeries.Items.Add(new HighLowItem(
                     DateTimeAxis.ToDouble(candle.Date),
                     candle.High,
@@ -192,6 +192,13 @@ namespace TinkoffTradeSimulator.ViewModels
                     candle.Open,
                     candle.Close
                 ));
+
+                StockInfo = new TickerInfo()
+                {
+                    TickerName = Title,
+                    Price = "Очень большая цена"
+
+                };
             }
 
             plotModel.Series.Add(candlestickSeries);
@@ -211,7 +218,7 @@ namespace TinkoffTradeSimulator.ViewModels
             CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName);
 
             await SetAndUpdateCandlesChartWindow(candleInterval: candleInterval);
-        }     
+        }
 
         // Метод загрузки асинхронных данных для вызова из конструктора
         public async void LoadAsyncData()
@@ -225,7 +232,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // List<CandlestickData> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
 
             //UpdateData(candles);
-        }       
+        }
 
         // Открываю окно с выбором таймфрема
         private static void OpenCandleIntervalWindow()
@@ -270,7 +277,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             var asdfasd = SelectedHistoricalTimeCandleIndex;
 
-            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);           
+            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
         }
         // Метод продажи
         #endregion

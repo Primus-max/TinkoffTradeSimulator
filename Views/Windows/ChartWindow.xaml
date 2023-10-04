@@ -13,7 +13,7 @@
     Title="{Binding Title}"
     Width="900"
     Height="600"
-    Background="#A5424B51"
+    Background="#A4353C42"
     Closed="ChartWindow_Closed"
     mc:Ignorable="d">
     <Window.DataContext>
@@ -66,7 +66,7 @@
                                 FontSize="18"
                                 FontWeight="Bold"
                                 Foreground="Green"
-                                Text="$50000.0" />
+                                Text="{Binding StockInfo.Price}" />
                         </StackPanel>
                         <TextBlock
                             HorizontalAlignment="Right"
@@ -88,7 +88,6 @@
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
-
         </Border>
 
         <!--  Средняя область с кнопками и инструментами  -->
@@ -140,8 +139,8 @@
         <oxy:PlotView
             x:Name="CandlestickPlot"
             Grid.Row="2"
-            IsManipulationEnabled="False"
-            />
+            Background="#1C424B51"
+            IsManipulationEnabled="False" />
     </Grid>
 
 </Window>
