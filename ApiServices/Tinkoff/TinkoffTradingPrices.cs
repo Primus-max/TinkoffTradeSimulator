@@ -94,7 +94,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 Share instrument = await GetShareByTicker(_currentTicker);
 
                 // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes(100);
+                TimeSpan timeFrame = TimeSpan.FromMinutes((double)candleHistoricalIntervalIndex);
 
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 CandleInterval interval = candleInterval ?? CandleInterval._1Min;

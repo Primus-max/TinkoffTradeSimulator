@@ -132,12 +132,16 @@
                         Content="Продать" />
                 </StackPanel>
                 <Separator />
-                
+
 
             </ToolBar>
         </ToolBarTray>
-       
-        <oxy:PlotView x:Name="CandlestickPlot" Grid.Row="2" />
+
+        <oxy:PlotView
+            x:Name="CandlestickPlot"
+            Grid.Row="2"
+            IsManipulationEnabled="False"
+            />
     </Grid>
 
 </Window>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels;
 
@@ -29,6 +30,26 @@ namespace TinkoffTradeSimulator.Views.Windows
 
             // Вызываю метод загрузки исторических данных свечей для отображения во View
             Loaded += ChartWindow_Loaded;
+
+            MouseWheel += MainWindow_MouseWheel;
+        }
+
+        private void MainWindow_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                // Прокрутка колесика мыши вперед
+                // Вызовите метод для обработки прокрутки вперед
+                _chartViewModel.IncreaseCandleHistorical();
+            }
+            else
+            {
+                // Прокрутка колесика мыши назад
+                // Вызовите метод для обработки прокрутки назад
+                _chartViewModel.DecreaseCandleIHistorical();
+            }
+
+            e.Handled = true; // Предотвратите дальнейшее распространение события
         }
 
         #region Отображение свечей

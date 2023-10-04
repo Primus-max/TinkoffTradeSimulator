@@ -98,7 +98,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private bool CanOpenCandleIntervalWindowCommandExecute(object p) => true;
 
         private void OnOpenCandleIntervalWindowCommandExecuted(object sender)
-        {            
+        {
             // Открываю окно с выбором таймфрема для свечи
             OpenCandleIntervalWindow();
         }
@@ -232,6 +232,9 @@ namespace TinkoffTradeSimulator.ViewModels
             }
 
             var plotModel = new PlotModel { Title = "Candlestick Chart" };
+            plotModel.Axes.Add(new LinearAxis() { IsPanEnabled = false, IsZoomEnabled = false });
+            plotModel.Axes.Add(new LinearAxis() { IsPanEnabled = false, IsZoomEnabled = false, Position = AxisPosition.Bottom });
+
 
             List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
 
@@ -278,7 +281,7 @@ namespace TinkoffTradeSimulator.ViewModels
             TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
 
             // Получаю обновлённый список свечей c задаными параметрами
-          // List<CandlestickData> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+            // List<CandlestickData> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
 
             //UpdateData(candles);
         }
@@ -333,7 +336,8 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex += 10;
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
 
-            await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
+            var asdfasd = SelectedHistoricalTimeCandleIndex;
+            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
         }
 
         // Метод уменьшения таймфрейма свечи
@@ -345,7 +349,9 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex -= 10;
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
-            await TinkoffTradingPrices.GetCandlesData(Title, SelectedHistoricalTimeCandleIndex);
+            var asdfasd = SelectedHistoricalTimeCandleIndex;
+
+            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);           
         }
         // Метод продажи
         #endregion
