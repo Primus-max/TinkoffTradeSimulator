@@ -53,7 +53,7 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _title;
             set => Set(ref _title, value);
         }
-        public ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData> CandlestickData
+        public ObservableCollection<CandlestickData> CandlestickData
         {
             get => _candlestickData;
             set => Set(ref _candlestickData, value);
@@ -129,9 +129,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
-
             BuyTickerCommand = new LambdaCommand(OnBuyTickerCommandExecuted, CanBuyTickerCommandExecute);
-
             SellickerCommand = new LambdaCommand(OnSellickerCommandExecuted, CanSellickerCommandExecute);
             #endregion
 
@@ -146,7 +144,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Подписки на события
-            // Подписываемся на событие CandleIntervalSelected
+            // Подписываемся на событие выбранного таймфрейма CandleIntervalSelected
             EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
             #endregion
 
@@ -157,25 +155,6 @@ namespace TinkoffTradeSimulator.ViewModels
             //UpdateData(1);
             LoadAsyncData();
         }
-
-        // Коснтурктор с перегрузами
-        //public ChartWindowViewModel(string ticker)
-        //{
-
-        //    // TODO найти в чём причина обнуления Title при определённых сценариях
-        //    // Обновляю заголовок окна на актуальный 
-        //    Title = ticker;
-
-        //    // TODO разобраться какая инициализация лишняя
-        //    #region Инициализация команд
-        //    OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
-        //    #endregion
-
-        //    #region Инициализация базы данных
-        //    DbManager dbManager = new();
-        //    _db = dbManager.InitializeDB();
-        //    #endregion
-        //}
 
         #region Методы
 

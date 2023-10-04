@@ -9,7 +9,7 @@ using TinkoffTradeSimulator.Models;
 
 namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 {
-    class TinkoffTradingPrices
+     public class TinkoffTradingPrices
     {
         private static InvestApiClient? _client = null;
         private static string _currentTicker = string.Empty;
@@ -53,7 +53,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 InstrumentId = instrument.Uid,
                 From = intervalAgoTimestamp,
                 To = nowTimestamp,
-                Interval = candleIndexInterval
+                Interval = CandleInterval._3Min
             };
 
             try
@@ -94,7 +94,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 Share instrument = await GetShareByTicker(_currentTicker);
 
                 // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes(1000);
+                TimeSpan timeFrame = TimeSpan.FromMinutes(100);
 
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 CandleInterval interval = candleInterval ?? CandleInterval._1Min;
