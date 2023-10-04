@@ -159,62 +159,78 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Методы
 
         // Метод обновления данных для отображения OxyPlot
-        public void UpdateData(int hoursInterval)
+        //public void UpdateData(int hoursInterval)
+        //{
+        //    // Здесь обновите данные свечей с новым временным интервалом
+        //    // Просто для примера, мы снова создадим случайные данные.
+        //    var random = new Random();
+        //    var data = new ObservableCollection<CandlestickData>();
+        //    var currentDate = DateTime.Now.Date;
+        //    var plotModel = new PlotModel { Title = "Candlestick Chart" };
+
+
+        //    for (int i = 0; i < 30; i++)
+        //    {
+        //        var high = random.Next(100, 200);
+        //        var low = random.Next(50, 100);
+        //        var open = random.Next(100, 150);
+        //        var close = random.Next(100, 150);
+
+        //        data.Add(new CandlestickData
+        //        {
+        //            Date = currentDate,
+        //            High = high,
+        //            Low = low,
+        //            Open = open,
+        //            Close = close
+        //        });
+
+        //        currentDate = currentDate.AddHours(hoursInterval);
+        //    }
+
+        //    CandlestickData = data;
+
+        //    // Очистите старые серии данных из PlotModel
+        //    plotModel.Series.Clear();
+
+        //    var candlestickSeries = new CandleStickSeries
+        //    {
+        //        Title = "Candlesticks",
+        //        TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
+        //    };
+        //    candlestickSeries.Items.AddRange(CandlestickData.Select(data => new HighLowItem(
+        //        DateTimeAxis.ToDouble(data.Date),
+        //        data.High,
+        //        data.Low,
+        //        data.Open,
+        //        data.Close
+        //    )));
+
+        //    plotModel.Series.Add(candlestickSeries);
+        //    PlotModel.Model = plotModel;
+
+        //    // Обновите PlotModel, чтобы обновить график
+        //    PlotModel.InvalidatePlot(true);
+        //}
+
+        public async Task SetAndUpdateCandlesChartWindow(string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
         {
-            // Здесь обновите данные свечей с новым временным интервалом
-            // Просто для примера, мы снова создадим случайные данные.
-            var random = new Random();
-            var data = new ObservableCollection<CandlestickData>();
-            var currentDate = DateTime.Now.Date;
-            var plotModel = new PlotModel { Title = "Candlestick Chart" };
-
-
-            for (int i = 0; i < 30; i++)
+            // Проверка на null перед использованием параметров
+            if (ticker == null)
             {
-                var high = random.Next(100, 200);
-                var low = random.Next(50, 100);
-                var open = random.Next(100, 150);
-                var close = random.Next(100, 150);
-
-                data.Add(new CandlestickData
-                {
-                    Date = currentDate,
-                    High = high,
-                    Low = low,
-                    Open = open,
-                    Close = close
-                });
-
-                currentDate = currentDate.AddHours(hoursInterval);
+                // Обработка случая, когда 'ticker' не был передан
             }
 
-            CandlestickData = data;
-
-            // Очистите старые серии данных из PlotModel
-            plotModel.Series.Clear();
-
-            var candlestickSeries = new CandleStickSeries
+            if (candleHistoricalIntervalIndex == null)
             {
-                Title = "Candlesticks",
-                TrackerFormatString = "Date: {2:yyyy-MM-dd}\nOpen: {5}\nHigh: {3}\nLow: {4}\nClose: {6}"
-            };
-            candlestickSeries.Items.AddRange(CandlestickData.Select(data => new HighLowItem(
-                DateTimeAxis.ToDouble(data.Date),
-                data.High,
-                data.Low,
-                data.Open,
-                data.Close
-            )));
+                // Обработка случая, когда 'candleHistoricalIntervalIndex' не был передан
+            }
 
-            plotModel.Series.Add(candlestickSeries);
-            PlotModel.Model = plotModel;
+            if (candleInterval == null)
+            {
+                // Обработка случая, когда 'candleInterval' не был передан
+            }
 
-            // Обновите PlotModel, чтобы обновить график
-            PlotModel.InvalidatePlot(true);
-        }
-
-        public async Task UpdateData1(string ticker)
-        {
             var plotModel = new PlotModel { Title = "Candlestick Chart" };
 
             List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);

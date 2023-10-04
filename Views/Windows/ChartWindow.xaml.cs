@@ -42,7 +42,7 @@ namespace TinkoffTradeSimulator.Views.Windows
         {
             string? ticker = Title;
             // Вызываем метод UpdateData, когда требуется обновление данных
-            await _chartViewModel.UpdateData1(ticker);
+            await _chartViewModel.SetAndUpdateCandlesChartWindow(ticker: ticker);
         }
 
         private async void EventAggregator_UpdateDataRequested()
