@@ -27,24 +27,18 @@ namespace TinkoffTradeSimulator.ViewModels
     {
 
         #region Приватные свойства
-        private InvestApiClient? _client = null;
-        private WpfPlot? _wpfPlot = null;
+        private InvestApiClient? _client = null;        
         private string _title = string.Empty;
         private AppContext _db = null!;
         private PlotView _plotModel = null!;
-
-        // Приватное свойство для определения временно интервала свечей
         private int _selectedHistoricalTimeCandleIndex = 10;
-
-        // Приватное свойство для хранения данных свечей
-
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
         private int _volumeTradingTicker = 1;
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
         private TickerInfo _stockInfo = null!;
         private string _ticker = string.Empty;
-        private ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData> _candlestickData = null!;
+        private ObservableCollection<CandlestickData> _candlestickData = null!;
         #endregion
 
         #region Публичные свойства
@@ -78,12 +72,7 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _stockInfo;
             set => Set(ref _stockInfo, value);
-        }
-        public string Ticker
-        {
-            get => _ticker;
-            set => Set(ref _ticker, value);
-        }
+        }        
 
         public PlotView PlotModel
         {
@@ -157,6 +146,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Методы
+        // Метод установки или обновления свечей для отображения в графике
         public async Task SetAndUpdateCandlesChartWindow(string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
         {
             // Проверка на null перед использованием параметров
@@ -176,8 +166,10 @@ namespace TinkoffTradeSimulator.ViewModels
             }
 
             var plotModel = new PlotModel { Title = "Candlestick Chart" };
-            plotModel.Axes.Add(new LinearAxis() { IsPanEnabled = false, IsZoomEnabled = false });
-            plotModel.Axes.Add(new LinearAxis() { IsPanEnabled = false, IsZoomEnabled = false, Position = AxisPosition.Bottom });
+            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false }); // Горизонтальная ось
+            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
+
+
 
 
             List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex, candleInterval: candleInterval);
@@ -220,7 +212,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
             await SetAndUpdateCandlesChartWindow(candleInterval: candleInterval);
         }     
-
 
         // Метод загрузки асинхронных данных для вызова из конструктора
         public async void LoadAsyncData()
