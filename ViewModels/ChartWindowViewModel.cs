@@ -164,7 +164,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Здесь обновите данные свечей с новым временным интервалом
             // Просто для примера, мы снова создадим случайные данные.
             var random = new Random();
-            var data = new ObservableCollection<TinkoffTradeSimulator.Models.CandlestickData>();
+            var data = new ObservableCollection<CandlestickData>();
             var currentDate = DateTime.Now.Date;
             var plotModel = new PlotModel { Title = "Candlestick Chart" };
 
@@ -215,7 +215,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
         public async Task UpdateData1(string ticker)
         {
-            var asdfa = Title;
             var plotModel = new PlotModel { Title = "Candlestick Chart" };
 
             List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
@@ -233,9 +232,9 @@ namespace TinkoffTradeSimulator.ViewModels
             {
                 candlestickSeries.Items.Add(new HighLowItem(
                     DateTimeAxis.ToDouble(candle.Date),
-                    candle.Open,
                     candle.High,
                     candle.Low,
+                    candle.Open,
                     candle.Close
                 ));
             }
