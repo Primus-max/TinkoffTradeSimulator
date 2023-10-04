@@ -164,10 +164,8 @@ namespace TinkoffTradeSimulator.ViewModels
                 // Обработка случая, когда 'candleInterval' не был передан
             }
 
-            var plotModel = new PlotModel { Title = "Candlestick Chart" };
-            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false }); // Горизонтальная ось
-            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
-
+            // Создаю объект для отображения свечей
+            var plotModel = CreateCandlestickPlotModel();
 
             List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex, candleInterval: candleInterval);
 
@@ -196,7 +194,8 @@ namespace TinkoffTradeSimulator.ViewModels
                 StockInfo = new TickerInfo()
                 {
                     TickerName = Title,
-                    Price = "Очень большая цена"
+                    Price = "Очень большая цена",
+                    MaxPrice = "ЛЯМ ЁПТА"
 
                 };
             }
@@ -206,6 +205,15 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Обновите PlotModel, чтобы обновить график
             PlotModel.InvalidatePlot(true);
+        }
+
+        // Метод создания объекта модели отображения свечей
+        private  PlotModel CreateCandlestickPlotModel()
+        {
+            var plotModel = new PlotModel { Title = $"График свечей для {Title}" };
+            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false }); // Горизонтальная ось
+            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
+            return plotModel;
         }
 
 
