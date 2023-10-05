@@ -34,7 +34,7 @@
             <!--  Здесь можете разместить информацию о монете, например, имя монеты, текущую цену и т. д.  -->
             <!--  Пример:  -->
             <StackPanel>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel x:Name="StockPanelInfo" Orientation="Horizontal">
                     <!--  Здесь будет логотип монеты (вставьте изображение или другой элемент)  -->
                     <Image
                         Width="100"
@@ -53,7 +53,7 @@
                                 FontSize="18"
                                 FontWeight="Bold"
                                 Foreground="Green"
-                                Text="{Binding Ticker}" />
+                                Text="{Binding Title}" />
                         </StackPanel>
                         <!--  Текущая цена  -->
                         <StackPanel Orientation="Horizontal">
@@ -63,27 +63,28 @@
                                 FontSize="18"
                                 Text="Цена:" />
                             <TextBlock
+                                x:Name="TickerPriceTextBlock"
                                 FontSize="18"
                                 FontWeight="Bold"
-                                Foreground="Green"
-                                Text="{Binding StockInfo.Price}" />
+                                Foreground="Green" />
+
                         </StackPanel>
-                        <TextBlock
+                        <!--<TextBlock
                             HorizontalAlignment="Right"
                             Foreground="Red"
-                            Text="-123,0%" />
+                            Text="-123,0%" />-->
                     </StackPanel>
 
                     <StackPanel Margin="40,0,0,0">
                         <!--  Цена на сколько в плюс или минус  -->
-                        <TextBlock Text="{Binding StockInfo.Open}" />
+                        <!--<TextBlock Text="{Binding StockInfo.Open}" />-->
                         <!--  Максимальная цена  -->
-                        <TextBlock Text="Максимальная:">
-                            <Run Text="{Binding StockInfo.MaxPrice}" />
+                        <TextBlock Text="Максимальная:  ">
+                            <Run x:Name="MaxPriceTextBlock" />
                         </TextBlock>
                         <!--  Минимальная цена  -->
-                        <TextBlock Text="Минимальная:">
-                            <Run Text="{Binding StockInfo.MinPrice}" />
+                        <TextBlock Text="Минимальная:   ">
+                            <Run x:Name="MinPriceTextBlock" />
                         </TextBlock>
                     </StackPanel>
                 </StackPanel>

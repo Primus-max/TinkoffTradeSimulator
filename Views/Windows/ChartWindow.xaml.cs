@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels;
 
@@ -27,11 +28,19 @@ namespace TinkoffTradeSimulator.Views.Windows
             _chartViewModel.PlotModel = CandlestickPlot;
 
             EventAggregator.UpdateDataRequested += EventAggregator_UpdateDataRequested;
+            EventAggregator.UpdateTickerInfo += EventAggregator_UpdateTickerInfo;
 
             // Вызываю метод загрузки исторических данных свечей для отображения во View
             Loaded += ChartWindow_Loaded;
+            MouseWheel += MainWindow_MouseWheel;                    
+        }
 
-            MouseWheel += MainWindow_MouseWheel;
+        // Метод подписчика на событие об изменении информации о тикере
+        private void EventAggregator_UpdateTickerInfo(TickerInfo tickerInfo)
+        {
+            TickerPriceTextBlock.Text = tickerInfo?.Price != null ? $"{tickerInfo.Price} ₽" : string.Empty;
+            MaxPriceTextBlock.Text = tickerInfo?.MaxPrice != null ? $"{tickerInfo.MaxPrice} ₽" : string.Empty;
+            MinPriceTextBlock.Text = tickerInfo?.MinPrice != null ? $"{tickerInfo.MinPrice} ₽" : string.Empty;
         }
 
         private void MainWindow_MouseWheel(object sender, MouseWheelEventArgs e)

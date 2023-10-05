@@ -73,7 +73,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Обновляю данные иакрываю окно с выбором таймфрема для свечи
             HandleTimeFrameButtonClicked((CandleTimeFrameButton)sender);
 
-            EventAggregator.PublishUpdateDataRequested();
+            //EventAggregator.PublishUpdateDataRequested();
 
             CloseCandleIntervalWindow();
         }

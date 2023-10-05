@@ -10,7 +10,7 @@
     Title="Тинькофф трэйдинг"
     Width="1000"
     Height="600"
-    Background="{DynamicResource MaterialDesignPaper}"
+    Background="#1C424B51"
     FontFamily="{DynamicResource MaterialDesignFont}"
     TextElement.FontSize="13"
     TextElement.FontWeight="Regular"
@@ -192,12 +192,12 @@
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Top">
                             <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
-                                <DockPanel>                                   
+                                <DockPanel>
                                     <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
                                         <TextBlock
                                             VerticalAlignment="Center"
                                             FontSize="18"
-                                            Text="Открытые сделки" />                                        
+                                            Text="Открытые сделки" />
                                     </StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -259,7 +259,7 @@
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
                                     <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
-                                    <GridViewColumn Header="Закрыть" Width="120">
+                                    <GridViewColumn Width="120" Header="Закрыть">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button

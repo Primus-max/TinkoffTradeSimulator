@@ -35,5 +35,12 @@ namespace TinkoffTradeSimulator.Services
         {
             UpdateDataRequested?.Invoke();
         }
+
+        public static event Action<TickerInfo>? UpdateTickerInfo;
+
+        public static void PublishUpdateTickerInfo(TickerInfo stockInfo)
+        {           
+            UpdateTickerInfo?.Invoke(stockInfo);
+        }
     }
 }

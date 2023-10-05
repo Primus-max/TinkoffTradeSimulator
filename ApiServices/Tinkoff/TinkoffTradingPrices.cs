@@ -120,7 +120,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                     // Преобразуем Timestamp в DateTime
                     DateTime candleTime = candle.Time.ToDateTime();
 
-                    var candlestick = new TinkoffTradeSimulator.Models.CandlestickData
+                    var candlestick = new CandlestickData
                     {
                         Date = candleTime,
                         High = highPriceCandle,

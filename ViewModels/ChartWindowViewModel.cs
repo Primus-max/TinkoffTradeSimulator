@@ -30,7 +30,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _title = string.Empty;
         private AppContext _db = null!;
         private PlotView _plotModel = null!;
-        private int _selectedHistoricalTimeCandleIndex = 10;
+        private int _selectedHistoricalTimeCandleIndex = 100;
         private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
         private int _volumeTradingTicker = 1;
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
@@ -129,6 +129,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #region Инициализация источников данных
             _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
             _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();
+            StockInfo = new TickerInfo();
             #endregion
 
             #region Подписки на события
@@ -190,15 +191,31 @@ namespace TinkoffTradeSimulator.ViewModels
                     candle.Open,
                     candle.Close
                 ));
-
-                StockInfo = new TickerInfo()
-                {
-                    TickerName = Title,
-                    Price = "Очень большая цена",
-                    MaxPrice = "ЛЯМ ЁПТА"
-
-                };
             }
+
+            #region Формирование инфомрации о тикере для отображения
+            // Определение актуальной цены (последняя свеча в списке)
+            var lastCandle = candlestickData.LastOrDefault();
+            string actualPrice = lastCandle?.Close.ToString("F2"); // Предполагая, что Close является ценой закрытия
+
+            // Определение максимальной и минимальной цен
+            var maxPrice = candlestickData.Max(candle => candle.High);
+            var minPrice = candlestickData.Min(candle => candle.Low);
+
+
+            // Создание объекта TickerInfo
+            var tickerInfo = new TickerInfo
+            {
+                TickerName = Title,
+                Price = actualPrice,
+                MaxPrice = maxPrice.ToString("F2"),
+                MinPrice = minPrice.ToString("F2")
+            };
+
+            EventAggregator.PublishUpdateTickerInfo(tickerInfo);
+
+            #endregion
+
 
             plotModel.Series.Add(candlestickSeries);
             PlotModel.Model = plotModel;
@@ -206,9 +223,10 @@ namespace TinkoffTradeSimulator.ViewModels
             // Обновите PlotModel, чтобы обновить график
             PlotModel.InvalidatePlot(true);
         }
+                
 
         // Метод создания объекта модели отображения свечей
-        private  PlotModel CreateCandlestickPlotModel()
+        private PlotModel CreateCandlestickPlotModel()
         {
             var plotModel = new PlotModel { Title = $"График свечей для {Title}" };
             plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false }); // Горизонтальная ось
