@@ -26,6 +26,7 @@ namespace TinkoffTradeSimulator.Data
             // загружаем данные из БД
             _db.TradeRecordsInfo.Load();
             _db.HistoricalTradeRecordsInfo.Load();
+            _db.FavoriteTickers.Load();
 
             return _db;
         }

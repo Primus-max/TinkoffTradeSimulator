@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,7 +11,6 @@ using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
-using TinkoffTradeSimulator.Models.Interfaces;
 using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
@@ -50,6 +47,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _filterByTickerTradeRecordHistorical = string.Empty;
         private ObservableCollection<HistoricalTradeRecordInfo> _originalHistoricalTradeRecordInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
         private ObservableCollection<TradeRecordInfo>? _originalTradingRecordInfoList = new ObservableCollection<TradeRecordInfo>();
+        private ObservableCollection<FavoriteTicker> _favoriteTickers = null!;
         #endregion
 
         #region Публичные поля
@@ -115,6 +113,11 @@ namespace TinkoffTradeSimulator.ViewModels
             get => _filterByTickerTradeRecordHistorical;
             set => Set(ref _filterByTickerTradeRecordHistorical, value);
         }
+        public ObservableCollection<FavoriteTicker> FavoriteTickers
+        {
+            get => _favoriteTickers;
+            set => Set(ref _favoriteTickers, value);
+        }
         #endregion
 
         #region Команды
@@ -148,7 +151,7 @@ namespace TinkoffTradeSimulator.ViewModels
                     _db.TradeRecordsInfo.Remove(tradeRecordToDelete);
                     _db.SaveChanges();
 
-                    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList()) ;
+                    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
                 }
 
                 // Создайте объект HistoricalTradeRecordInfo и скопируйте данные
@@ -187,6 +190,27 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             //TradeHistoricalInfoList = FilterTradeInfoListByTicker(TradeHistoricalInfoList, FilterByTickerTradeRecordHistorical);
         }
+
+        public ICommand? AddTickerToFavoriteCommand { get; } = null;
+
+        private bool CanAddTickerToFavoriteCommandExecute(object p) => true;
+
+        private void OnAddTickerToFavoriteCommandExecuted(object sender)
+        {
+            string tickerName = sender?.ToString();
+            AddTickerToFavorite(tickerName);
+        }
+
+        public ICommand? RemoveTickerToFavoriteCommand { get; } = null;
+
+        private bool CanRemoveTickerToFavoriteCommandExecute(object p) => true;
+
+        private void OnRemoveTickerToFavoriteCommandExecuted(object sender)
+        {
+            string tickerName = sender?.ToString();
+            RemoveFavoriteTickerByName(tickerName);
+        }
+
         #endregion
 
         // Конструктор
@@ -195,12 +219,11 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Инициализация команд
             OpenChartWindowCommand = new LambdaCommand(OnOpenChartWindowCommandExecuted, CanOpenChartWindowCommandExecute);
-
             CloseTradingDealCommand = new LambdaCommand(OnCloseTradingDealCommandExecuted, CanCloseTradingDealCommandExecute);
-
             FilterTickerInfoListCommand = new LambdaCommand(OnFilterTickerInfoListCommandCommandExecuted, CanFilterTickerInfoListCommandCommandExecute);
-
             FilterTradingRecorsInfoListCommand = new LambdaCommand(OnFilterTradingRecorsInfoListCommandExecuted, CanFilterTradingRecorsInfoListCommandExecute);
+            AddTickerToFavoriteCommand = new LambdaCommand(OnAddTickerToFavoriteCommandExecuted, CanAddTickerToFavoriteCommandExecute);
+            RemoveTickerToFavoriteCommand = new LambdaCommand(OnRemoveTickerToFavoriteCommandExecuted, CanRemoveTickerToFavoriteCommandExecute);
             #endregion
 
             #region Инициализация базы данных
@@ -213,14 +236,16 @@ namespace TinkoffTradeSimulator.ViewModels
             TradingInfoList = new ObservableCollection<TradeRecordInfo>(); // Коллекция о текущих операциях
             TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(); // Коллекция об исторических операциях
             FilteredTradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(); // Отфильтрованная коллекция
+            FavoriteTickers = new ObservableCollection<FavoriteTicker>(); // Коллекия с избранными тикерами
             #endregion
 
             _chartViewModel = new ChartWindowViewModel();
 
             #region Загрузка источников данных
-            new Thread(async () => await LoadDataFromTinkoffApi()).Start();
+            new Thread(async () => await LoadFavoriteTickers()).Start();
             LoadHistorticalTradingData();
             LoadTradingData();
+            //LoadFavoriteTickers();
             #endregion
 
             #region Подписчики на события
@@ -243,7 +268,8 @@ namespace TinkoffTradeSimulator.ViewModels
         }
         #endregion
 
-        #region Методы загрузки данных при инициализации приложения
+        #region Методы загрузки данных при инициализации приложения        
+
         // Загружаю / отображаю актуальные данные из Tinkoff InvestAPI 
         public async Task LoadDataFromTinkoffApi()
         {
@@ -282,12 +308,97 @@ namespace TinkoffTradeSimulator.ViewModels
 
             UpdateFilterTradingInfoListByTicker(string.Empty);
         }
+
+        private async Task LoadFavoriteTickers()
+        {
+            // Здесь вызываю метод получения тикеров чтобы гарантированно метод LoadFavoriteTickers отработал после получения всех тикеров
+            await LoadDataFromTinkoffApi();
+
+            // Получаем список избранных тикеров из базы данных (или откуда у вас они хранятся)
+            List<FavoriteTicker> favoriteTickersFromDatabase = _db.FavoriteTickers.ToList();
+
+            // Получаем список всех доступных тикеров (в вашем случае, _originalTickerInfoList)
+            List<TickerInfo> allTickers = _originalTickerInfoList.ToList();
+
+            // Создаем новую коллекцию FavoriteTickers на основе совпадающих тикеров из allTickers и favoriteTickersFromDatabase
+            var favoriteTickersWithIds = from favorite in favoriteTickersFromDatabase
+                                         join ticker in allTickers on favorite.Name equals ticker.TickerName
+                                         select new FavoriteTicker
+                                         {
+                                             Name = favorite.Name,
+                                             UId = ticker.Id
+                                         };
+
+            // Заполняем коллекцию FavoriteTickers из совпадающих тикеров
+            FavoriteTickers = new ObservableCollection<FavoriteTicker>(favoriteTickersWithIds);
+        }
+
         #endregion
+
+        // Добавляю тикер в избранное
+        private void AddTickerToFavorite(string? tickerName)
+        {
+            FavoriteTicker favoriteTicker = new FavoriteTicker
+            {
+                Name = tickerName,
+            };
+
+            try
+            {
+
+                _db.FavoriteTickers.Add(favoriteTicker);
+                _db.SaveChanges();
+
+                // Получаем список избранных тикеров из базы данных (или откуда у вас они хранятся)
+                List<FavoriteTicker> favoriteTickersFromDatabase = _db.FavoriteTickers.ToList();
+
+                // Получаем список всех доступных тикеров (в вашем случае, _originalTickerInfoList)
+                List<TickerInfo> allTickers = _originalTickerInfoList.ToList();
+
+                // Создаем новую коллекцию FavoriteTickers на основе совпадающих тикеров из allTickers и favoriteTickersFromDatabase
+                var favoriteTickersWithIds = from favorite in favoriteTickersFromDatabase
+                                             join ticker in allTickers on favorite.Name equals ticker.TickerName
+                                             select new FavoriteTicker
+                                             {
+                                                 Name = favorite.Name,
+                                                 UId = ticker.Id
+                                             };
+
+                // Заполняем коллекцию FavoriteTickers из совпадающих тикеров
+                FavoriteTickers = new ObservableCollection<FavoriteTicker>(favoriteTickersWithIds);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        // Удаляю тикер из избранного
+        public void RemoveFavoriteTickerByName(string tickerName)
+        {
+            // Найдите тикер в базе данных по имени
+            var tickerToDelete = _db.FavoriteTickers.FirstOrDefault(t => t.Name == tickerName);
+
+            if (tickerToDelete != null)
+            {
+                try
+                {
+                    // Если тикер найден, удалите его из базы данных
+                    _db.FavoriteTickers.Remove(tickerToDelete);
+                    _db.SaveChanges();
+
+                    FavoriteTickers = new ObservableCollection<FavoriteTicker>(_db.FavoriteTickers.ToList());
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
 
         // Открываю окно и строю в нём график
         private void OpenChartWindow(string tickerName)
         {
-
             // Создаем новое окно и передаем ему ViewModel
             var chartWindow = new ChartWindow();
 

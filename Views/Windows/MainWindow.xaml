@@ -143,9 +143,29 @@
                                                     Foreground="#acacac"
                                                     ToolTip="Открыть в новом окне">
                                                     <materialDesign:PackIcon
-                                                        Width="28"
-                                                        Height="28"
+                                                        Width="24"
+                                                        Height="24"
                                                         Kind="OpenInNew" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.AddTickerToFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding TickerName}"
+                                                    FontWeight="Bold"
+                                                    Foreground="#acacac"
+                                                    ToolTip="Открыть в новом окне">
+                                                    <materialDesign:PackIcon
+                                                        Width="24"
+                                                        Height="24"
+                                                        Kind="Favorite" />
                                                 </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -162,7 +182,72 @@
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Избранное">
-                    <TextBlock Margin="8" Text="Список избранных тикеров" />
+                    <ListView
+                        MinHeight="100"
+                        ItemsSource="{Binding FavoriteTickers}"
+                        ScrollViewer.CanContentScroll="True">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn DisplayMemberBinding="{Binding UId}" Header="Id" />
+                                <GridViewColumn Header="Тикер">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Foreground="Green"
+                                                Text="{Binding Name}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding Name}"
+                                                FontWeight="Bold"
+                                                Foreground="#acacac"
+                                                ToolTip="Открыть в новом окне">
+                                                <materialDesign:PackIcon
+                                                    Width="24"
+                                                    Height="24"
+                                                    Kind="OpenInNew" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding DataContext.RemoveTickerToFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding Name}"
+                                                FontWeight="Bold"
+                                                Foreground="#acacac"
+                                                ToolTip="Убрать из избранного">
+                                                <materialDesign:PackIcon
+                                                    Width="24"
+                                                    Height="24"
+                                                    Kind="Delete" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                    </ListView>
                 </TabItem>
             </TabControl>
         </DockPanel>

@@ -67,7 +67,6 @@ namespace TinkoffTradeSimulator.Views.Windows
             await SetCandlesTOView();
         }
 
-
         public async Task SetCandlesTOView()
         {
             string? ticker = Title;
