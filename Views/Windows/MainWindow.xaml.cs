@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels;
 
 namespace TinkoffTradeSimulator.Views.Windows
@@ -15,7 +16,9 @@ namespace TinkoffTradeSimulator.Views.Windows
             
             InitializeComponent();
             _mainWindowViewModel = new MainWindowViewModel();
-            DataContext = _mainWindowViewModel;                
+            DataContext = _mainWindowViewModel; 
+            
+
         }
 
         #region ФИЛЬТРЫ
@@ -46,5 +49,7 @@ namespace TinkoffTradeSimulator.Views.Windows
             // Вызываю метод фильрации метод фильтрации
             _mainWindowViewModel.UpdateFilterTradingInfoListByTicker(filterText);
         }
+
+        
     }
 }

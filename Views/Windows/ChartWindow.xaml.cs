@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DromAutoTrader.Views;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -41,6 +42,9 @@ namespace TinkoffTradeSimulator.Views.Windows
             TickerPriceTextBlock.Text = tickerInfo?.Price != null ? $"{tickerInfo.Price} ₽" : string.Empty;
             MaxPriceTextBlock.Text = tickerInfo?.MaxPrice != null ? $"{tickerInfo.MaxPrice} ₽" : string.Empty;
             MinPriceTextBlock.Text = tickerInfo?.MinPrice != null ? $"{tickerInfo.MinPrice} ₽" : string.Empty;
+
+            // Передаю обратно информацию о тикере во ViewModel
+            LocatorService.Current.TickerInfo = tickerInfo;
         }
 
         private void MainWindow_MouseWheel(object sender, MouseWheelEventArgs e)

@@ -1,4 +1,5 @@
-﻿using OxyPlot;
+﻿using DromAutoTrader.Views;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using OxyPlot.Wpf;
@@ -38,6 +39,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private TickerInfo _stockInfo = null!;
         private string _ticker = string.Empty;
         private ObservableCollection<CandlestickData> _candlestickData = null!;
+        private TickerInfo _tickerInfo = null!;
         #endregion
 
         #region Публичные свойства
@@ -77,6 +79,11 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _plotModel;
             set => Set(ref _plotModel, value);
+        }
+        public TickerInfo TickerInfo
+        {
+            get => _tickerInfo;
+            set => Set(ref _tickerInfo, value);
         }
         #endregion
 
@@ -128,8 +135,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Инициализация источников данных
             _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
-            _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();
-            StockInfo = new TickerInfo();
+            _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();           
             #endregion
 
             #region Подписки на события
@@ -213,7 +219,7 @@ namespace TinkoffTradeSimulator.ViewModels
                     Price = actualPrice,
                     MaxPrice = maxPrice.ToString("F2"),
                     MinPrice = minPrice.ToString("F2")
-                };
+                };                
 
                 EventAggregator.PublishUpdateTickerInfo(tickerInfo);
             }
@@ -320,8 +326,12 @@ namespace TinkoffTradeSimulator.ViewModels
         // Общий метод покупки и продажи
         private void ExecuteTrade(string operation)
         {
+            // Получаю информацию о тикере обратно из CodeBehind
+            // TODO Разобраться с обнулением TickerInfo или StockInfo
+            TickerInfo = LocatorService.Current.TickerInfo;
+
             string tickerName = Title;
-            double price = 3444;
+            double price = Convert.ToDouble(TickerInfo?.Price);
             bool subtractVolume = operation == "Продажа"; // Проверяем, нужно ли вычитать объем
 
             // Поиск записи с тем же TickerName в _db.TradeRecordsInfo

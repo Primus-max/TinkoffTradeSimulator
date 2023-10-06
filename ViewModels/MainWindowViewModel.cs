@@ -48,6 +48,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private ObservableCollection<HistoricalTradeRecordInfo> _originalHistoricalTradeRecordInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
         private ObservableCollection<TradeRecordInfo>? _originalTradingRecordInfoList = new ObservableCollection<TradeRecordInfo>();
         private ObservableCollection<FavoriteTicker> _favoriteTickers = null!;
+        private AppConfig _appConfig = null!;
         #endregion
 
         #region Публичные поля
@@ -71,7 +72,15 @@ namespace TinkoffTradeSimulator.ViewModels
         public ObservableCollection<HistoricalTradeRecordInfo> TradeHistoricalInfoList
         {
             get => _tradeHistoricalInfoList;
-            set => Set(ref _tradeHistoricalInfoList, value);
+            set
+            {
+                if (Set(ref _tradeHistoricalInfoList, value))
+                {
+                    _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(
+                        _tradeHistoricalInfoList.OrderByDescending(info => info.Date));
+                    OnPropertyChanged(nameof(TradeHistoricalInfoList));
+                }
+            }
         }
         public ObservableCollection<HistoricalTradeRecordInfo> FilteredTradeHistoricalInfoList
         {
@@ -81,7 +90,15 @@ namespace TinkoffTradeSimulator.ViewModels
         public ObservableCollection<TradeRecordInfo> TradingInfoList
         {
             get => _tradingInfoList;
-            set => Set(ref _tradingInfoList, value);
+            set
+            {
+                if (Set(ref _tradingInfoList, value))
+                {
+                    _tradingInfoList = new ObservableCollection<TradeRecordInfo>(
+                        _tradingInfoList.OrderByDescending(info => info.Date));
+                    OnPropertyChanged(nameof(TradingInfoList));
+                }
+            }
         }
         public TradeRecordInfo SelectedTradeInfo
         {
@@ -117,6 +134,11 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             get => _favoriteTickers;
             set => Set(ref _favoriteTickers, value);
+        }
+        public AppConfig AppConfig
+        {
+            get => _appConfig;
+            set => Set(ref _appConfig, value);
         }
         #endregion
 
@@ -211,6 +233,17 @@ namespace TinkoffTradeSimulator.ViewModels
             RemoveFavoriteTickerByName(tickerName);
         }
 
+        public ICommand? SaveSettingsCommand { get; } = null;
+
+        private bool CanSaveSettingsCommandExecute(object p) => true;
+
+        private void OnSaveSettingsCommandExecuted(object sender)
+        {
+            var asdf = AppConfig;
+            SaveSettings();
+        }
+              
+
         #endregion
 
         // Конструктор
@@ -224,6 +257,7 @@ namespace TinkoffTradeSimulator.ViewModels
             FilterTradingRecorsInfoListCommand = new LambdaCommand(OnFilterTradingRecorsInfoListCommandExecuted, CanFilterTradingRecorsInfoListCommandExecute);
             AddTickerToFavoriteCommand = new LambdaCommand(OnAddTickerToFavoriteCommandExecuted, CanAddTickerToFavoriteCommandExecute);
             RemoveTickerToFavoriteCommand = new LambdaCommand(OnRemoveTickerToFavoriteCommandExecuted, CanRemoveTickerToFavoriteCommandExecute);
+            SaveSettingsCommand = new LambdaCommand(OnSaveSettingsCommandExecuted, CanSaveSettingsCommandExecute);
             #endregion
 
             #region Инициализация базы данных
@@ -245,6 +279,7 @@ namespace TinkoffTradeSimulator.ViewModels
             new Thread(async () => await LoadFavoriteTickers()).Start();
             LoadHistorticalTradingData();
             LoadTradingData();
+            GetSettings();
             //LoadFavoriteTickers();
             #endregion
 
@@ -295,16 +330,23 @@ namespace TinkoffTradeSimulator.ViewModels
         // Загружаю / отображаю исторические данные торгов
         private void LoadHistorticalTradingData()
         {
-            // Привожу у нужным данным коллекцию из базы данных
-            _originalHistoricalTradeRecordInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
+            // Привожу к нужным данным коллекцию из базы данных
+            _originalHistoricalTradeRecordInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(
+                _db.HistoricalTradeRecordsInfo
+                   .OrderByDescending(info => info.Date)
+                   .ToList());
+
             UpdateFilterTradeHistoricalInfoListByTicker(string.Empty);
         }
 
         // Загружаю / отображаю актуальные (торговые данные)
         private void LoadTradingData()
         {
-            // Привожу у нужным данным коллекцию из базы данных
-            _originalTradingRecordInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+            // Привожу к нужным данным коллекцию из базы данных
+            _originalTradingRecordInfoList = new ObservableCollection<TradeRecordInfo>(
+                _db.TradeRecordsInfo
+                   .OrderByDescending(info => info.Date)
+                   .ToList());
 
             UpdateFilterTradingInfoListByTicker(string.Empty);
         }
@@ -334,6 +376,18 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #endregion
+
+        // Метод сохранения настроек приложения
+        private void SaveSettings()
+        {
+            AppSettings.SaveConfig(AppConfig);
+        }
+        
+        // Метод получения настроек приложения
+        private void GetSettings()
+        {
+          AppConfig = AppSettings.LoadConfig();
+        }
 
         // Добавляю тикер в избранное
         private void AddTickerToFavorite(string? tickerName)
@@ -389,7 +443,6 @@ namespace TinkoffTradeSimulator.ViewModels
                 // Обработка ошибки
             }
         }
-
 
         // Удаляю тикер из избранного
         public void RemoveFavoriteTickerByName(string tickerName)

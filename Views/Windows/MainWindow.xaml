@@ -45,18 +45,113 @@
                 Style="{StaticResource MaterialDesignGroupBox}">
                 <GroupBox.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0,0,15,0" Text="Сегодня" />
-                        <TextBlock Text="{Binding CurrentDate, StringFormat='dd MMMM yyyy года HH:mm'}" />
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PopupBox IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" StaysOpen="True">
+                                <Grid Width="300" Margin="8,8,8,8">
+                                    <Grid.Resources>
+                                        <Style BasedOn="{StaticResource MaterialDesignCheckBox}" TargetType="CheckBox">
+                                            <Setter Property="Margin" Value="8,8,10,8" />
+                                        </Style>
+                                        <Style BasedOn="{StaticResource MaterialDesignTextBox}" TargetType="TextBox">
+                                            <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+                                            <Setter Property="Margin" Value="8,8,8,8" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Margin="8,8,8,16"
+                                        Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                        Text="Настройки" />
+                                    <TextBox
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        materialDesign:HintAssist.Hint="Ключ API"
+                                        Text="{Binding AppConfig.ApiKey}" />
+                                    <TextBox
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        materialDesign:HintAssist.Hint="Демо счёт"
+                                        Text="{Binding AppConfig.SimultionCash, Mode=TwoWay}" />
+                                    <TextBox
+                                        Grid.Row="3"
+                                        Grid.Column="0"
+                                        materialDesign:HintAssist.Hint="Имя"
+                                        Text="{Binding AppConfig.Name, Mode=TwoWay}" />
+                                    <!--<CheckBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Bottom" />-->
+                                    <!--<CheckBox
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Bottom"
+                                        IsChecked="True" />
+                                    <CheckBox
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Bottom" />
+                                    <ComboBox
+                                        Grid.Row="4"
+                                        Grid.Column="0"
+                                        Margin="8"
+                                        materialDesign:HintAssist.Hint="Setting 4"
+                                        materialDesign:HintAssist.IsFloating="True"
+                                        MaxDropDownHeight="200">
+                                        <ComboBoxItem Content="25%" />
+                                        <ComboBoxItem Content="50%" />
+                                        <ComboBoxItem Content="75%" />
+                                        <ComboBoxItem Content="100%" />
+                                        <ComboBoxItem Content="150%" />
+                                        <ComboBoxItem Content="200%" />
+                                        <ComboBoxItem Content="250%" />
+                                        <ComboBoxItem Content="500%" />
+                                    </ComboBox>-->
+                                    <StackPanel
+                                        Grid.Row="5"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                        <Button Command="{Binding SaveSettingsCommand}" Content="Сохранить" />
+                                        <Button Command="{x:Static materialDesign:PopupBox.ClosePopupCommand}" Content="Отменить">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Foreground" Value="Red" />
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </materialDesign:PopupBox>
+                        </StackPanel>
+                        <StackPanel
+                            Margin="20,0,0,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                            <TextBlock Text="{Binding CurrentDate, StringFormat='dd MMMM yyyy года HH:mm'}" />
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox.Header>
                 <StackPanel MinHeight="100">
                     <TextBlock
                         Margin="0,0,0,5"
                         FontSize="20"
-                        Text="Иванов Иван" />
+                        Text="{Binding AppConfig.Name, Mode=TwoWay}" />
                     <TextBlock Margin="0,0,0,20" FontSize="28">
                         <Run Text="Счёт: " />
-                        <Run Text="{Binding AccountBalance, Converter={StaticResource CurrencyConverter}}" />
+                        <Run Text="{Binding AppConfig.SimultionCash, Mode=TwoWay, Converter={StaticResource CurrencyConverter}}" />
                     </TextBlock>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock
