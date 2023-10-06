@@ -194,25 +194,33 @@ namespace TinkoffTradeSimulator.ViewModels
             }
 
             #region Формирование инфомрации о тикере для отображения
-            // Определение актуальной цены (последняя свеча в списке)
-            var lastCandle = candlestickData.LastOrDefault();
-            string actualPrice = lastCandle?.Close.ToString("F2"); // Предполагая, что Close является ценой закрытия
 
-            // Определение максимальной и минимальной цен
-            var maxPrice = candlestickData.Max(candle => candle.High);
-            var minPrice = candlestickData.Min(candle => candle.Low);
-
-
-            // Создание объекта TickerInfo
-            var tickerInfo = new TickerInfo
+            try
             {
-                TickerName = Title,
-                Price = actualPrice,
-                MaxPrice = maxPrice.ToString("F2"),
-                MinPrice = minPrice.ToString("F2")
-            };
+                // Определение актуальной цены (последняя свеча в списке)
+                var lastCandle = candlestickData.LastOrDefault();
+                string actualPrice = lastCandle?.Close.ToString("F2"); // Предполагая, что Close является ценой закрытия
 
-            EventAggregator.PublishUpdateTickerInfo(tickerInfo);
+                // Определение максимальной и минимальной цен
+                var maxPrice = candlestickData.Max(candle => candle.High);
+                var minPrice = candlestickData.Min(candle => candle.Low);
+
+
+                // Создание объекта TickerInfo
+                var tickerInfo = new TickerInfo
+                {
+                    TickerName = Title,
+                    Price = actualPrice,
+                    MaxPrice = maxPrice.ToString("F2"),
+                    MinPrice = minPrice.ToString("F2")
+                };
+
+                EventAggregator.PublishUpdateTickerInfo(tickerInfo);
+            }
+            catch (Exception)
+            {
+
+            }
 
             #endregion
 

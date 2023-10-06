@@ -338,40 +338,58 @@ namespace TinkoffTradeSimulator.ViewModels
         // Добавляю тикер в избранное
         private void AddTickerToFavorite(string? tickerName)
         {
-            FavoriteTicker favoriteTicker = new FavoriteTicker
-            {
-                Name = tickerName,
-            };
-
             try
             {
-
-                _db.FavoriteTickers.Add(favoriteTicker);
-                _db.SaveChanges();
-
                 // Получаем список избранных тикеров из базы данных (или откуда у вас они хранятся)
                 List<FavoriteTicker> favoriteTickersFromDatabase = _db.FavoriteTickers.ToList();
+
+                // Проверяем, есть ли уже тикер с таким именем в избранных
+                if (favoriteTickersFromDatabase.Any(ticker => ticker.Name == tickerName))
+                {
+                    // Если тикер уже есть, то не добавляем его повторно
+                    return;
+                }
 
                 // Получаем список всех доступных тикеров (в вашем случае, _originalTickerInfoList)
                 List<TickerInfo> allTickers = _originalTickerInfoList.ToList();
 
-                // Создаем новую коллекцию FavoriteTickers на основе совпадающих тикеров из allTickers и favoriteTickersFromDatabase
-                var favoriteTickersWithIds = from favorite in favoriteTickersFromDatabase
-                                             join ticker in allTickers on favorite.Name equals ticker.TickerName
-                                             select new FavoriteTicker
-                                             {
-                                                 Name = favorite.Name,
-                                                 UId = ticker.Id
-                                             };
+                // Находим тикер в общем списке по имени
+                TickerInfo matchingTicker = allTickers.FirstOrDefault(ticker => ticker.TickerName == tickerName);
 
-                // Заполняем коллекцию FavoriteTickers из совпадающих тикеров
-                FavoriteTickers = new ObservableCollection<FavoriteTicker>(favoriteTickersWithIds);
+                if (matchingTicker != null)
+                {
+                    // Если нашли совпадение, то создаем FavoriteTicker и добавляем его в базу данных
+                    FavoriteTicker favoriteTicker = new FavoriteTicker
+                    {
+                        Name = tickerName,
+                        UId = matchingTicker.Id
+                    };
+
+                    _db.FavoriteTickers.Add(favoriteTicker);
+                    _db.SaveChanges();
+
+                    // Обновляем коллекцию FavoriteTickers после добавления тикера в базу
+                    favoriteTickersFromDatabase.Add(favoriteTicker);
+
+                    // Создаем новую коллекцию FavoriteTickers на основе совпадающих тикеров из allTickers и favoriteTickersFromDatabase
+                    var favoriteTickersWithIds = from favorite in favoriteTickersFromDatabase
+                                                 join ticker in allTickers on favorite.Name equals ticker.TickerName
+                                                 select new FavoriteTicker
+                                                 {
+                                                     Name = favorite.Name,
+                                                     UId = ticker.Id
+                                                 };
+
+                    // Заполняем коллекцию FavoriteTickers из совпадающих тикеров
+                    FavoriteTickers = new ObservableCollection<FavoriteTicker>(favoriteTickersWithIds);
+                }
             }
             catch (Exception)
             {
-
+                // Обработка ошибки
             }
         }
+
 
         // Удаляю тикер из избранного
         public void RemoveFavoriteTickerByName(string tickerName)
