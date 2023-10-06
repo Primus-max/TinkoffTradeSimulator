@@ -28,7 +28,7 @@
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.8*" />
+            <ColumnDefinition Width="1*" />
             <!--  Левая область  -->
             <ColumnDefinition Width="5" />
             <!--  Сплиттер между левой и правой областью  -->
@@ -161,7 +161,7 @@
                                                     CommandParameter="{Binding TickerName}"
                                                     FontWeight="Bold"
                                                     Foreground="#acacac"
-                                                    ToolTip="Открыть в новом окне">
+                                                    ToolTip="Добавить в избранное">
                                                     <materialDesign:PackIcon
                                                         Width="24"
                                                         Height="24"
