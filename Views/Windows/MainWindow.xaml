@@ -3,16 +3,15 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:TinkoffTradeSimulator"
+    xmlns:local="clr-namespace:TinkoffTradeSimulator.Services"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="Тинькофф трэйдинг"
     Width="1000"
     Height="600"
-    Background="{DynamicResource MaterialDesignPaper}"
+    Background="#1C424B51"
     FontFamily="{DynamicResource MaterialDesignFont}"
-    Loaded="MainWindow_Loaded"
     TextElement.FontSize="13"
     TextElement.FontWeight="Regular"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -24,9 +23,12 @@
     <Window.DataContext>
         <vm:MainWindowViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <local:CurrencyConverter x:Key="CurrencyConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.3*" />
+            <ColumnDefinition Width="1*" />
             <!--  Левая область  -->
             <ColumnDefinition Width="5" />
             <!--  Сплиттер между левой и правой областью  -->
@@ -35,73 +37,322 @@
         </Grid.ColumnDefinitions>
 
         <DockPanel>
-            <StackPanel
-                Height="60"
-                Background="Ivory"
-                DockPanel.Dock="Top">
-                <TextBlock Margin="10" Text="Иванов Иван" />
-                <TextBlock
-                    Margin="10,0,0,0"
-                    FontSize="14"
-                    FontWeight="Bold">
-                    <Run Text="Счёт:" />
-                    <Run Text="1000000 р" />
-                </TextBlock>
-            </StackPanel>
-            <ListView
-                MinHeight="100"
-                ItemsSource="{Binding TickerInfoList}"
-                SelectionChanged="ListView_SelectionChanged">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
-                        <GridViewColumn Header="Тикер">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
+            <GroupBox
+                materialDesign:ColorZoneAssist.Background="CornflowerBlue"
+                materialDesign:ColorZoneAssist.Foreground="White"
+                materialDesign:ColorZoneAssist.Mode="Custom"
+                DockPanel.Dock="Top"
+                Style="{StaticResource MaterialDesignGroupBox}">
+                <GroupBox.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PopupBox IsEnabled="{Binding DataContext.ControlsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" StaysOpen="True">
+                                <Grid Width="300" Margin="8,8,8,8">
+                                    <Grid.Resources>
+                                        <Style BasedOn="{StaticResource MaterialDesignCheckBox}" TargetType="CheckBox">
+                                            <Setter Property="Margin" Value="8,8,10,8" />
+                                        </Style>
+                                        <Style BasedOn="{StaticResource MaterialDesignTextBox}" TargetType="TextBox">
+                                            <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+                                            <Setter Property="Margin" Value="8,8,8,8" />
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
                                     <TextBlock
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Foreground="Green"
-                                        Text="{Binding TickerName}" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn>
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button
-                                        Background="Transparent"
-                                        BorderBrush="Transparent"
-                                        BorderThickness="0"
-                                        Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding TickerName}"
-                                        FontWeight="Bold"
-                                        Foreground="#0037e5"
-                                        ToolTip="Открыть в новом окне">
-                                        <!--<materialDesign:PackIcon
-                                            Width="28"
-                                            Height="28"
-                                            Kind="StarPlusOutline" />-->
-                                        <materialDesign:PackIcon
-                                            Width="28"
-                                            Height="28"
-                                            Kind="OpenInNew" />
-                                    </Button>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Margin="8,8,8,16"
+                                        Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                        Text="Настройки" />
+                                    <TextBox
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        materialDesign:HintAssist.Hint="Ключ API"
+                                        Text="{Binding AppConfig.ApiKey}" />
+                                    <TextBox
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        materialDesign:HintAssist.Hint="Демо счёт"
+                                        Text="{Binding AppConfig.SimultionCash, Mode=TwoWay}" />
+                                    <TextBox
+                                        Grid.Row="3"
+                                        Grid.Column="0"
+                                        materialDesign:HintAssist.Hint="Имя"
+                                        Text="{Binding AppConfig.Name, Mode=TwoWay}" />
+                                    <!--<CheckBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Bottom" />-->
+                                    <!--<CheckBox
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Bottom"
+                                        IsChecked="True" />
+                                    <CheckBox
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Bottom" />
+                                    <ComboBox
+                                        Grid.Row="4"
+                                        Grid.Column="0"
+                                        Margin="8"
+                                        materialDesign:HintAssist.Hint="Setting 4"
+                                        materialDesign:HintAssist.IsFloating="True"
+                                        MaxDropDownHeight="200">
+                                        <ComboBoxItem Content="25%" />
+                                        <ComboBoxItem Content="50%" />
+                                        <ComboBoxItem Content="75%" />
+                                        <ComboBoxItem Content="100%" />
+                                        <ComboBoxItem Content="150%" />
+                                        <ComboBoxItem Content="200%" />
+                                        <ComboBoxItem Content="250%" />
+                                        <ComboBoxItem Content="500%" />
+                                    </ComboBox>-->
+                                    <StackPanel
+                                        Grid.Row="5"
+                                        Grid.ColumnSpan="2"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                        <Button Command="{Binding SaveSettingsCommand}" Content="Сохранить" />
+                                        <Button Command="{x:Static materialDesign:PopupBox.ClosePopupCommand}" Content="Отменить">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Foreground" Value="Red" />
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </materialDesign:PopupBox>
+                        </StackPanel>
+                        <StackPanel
+                            Margin="20,0,0,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                            <TextBlock Text="{Binding CurrentDate, StringFormat='dd MMMM yyyy года HH:mm'}" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox.Header>
+                <StackPanel MinHeight="100">
+                    <TextBlock
+                        Margin="0,0,0,5"
+                        FontSize="20"
+                        Text="{Binding AppConfig.Name, Mode=TwoWay}" />
+                    <TextBlock Margin="0,0,0,20" FontSize="28">
+                        <Run Text="Счёт: " />
+                        <Run Text="{Binding AppConfig.SimultionCash, Mode=TwoWay, Converter={StaticResource CurrencyConverter}}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            FontSize="12"
+                            Foreground="White"
+                            Text="За сегодня:" />
+                        <TextBlock
+                            Margin="0,0,0,10"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="Green"
+                            Text="{Binding DailyEarnings, Converter={StaticResource CurrencyConverter}}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <materialDesign:ColorZone
+                    Grid.Column="0"
+                    Padding="8,4,8,4"
+                    Panel.ZIndex="1"
+                    materialDesign:ElevationAssist.Elevation="Dp2"
+                    CornerRadius="2"
+                    Mode="Inverted">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            Grid.Column="0"
+                            Margin="8,0,0,0"
+                            VerticalAlignment="Center"
+                            materialDesign:HintAssist.Hint="Поиск"
+                            materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                            BorderThickness="0"
+                            Text="{Binding FilterByTickerNameAll, UpdateSourceTrigger=PropertyChanged}"
+                            TextChanged="FilterByTickerAll_TextChanged" />
+                        <Button
+                            Grid.Column="1"
+                            Command="{Binding FilterTickerInfoListCommand}"
+                            Style="{StaticResource MaterialDesignToolButton}">
+                            <materialDesign:PackIcon Kind="Search" Opacity=".56" />
+                        </Button>
+                    </Grid>
+                </materialDesign:ColorZone>
+            </Grid>
+            <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
+                <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ListView
+                            MinHeight="100"
+                            ItemsSource="{Binding FilteredByTickerInfoList}"
+                            ScrollViewer.CanContentScroll="True">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
+                                    <GridViewColumn Header="Тикер">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Foreground="Green"
+                                                    Text="{Binding TickerName}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding TickerName}"
+                                                    FontWeight="Bold"
+                                                    Foreground="#acacac"
+                                                    ToolTip="Открыть в новом окне">
+                                                    <materialDesign:PackIcon
+                                                        Width="24"
+                                                        Height="24"
+                                                        Kind="OpenInNew" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{Binding DataContext.AddTickerToFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding TickerName}"
+                                                    FontWeight="Bold"
+                                                    Foreground="#acacac"
+                                                    ToolTip="Добавить в избранное">
+                                                    <materialDesign:PackIcon
+                                                        Width="24"
+                                                        Height="24"
+                                                        Kind="Favorite" />
+                                                </Button>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Избранное">
+                    <ListView
+                        MinHeight="100"
+                        ItemsSource="{Binding FavoriteTickers}"
+                        ScrollViewer.CanContentScroll="True">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn DisplayMemberBinding="{Binding UId}" Header="Id" />
+                                <GridViewColumn Header="Тикер">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Foreground="Green"
+                                                Text="{Binding Name}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding Name}"
+                                                FontWeight="Bold"
+                                                Foreground="#acacac"
+                                                ToolTip="Открыть в новом окне">
+                                                <materialDesign:PackIcon
+                                                    Width="24"
+                                                    Height="24"
+                                                    Kind="OpenInNew" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding DataContext.RemoveTickerToFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding Name}"
+                                                FontWeight="Bold"
+                                                Foreground="#acacac"
+                                                ToolTip="Убрать из избранного">
+                                                <materialDesign:PackIcon
+                                                    Width="24"
+                                                    Height="24"
+                                                    Kind="Delete" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                    </ListView>
+                </TabItem>
+            </TabControl>
         </DockPanel>
-
-
         <!--  Сплиттер между левой и правой областью  -->
         <GridSplitter
             Grid.Column="1"
             Width="5"
             HorizontalAlignment="Stretch"
-            ResizeBehavior="PreviousAndNext" />
+            ResizeBehavior="PreviousAndNext"
+            ToolTip="Возьми и тяни" />
 
         <!--  Правая область  -->
         <Border Grid.Column="2">
@@ -119,46 +370,122 @@
                 <!--  Верхняя часть  -->
                 <Border Grid.Row="0">
                     <DockPanel>
-                        <StackPanel
-                            Height="40"
-                            Background="#b27c35"
-                            DockPanel.Dock="Top">
-                            <TextBlock
-                                Margin="11"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Text="Открытые сделки" />
+                        <StackPanel DockPanel.Dock="Top">
+                            <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
+                                <DockPanel>
+                                    <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="18"
+                                            Text="Открытые сделки" />
+                                    </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel
+                                            Width="300"
+                                            Margin="0,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                            <materialDesign:ColorZone
+                                                Padding="8,4,8,4"
+                                                Panel.ZIndex="1"
+                                                materialDesign:ElevationAssist.Elevation="Dp2"
+                                                CornerRadius="2"
+                                                Mode="Standard">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox
+                                                        Grid.Column="0"
+                                                        MinWidth="200"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        materialDesign:HintAssist.Hint="Поиск"
+                                                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                                                        BorderThickness="0"
+                                                        TextChanged="FilterByTickerTradingRecord_TextChanged" />
+                                                    <Button Grid.Column="1" Style="{StaticResource MaterialDesignToolButton}">
+                                                        <materialDesign:PackIcon Kind="Search" Opacity=".56" />
+                                                    </Button>
+                                                </Grid>
+                                            </materialDesign:ColorZone>
+                                            <!--<Button
+                                                Margin="8,0,0,0"
+                                                Panel.ZIndex="0"
+                                                Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                                <materialDesign:PackIcon Kind="Send" />
+                                            </Button>-->
+                                        </StackPanel>
+                                    </Grid>
+                                </DockPanel>
+                            </materialDesign:ColorZone>
                         </StackPanel>
 
-                        <ListView MinHeight="100" ItemsSource="{Binding TickerInfoList}">
+
+                        <ListView
+                            MinHeight="100"
+                            ItemsSource="{Binding TradingInfoList}"
+                            SelectedItem="{Binding SelectedTradeInfo}">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date.TimeOfDay}" Header="Время" />
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Цена" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Объём" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Прибыль" />
-                                    <GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
+                                    <GridViewColumn Width="120" Header="Закрыть">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button
                                                     Background="Transparent"
                                                     BorderBrush="Transparent"
                                                     BorderThickness="0"
-                                                    Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    Foreground="Red"
-                                                    ToolTip="Удалить">
+                                                    Command="{Binding DataContext.CloseTradingDealCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Foreground="White"
+                                                    ToolTip="Закрыть сделку">
                                                     <materialDesign:PackIcon
                                                         Width="24"
                                                         Height="24"
-                                                        Kind="Delete" />
+                                                        Kind="Handshake" />
                                                 </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
                                 </GridView>
                             </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="Height" Value="50" />
+                                    <Setter Property="FontSize" Value="14" />
+
+                                    <Setter Property="BorderThickness" Value="1" />
+                                    <Setter Property="BorderBrush" Value="#9a444444" />
+
+                                    <!--  Триггеры для изменения фона в зависимости от Operation  -->
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+
+                                        </Trigger>
+
+                                        <!--  Если элемент выбран  -->
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.ItemContainerStyle>
                         </ListView>
                     </DockPanel>
 
@@ -169,8 +496,9 @@
                     Grid.Row="1"
                     Height="5"
                     HorizontalAlignment="Stretch"
-                    Background="Crimson"
-                    ResizeBehavior="PreviousAndNext" />
+                    Background="#b7b7b7"
+                    ResizeBehavior="PreviousAndNext"
+                    ToolTip="Возьми и тяни" />
 
                 <!--  Нижняя часть  -->
                 <Border
@@ -179,39 +507,112 @@
                     VerticalAlignment="Top">
                     <!--  Содержимое нижней части  -->
                     <DockPanel>
-                        <StackPanel
-                            Height="40"
-                            Background="#b27c35"
-                            DockPanel.Dock="Top">
-                            <TextBlock
-                                Margin="11"
-                                FontSize="14"
-                                FontWeight="Bold"
-                                Text="История сделок" />
+                        <StackPanel DockPanel.Dock="Top">
+                            <materialDesign:ColorZone Padding="10,4,4,4" Mode="Inverted">
+                                <DockPanel>
+                                    <StackPanel materialDesign:RippleAssist.IsCentered="True" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="18"
+                                            Text="История сделок" />
+                                    </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel
+                                            Width="300"
+                                            Margin="0,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                            <materialDesign:ColorZone
+                                                Padding="8,4,8,4"
+                                                Panel.ZIndex="1"
+                                                materialDesign:ElevationAssist.Elevation="Dp2"
+                                                CornerRadius="2"
+                                                Mode="Standard">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox
+                                                        Grid.Column="0"
+                                                        MinWidth="200"
+                                                        Margin="8,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        materialDesign:HintAssist.Hint="Поиск"
+                                                        materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                                                        BorderThickness="0"
+                                                        Text="{Binding FilterByTickerTradeRecordHistorical}"
+                                                        TextChanged="FilterByTickerTradeRecordHistorial_TextChanged" />
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Command="{Binding FilterTradingRecorsInfoListCommand}"
+                                                        Style="{StaticResource MaterialDesignToolButton}">
+                                                        <materialDesign:PackIcon Kind="Search" Opacity=".56" />
+                                                    </Button>
+                                                </Grid>
+                                            </materialDesign:ColorZone>
+                                        </StackPanel>
+                                    </Grid>
+                                </DockPanel>
+                            </materialDesign:ColorZone>
                         </StackPanel>
-                        <ListView MinHeight="100" ItemsSource="{Binding TickerInfoList}">
+
+                        <ListView
+                            Width="Auto"
+                            MinHeight="100"
+                            ItemsSource="{Binding TradeHistoricalInfoList}">
+
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Дата" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Время" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date.Date}" Header="Дата" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Date.TimeOfDay}" Header="Время" />
                                     <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Инструмент" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Цена" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Операция" />
-                                    <GridViewColumn DisplayMemberBinding="{Binding TickerName}" Header="Объём" />
-                                    <GridViewColumn>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <!--<Button Command="{Binding DataContext.OpenChartWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}" Content="Удалить" />-->
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
+                                    <GridViewColumn DisplayMemberBinding="{Binding Price}" Header="Цена" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Operation}" Header="Операция" />
+                                    <GridViewColumn DisplayMemberBinding="{Binding Volume}" Header="Объём" />
                                 </GridView>
                             </ListView.View>
+                            <!--  Стили для всех элементов ListViewItem  -->
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="Height" Value="50" />
+                                    <Setter Property="FontSize" Value="14" />
+
+                                    <!--  Триггеры для изменения фона в зависимости от Operation  -->
+                                    <Style.Triggers>
+                                        <!--  Если Operation равно "Покупка", окрасить фон в зеленый  -->
+                                        <DataTrigger Binding="{Binding Operation}" Value="Покупка">
+                                            <Setter Property="Background" Value="#4000ff00" />
+                                        </DataTrigger>
+                                        <!--  Если Operation равно "Продажа", окрасить фон в красный  -->
+                                        <DataTrigger Binding="{Binding Operation}" Value="Продажа">
+                                            <Setter Property="Background" Value="#75ff0000" />
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                        </Trigger>
+                                        <!--  Если элемент выбран  -->
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#9A444444" />
+                                            <Setter Property="BorderBrush" Value="Transparent" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
                         </ListView>
                     </DockPanel>
                 </Border>
             </Grid>
         </Border>
     </Grid>
-
 </Window>

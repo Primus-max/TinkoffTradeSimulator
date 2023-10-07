@@ -2,12 +2,7 @@
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Xml.Linq;
 using Tinkoff.InvestApi;
 
 namespace TinkoffTradeSimulator.ApiServices
@@ -21,8 +16,8 @@ namespace TinkoffTradeSimulator.ApiServices
         public static Task<InvestApiClient> CreateAsync()
         {
             // Токен временно храню в строке
-            string token = "t.xyqIxVciDDS4TtnLukX44Mf-PjiPIl8Wx_lk4xsaoCA23eyVbaSlMS5WZTJUeidfBrrqyE458_nxk9KuFb3S-A";
-            
+            string token = "t.MdgtB4uUizON-6sWQMirH61UzLxM-pLE6I8OqCp2F25au0VUR6Ee9ou-DLA682CUjpO1WQd0vzz1pp5QerFIKQ";
+
             var appName = "tinkoff.invest-api-csharp-sdk";
             var callCredentials = CallCredentials.FromInterceptor((_, metadata) =>
             {

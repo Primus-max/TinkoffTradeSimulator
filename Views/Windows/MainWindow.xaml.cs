@@ -1,62 +1,54 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Documents;
-using Tinkoff.InvestApi.V1;
-using TinkoffTradeSimulator.ApiServices;
-using TinkoffTradeSimulator.ApiServices.Tinkoff;
-using TinkoffTradeSimulator.Models;
+﻿using System.Windows;
+using System.Windows.Controls;
+using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TinkoffTradeSimulator.Views.Windows
 {
     /// <summary> Главное окно приложения </summary>
     public partial class MainWindow : Window
     {
+        MainWindowViewModel _mainWindowViewModel = null!;
+
+
         public MainWindow()
         {
+            
             InitializeComponent();
+            _mainWindowViewModel = new MainWindowViewModel();
+            DataContext = _mainWindowViewModel;           
 
-            Loaded += MainWindow_Loaded;
-            GetPrice();
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        #region ФИЛЬТРЫ
+        private void FilterByTickerAll_TextChanged(object sender, TextChangedEventArgs e)
         {
-            MainWindowViewModel viewModel = new MainWindowViewModel();
-            viewModel.LoadData();
+            // Получите текст из TextBox
+            string filterText = ((TextBox)sender).Text;
+
+            // Вызываю метод фильрации метод фильтрации
+            _mainWindowViewModel.UpdateFilteredTickerInfoList(filterText);
         }
 
-        private async void GetPrice()
+        private void FilterByTickerTradeRecordHistorial_TextChanged(object sender, TextChangedEventArgs e)
         {
-           var client = await TinkoffClient.CreateAsync();
-            var nstruments = await client?.Instruments?.SharesAsync();
+            // Получите текст из TextBox
+            string filterText = ((TextBox)sender).Text;
 
-            
-
-            List<TickerInfo> tickers = new List<TickerInfo>();
-
-            foreach ( var n in nstruments.Instruments) 
-            {
-                TickerInfo tickerInfo = new TickerInfo
-                {
-                    Id = n.Isin,
-                    TickerName = n.Name
-                };
-
-                tickers.Add(tickerInfo);
-            }
-
-            
-
-            Instrument instrument1 = new Instrument();
-           
+            // Вызываю метод фильрации
+            _mainWindowViewModel.UpdateFilterTradeHistoricalInfoListByTicker(filterText);
         }
+        #endregion
 
-        private void ListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void FilterByTickerTradingRecord_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // Получите текст из TextBox
+            string filterText = ((TextBox)sender).Text;
 
+            // Вызываю метод фильрации метод фильтрации
+            _mainWindowViewModel.UpdateFilterTradingInfoListByTicker(filterText);
         }
+
+        
     }
 }
