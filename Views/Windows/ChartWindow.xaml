@@ -3,19 +3,145 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ScottPlot="clr-namespace:ScottPlot;assembly=ScottPlot.WPF"
+    xmlns:controls="clr-namespace:TinkoffTradeSimulator.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TinkoffTradeSimulator.Views.Windows"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels" 
-    xmlns:controls="clr-namespace:TinkoffTradeSimulator.Views.Controls"
+    xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:vm="clr-namespace:TinkoffTradeSimulator.ViewModels"
     Title="{Binding Title}"
     Width="900"
     Height="600"
+    Background="#A4353C42"
+    Closed="ChartWindow_Closed"
     mc:Ignorable="d">
     <Window.DataContext>
         <vm:ChartWindowViewModel />
     </Window.DataContext>
-    <Grid>      
-        <ScottPlot:WpfPlot x:Name="WpfPlot1" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <!--  Верхняя область с информацией о монете  -->
+            <RowDefinition Height="Auto" />
+            <!--  Средняя область с кнопками и инструментами  -->
+            <RowDefinition Height="Auto" />
+            <!--  Основная область с графиком  -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Верхняя область с информацией о монете  -->
+        <Border Grid.Row="0" Padding="10">
+            <!--  Здесь можете разместить информацию о монете, например, имя монеты, текущую цену и т. д.  -->
+            <!--  Пример:  -->
+            <StackPanel>
+                <StackPanel x:Name="StockPanelInfo" Orientation="Horizontal">
+                    <!--  Здесь будет логотип монеты (вставьте изображение или другой элемент)  -->
+                    <Image
+                        Width="100"
+                        Height="100"
+                        HorizontalAlignment="Left"
+                        Source="C:\Users\FedoTT\source\repos\TinkoffTradeSimulator\bin\Debug\net6.0-windows\png-transparent-bitcoin-currency-coin-money-bank-finances-currency-symbol-transparent-background-gold-medal.png" />
+                    <StackPanel Margin="10,5,0,0" VerticalAlignment="Center">
+                        <!--  Имя монеты  -->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Width="60"
+                                Margin="0,0,10,0"
+                                FontSize="18"
+                                Text="Тикер:" />
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="Green"
+                                Text="{Binding Title}" />
+                        </StackPanel>
+                        <!--  Текущая цена  -->
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Width="60"
+                                Margin="0,0,10,0"
+                                FontSize="18"
+                                Text="Цена:" />
+                            <TextBlock
+                                x:Name="TickerPriceTextBlock"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Foreground="Green" />
+
+                        </StackPanel>
+                        <!--<TextBlock
+                            HorizontalAlignment="Right"
+                            Foreground="Red"
+                            Text="-123,0%" />-->
+                    </StackPanel>
+
+                    <StackPanel Margin="40,0,0,0">
+                        <!--  Цена на сколько в плюс или минус  -->
+                        <!--<TextBlock Text="{Binding StockInfo.Open}" />-->
+                        <!--  Максимальная цена  -->
+                        <TextBlock Text="Максимальная:  ">
+                            <Run x:Name="MaxPriceTextBlock" />
+                        </TextBlock>
+                        <!--  Минимальная цена  -->
+                        <TextBlock Text="Минимальная:   ">
+                            <Run x:Name="MinPriceTextBlock" />
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!--  Средняя область с кнопками и инструментами  -->
+        <ToolBarTray Grid.Row="1">
+            <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
+                <!--<TextBlock VerticalAlignment="Center" Text="Таймфрейм:" />-->
+                <Button
+                    Width="80"
+                    Margin="8,0,0,0"
+                    Command="{Binding OpenCandleIntervalWindowCommand}"
+                    Content="{Binding SelectedTimeFrame.Name}" />
+                <!--  Добавьте другие кнопки для других таймфреймов  -->
+                <Separator />
+                <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">
+                    <ComboBoxItem Content="Fries" IsSelected="True" />
+                    <ComboBoxItem Content="Waffles" />
+                    <ComboBoxItem Content="Chocolate" />
+                </ComboBox>-->
+
+                <StackPanel
+                    VerticalAlignment="Center"
+                    Cursor=""
+                    Orientation="Horizontal">
+                    <Button
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Command="{Binding BuyTickerCommand}"
+                        CommandParameter="{Binding ElementName=QuantityTextBox, Path=Text}"
+                        Content="Купить" />
+                    <TextBox
+                        x:Name="QuantityTextBox"
+                        Width="80"
+                        Margin="10,0,20,0"
+                        materialDesign:HintAssist.Hint="Сколько"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding VolumeTradingTicker}" />
+                    <Button
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Command="{Binding SellickerCommand}"
+                        Content="Продать" />
+                </StackPanel>
+                <Separator />
+
+
+            </ToolBar>
+        </ToolBarTray>
+
+        <oxy:PlotView
+            x:Name="CandlestickPlot"
+            Grid.Row="2"
+            Background="#1C424B51"
+            IsManipulationEnabled="False" />
     </Grid>
+
 </Window>

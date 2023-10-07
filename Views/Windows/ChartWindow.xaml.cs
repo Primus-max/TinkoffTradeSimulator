@@ -1,21 +1,13 @@
-﻿using ScottPlot;
+﻿using DromAutoTrader.Views;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Tinkoff.InvestApi;
-using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.Models;
+using TinkoffTradeSimulator.Services;
 using TinkoffTradeSimulator.ViewModels;
+
+
 
 namespace TinkoffTradeSimulator.Views.Windows
 {
@@ -24,12 +16,77 @@ namespace TinkoffTradeSimulator.Views.Windows
     /// </summary>
     public partial class ChartWindow : Window
     {
+
+        private ChartWindowViewModel _chartViewModel = null;
+
+
         public ChartWindow()
         {
             InitializeComponent();
 
-            // Создаю экземпляр класса и передаю в конструкторе WpfPlot который создан во View
-            ChartWindowViewModel chartWindow = new(WpfPlot1);
+            _chartViewModel = new ChartWindowViewModel();
+            DataContext = _chartViewModel;
+            _chartViewModel.PlotModel = CandlestickPlot;
+
+            EventAggregator.UpdateDataRequested += EventAggregator_UpdateDataRequested;
+            EventAggregator.UpdateTickerInfo += EventAggregator_UpdateTickerInfo;
+
+            // Вызываю метод загрузки исторических данных свечей для отображения во View
+            Loaded += ChartWindow_Loaded;
+            MouseWheel += MainWindow_MouseWheel;                    
         }
+
+        // Метод подписчика на событие об изменении информации о тикере
+        private void EventAggregator_UpdateTickerInfo(TickerInfo tickerInfo)
+        {
+            TickerPriceTextBlock.Text = tickerInfo?.Price != null ? $"{tickerInfo.Price} ₽" : string.Empty;
+            MaxPriceTextBlock.Text = tickerInfo?.MaxPrice != null ? $"{tickerInfo.MaxPrice} ₽" : string.Empty;
+            MinPriceTextBlock.Text = tickerInfo?.MinPrice != null ? $"{tickerInfo.MinPrice} ₽" : string.Empty;
+
+            // Передаю обратно информацию о тикере во ViewModel
+            LocatorService.Current.TickerInfo = tickerInfo;
+        }
+
+        private void MainWindow_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                // Прокрутка колесика мыши вперед
+                // Вызовите метод для обработки прокрутки вперед
+                _chartViewModel.IncreaseCandleHistorical();
+            }
+            else
+            {
+                // Прокрутка колесика мыши назад
+                // Вызовите метод для обработки прокрутки назад
+                _chartViewModel.DecreaseCandleIHistorical();
+            }
+
+            e.Handled = true; // Предотвратите дальнейшее распространение события
+        }
+
+        #region Отображение свечей
+        private async void ChartWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await SetCandlesTOView();
+        }
+
+        public async Task SetCandlesTOView()
+        {
+            string? ticker = Title;
+            // Вызываем метод UpdateData, когда требуется обновление данных
+            await _chartViewModel.SetAndUpdateCandlesChartWindow(ticker: ticker);
+        }
+
+        private async void EventAggregator_UpdateDataRequested()
+        {
+            // Отображаю свечи
+            await SetCandlesTOView();
+        }
+        private void ChartWindow_Closed(object sender, EventArgs e)
+        {
+            EventAggregator.UpdateDataRequested -= EventAggregator_UpdateDataRequested;
+        }
+        #endregion        
     }
 }
