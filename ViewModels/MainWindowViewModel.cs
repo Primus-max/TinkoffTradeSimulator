@@ -16,16 +16,7 @@ using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
-{
-
-    // TODO Выводить стоимость    
-    // TODO Добавить вкладку Избранное, в ней будут храниться тикеры 
-    // TODO Реализовать принцип хранения тикеров в избранном
-
-    // -----------------------------------------------------------------
-    // TODO Сделать логику покупки и продажи акций тикеров
-    // логика должна быть имттацией настоящей торговли, но реальных данных 
-
+{        
     internal class MainWindowViewModel : BaseViewModel
     {
         #region Приватные поля
