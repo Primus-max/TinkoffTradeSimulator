@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DromAutoTrader.Data;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,7 +10,6 @@ using System.Windows;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
-using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Services;
@@ -17,15 +18,6 @@ using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
 {
-
-    // TODO Выводить стоимость    
-    // TODO Добавить вкладку Избранное, в ней будут храниться тикеры 
-    // TODO Реализовать принцип хранения тикеров в избранном
-
-    // -----------------------------------------------------------------
-    // TODO Сделать логику покупки и продажи акций тикеров
-    // логика должна быть имттацией настоящей торговли, но реальных данных 
-
     internal class MainWindowViewModel : BaseViewModel
     {
         #region Приватные поля
@@ -166,36 +158,46 @@ namespace TinkoffTradeSimulator.ViewModels
 
             if (sender is TradeRecordInfo tradeRecordInfo)
             {
-                // Найдите объект TradeRecordInfo в базе данных и удалите его
-                var tradeRecordToDelete = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.Id == tradeRecordInfo.Id);
-                if (tradeRecordToDelete != null)
-                {
-                    _db.TradeRecordsInfo.Remove(tradeRecordToDelete);
-                    _db.SaveChanges();
+                string tickerName = tradeRecordInfo.TickerName;
+                double tickerPrice = tradeRecordInfo.Price;
+                int volumeTradingTicker = tradeRecordInfo.Volume;
 
-                    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
-                }
+                TradeManager.SellTicker(tickerName, tickerPrice, volumeTradingTicker);
 
-                // Создайте объект HistoricalTradeRecordInfo и скопируйте данные
-                var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
-                {
-                    Date = DateTime.Now,
-                    TickerName = tradeRecordInfo.TickerName,
-                    Price = tradeRecordInfo.Price,
-                    Operation = tradeRecordInfo.Operation,
-                    Volume = tradeRecordInfo.Volume,
-                    IsBuy = tradeRecordInfo.IsBuy,
-                    IsSell = tradeRecordInfo.IsSell,
-                    IsClosed = tradeRecordInfo.IsClosed
-                };
+                UpdateTradingInfoAfterExecuteTrade();
 
-                // Добавьте новый объект HistoricalTradeRecordInfo в базу данных
-                _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
-                _db.SaveChanges();
 
-                // Обновляю колллекцию для отобажения 
-                TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
+                //// Нахожу объект TradeRecordInfo в базе данных и удаляю его
+                //var tradeRecordToDelete = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.Id == tradeRecordInfo.Id);
+                //if (tradeRecordToDelete != null)
+                //{
+                //    _db.TradeRecordsInfo.Remove(tradeRecordToDelete);
+                //    _db.SaveChanges();
+
+                //    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+                //}
+
+                //// Создаю объект HistoricalTradeRecordInfo и копирую данные
+                //var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
+                //{
+                //    Date = DateTime.Now,
+                //    TickerName = tradeRecordInfo.TickerName,
+                //    Price = tradeRecordInfo.Price,
+                //    Operation = tradeRecordInfo.Operation,
+                //    Volume = tradeRecordInfo.Volume,
+                //    IsBuy = tradeRecordInfo.IsBuy,
+                //    IsSell = tradeRecordInfo.IsSell,
+                //    IsClosed = tradeRecordInfo.IsClosed
+                //};
+
+                //// Добавляю новый объект HistoricalTradeRecordInfo в базу данных
+                //_db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
+                //_db.SaveChanges();
+
+                //// Обновляю колллекцию для отобажения 
+                //TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
             }
+
         }
 
         public ICommand? FilterTickerInfoListCommand { get; } = null;
@@ -245,7 +247,7 @@ namespace TinkoffTradeSimulator.ViewModels
             var asdf = AppConfig;
             SaveSettings();
         }
-              
+
 
         #endregion
 
@@ -264,8 +266,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            DbManager dbManager = new();
-            _db = dbManager.InitializeDB();
+            InitializeDatabase();
             #endregion
 
             #region Инициализация источников данных
@@ -286,8 +287,7 @@ namespace TinkoffTradeSimulator.ViewModels
             //LoadFavoriteTickers();
             #endregion
 
-            #region Подписчики на события
-            EventAggregator.HistoricalTradeInfoChanged += OnHistoricalTradeInfoChanged;
+            #region Подписчики на события            
             EventAggregator.TradingRecordInfoChanged += OnTradingInfoListChanged;
             #endregion
         }
@@ -295,15 +295,12 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Методы
         #region Методы подписчиков на события
         // Метод оповещения об изменении источника данных для отображения во View
-        private void OnTradingInfoListChanged(ObservableCollection<TradeRecordInfo> tradingIndolist)
+        private void OnTradingInfoListChanged()
         {
-            TradingInfoList = tradingIndolist;
+            TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.AsNoTracking().ToList());
+            TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.AsNoTracking().ToList());
         }
-        // Метод оповещения об изменении источника данных для отображения во View
-        private void OnHistoricalTradeInfoChanged(ObservableCollection<HistoricalTradeRecordInfo> historicalTradeRecord)
-        {
-            TradeHistoricalInfoList = historicalTradeRecord;
-        }
+
         #endregion
 
         #region Методы загрузки данных при инициализации приложения        
@@ -380,16 +377,37 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #endregion
 
+        // Метод обновления источников данных после покупки или продажи тикеров
+        private void UpdateTradingInfoAfterExecuteTrade()
+        {
+            // Очищаем и обновляем _tradeHistoricalInfoList
+            TradeHistoricalInfoList.Clear();
+            foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
+            {
+                TradeHistoricalInfoList.Add(item);
+            }
+
+            // Очищаем и обновляем _tradeCurrentInfoList из базы данных
+            TradingInfoList.Clear();
+            foreach (var item in _db.TradeRecordsInfo.ToList())
+            {
+                TradingInfoList.Add(item);
+            }
+
+            // Опубликовываем событие для текущей коллекции
+            EventAggregator.PublishTradingInfoChanged();
+        }
+
         // Метод сохранения настроек приложения
         private void SaveSettings()
         {
             AppSettings.SaveConfig(AppConfig);
         }
-        
+
         // Метод получения настроек приложения
         private void GetSettings()
         {
-          AppConfig = AppSettings.LoadConfig();
+            AppConfig = AppSettings.LoadConfig();
         }
 
         // Добавляю тикер в избранное
@@ -489,6 +507,10 @@ namespace TinkoffTradeSimulator.ViewModels
             chartWindow.Show();
         }
 
+        #region Сделки
+
+        #endregion
+
         #region Фильтры
         // Метод фильтрации по имени тикера
         public void UpdateFilteredTickerInfoList(string filter)
@@ -562,6 +584,24 @@ namespace TinkoffTradeSimulator.ViewModels
             });
         }
         #endregion
+
+        // Инициализация базы данных
+        private void InitializeDatabase()
+        {
+            try
+            {
+                // Экземпляр базы данных
+                _db = AppContextFactory.GetInstance();
+                // загружаем данные о поставщиках из БД
+                _db.HistoricalTradeRecordsInfo.Load();
+                _db.TradeRecordsInfo.Load();
+            }
+            catch (Exception)
+            {
+                // TODO сделать запись логов
+                //Console.WriteLine($"Не удалось инициализировать базу данных: {ex.Message}");
+            }
+        }
         #endregion
     }
 }

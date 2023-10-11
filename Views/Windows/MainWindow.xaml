@@ -187,30 +187,36 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBox
+                            x:Name="TextSearchParameterTextBox"
                             Grid.Column="0"
                             Margin="8,0,0,0"
                             VerticalAlignment="Center"
                             materialDesign:HintAssist.Hint="Поиск"
                             materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                            materialDesign:TextFieldAssist.HasLeadingIcon="True"
+                            materialDesign:TextFieldAssist.LeadingIcon="Search"
                             BorderThickness="0"
                             Text="{Binding FilterByTickerNameAll, UpdateSourceTrigger=PropertyChanged}"
                             TextChanged="FilterByTickerAll_TextChanged" />
-                        <Button
-                            Grid.Column="1"
-                            Command="{Binding FilterTickerInfoListCommand}"
-                            Style="{StaticResource MaterialDesignToolButton}">
-                            <materialDesign:PackIcon Kind="Search" Opacity=".56" />
-                        </Button>
                     </Grid>
                 </materialDesign:ColorZone>
             </Grid>
             <TabControl materialDesign:ColorZoneAssist.Mode="SecondaryLight">
-                <TabItem Header="Все" ScrollViewer.CanContentScroll="True">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TabItem Header="Все">
+                    <DockPanel x:Name="TickersCollectionDockPanelDataGrid">
+                        <DockPanel.Resources>
+                            <CollectionViewSource
+                                x:Key="TickersCollection"
+                                Filter="TickersCollection_Filter"
+                                Source="{Binding FilteredByTickerInfoList}" />
+                        </DockPanel.Resources>
                         <ListView
                             MinHeight="100"
-                            ItemsSource="{Binding FilteredByTickerInfoList}"
-                            ScrollViewer.CanContentScroll="True">
+                            DockPanel.Dock="Top"
+                            ItemsSource="{Binding Source={StaticResource TickersCollection}}"
+                            ScrollViewer.CanContentScroll="True"
+                            VirtualizingPanel.IsVirtualizing="True"
+                            VirtualizingPanel.VirtualizationMode="Recycling">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn DisplayMemberBinding="{Binding Id}" Header="Id" />
@@ -218,6 +224,7 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock
+                                                    Margin="20,0,0,0"
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
                                                     Foreground="Green"
@@ -273,8 +280,10 @@
                                 </ItemsPanelTemplate>
                             </ListView.ItemsPanel>
                         </ListView>
+                    </DockPanel>
 
-                    </ScrollViewer>
+
+
                 </TabItem>
                 <TabItem Header="Избранное">
                     <ListView

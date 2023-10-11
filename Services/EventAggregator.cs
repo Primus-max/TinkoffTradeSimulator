@@ -12,19 +12,13 @@ namespace TinkoffTradeSimulator.Services
         {
             CandleIntervalSelected?.Invoke(selectedButton);
         }
+              
+        // Событие обновления источников данных. Продажа / покупка / закрытие сделки
+        public static event Action? TradingRecordInfoChanged;
 
-        public static event Action<ObservableCollection<HistoricalTradeRecordInfo>>? HistoricalTradeInfoChanged;
-
-        public static void PublishHistoricalTradeInfoChanged(ObservableCollection<HistoricalTradeRecordInfo> historicalTradeRecordInfo)
+        public static void PublishTradingInfoChanged()
         {
-            HistoricalTradeInfoChanged?.Invoke(historicalTradeRecordInfo);
-        }
-
-        public static event Action<ObservableCollection<TradeRecordInfo>>? TradingRecordInfoChanged;
-
-        public static void PublishTradingInfoChanged(ObservableCollection<TradeRecordInfo> tradingRecordInfo)
-        {
-            TradingRecordInfoChanged?.Invoke(tradingRecordInfo);
+            TradingRecordInfoChanged?.Invoke();
         }
 
         // Событие, которое будет вызываться при запросе обновления данных
@@ -41,6 +35,6 @@ namespace TinkoffTradeSimulator.Services
         public static void PublishUpdateTickerInfo(TickerInfo stockInfo)
         {           
             UpdateTickerInfo?.Invoke(stockInfo);
-        }
+        }       
     }
 }
