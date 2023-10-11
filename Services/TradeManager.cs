@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Models;
 
 namespace TinkoffTradeSimulator.Services
@@ -10,14 +11,16 @@ namespace TinkoffTradeSimulator.Services
     {
         private static AppContext _db = null;
 
-        public static void ExecuteTrade(string operation, string tickerName, double price, bool subtractVolume, int VolumeTradingTicker)
+         static TradeManager()
         {
-            // Получаю информацию о тикере обратно из CodeBehind
-            // TODO Разобраться с обнулением TickerInfo или StockInfo
-            TickerInfo = LocatorService.Current.TickerInfo;
+            #region Инициализация базы данных
+            DbManager dbManager = new();
+            _db = dbManager.InitializeDB();
+            #endregion
+        }
 
-            bool subtractVolume = operation == "Продажа"; // Проверяем, нужно ли вычитать объем
-
+        public static void ExecuteTrade(string operation, string tickerName, double price, bool subtractVolume, int VolumeTradingTicker)
+        {            
             // Поиск записи с тем же TickerName в _db.TradeRecordsInfo
             TradeRecordInfo tradeRecordInfo = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.TickerName == tickerName);
 
@@ -88,16 +91,16 @@ namespace TinkoffTradeSimulator.Services
             _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
 
             // Сохраняем изменения в базе данных
-            _db.SaveChanges();
-
-           
+            _db.SaveChanges();           
         }
 
+        // Вызываемый метод покупки тикера
         public static void BuyTicker(string tickerName, double price, int volumeTradingTicker)
         {
             ExecuteTrade("Покупка", tickerName, price, false, volumeTradingTicker);
         }
 
+        // Вызываемый метод продажи тикера
         public static void SellTicker(string tickerName, double price, int volumeTradingTicker)
         {
             ExecuteTrade("Продажа", tickerName, price, true, volumeTradingTicker);

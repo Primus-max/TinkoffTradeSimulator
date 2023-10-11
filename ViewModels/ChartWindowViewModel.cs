@@ -98,23 +98,56 @@ namespace TinkoffTradeSimulator.ViewModels
             OpenCandleIntervalWindow();
         }
 
+        #region Покупаю тикер
         public ICommand? BuyTickerCommand { get; } = null;
 
         private bool CanBuyTickerCommandExecute(object p) => true;
 
         private void OnBuyTickerCommandExecuted(object sender)
         {
-            BuyTicker();
+            TickerInfo = LocatorService.Current.TickerInfo;
+
+            if (TickerInfo == null)
+            {
+                MessageBox.Show("Данные о тикере не были загружены. Убедитесь, что цена тикера отображается и попробуйте еще раз", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            double tickerPrice = Convert.ToDouble(TickerInfo.Price);
+
+            // Совершаю сделку
+            TradeManager.BuyTicker(Title, tickerPrice, VolumeTradingTicker);
+
+            // Обновляю источники данных после совершения сделки
+            UpdateTradingInfoAfterExecuteTrade();
         }
 
+        #endregion
+
+        #region Продаю тикер
         public ICommand? SellickerCommand { get; } = null;
 
         private bool CanSellickerCommandExecute(object p) => true;
 
         private void OnSellickerCommandExecuted(object sender)
         {
-            SellTicker();
-        }
+            TickerInfo = LocatorService.Current.TickerInfo;
+
+            if (TickerInfo == null)
+            {
+                MessageBox.Show("Данные о тикере не были загружены. Убедитесь, что цена тикера отображается и попробуйте еще раз", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            double tickerPrice = Convert.ToDouble(TickerInfo.Price);
+
+            // Совершаю сделку
+            TradeManager.SellTicker(Title, tickerPrice, VolumeTradingTicker);
+
+            // Обновляю источники данных после совершения сделки
+            UpdateTradingInfoAfterExecuteTrade();
+        } 
+        #endregion
 
         #endregion
 
@@ -324,88 +357,112 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Методы по торговле (покупка/продажа)
         // Общий метод покупки и продажи
-        private void ExecuteTrade(string operation)
-        {
-            // Получаю информацию о тикере обратно из CodeBehind
-            // TODO Разобраться с обнулением TickerInfo или StockInfo
-            TickerInfo = LocatorService.Current.TickerInfo;
+        //private void ExecuteTrade(string operation)
+        //{
+        //    // Получаю информацию о тикере обратно из CodeBehind
+        //    // TODO Разобраться с обнулением TickerInfo или StockInfo
+        //    TickerInfo = LocatorService.Current.TickerInfo;
 
-            string tickerName = Title;
-            double price = Convert.ToDouble(TickerInfo?.Price);
-            bool subtractVolume = operation == "Продажа"; // Проверяем, нужно ли вычитать объем
+        //    string tickerName = Title;
+        //    double price = Convert.ToDouble(TickerInfo?.Price);
+        //    bool subtractVolume = operation == "Продажа"; // Проверяем, нужно ли вычитать объем
 
-            // Поиск записи с тем же TickerName в _db.TradeRecordsInfo
-            TradeRecordInfo tradeRecordInfo = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.TickerName == tickerName);
+        //    // Поиск записи с тем же TickerName в _db.TradeRecordsInfo
+        //    TradeRecordInfo tradeRecordInfo = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.TickerName == tickerName);
 
-            if (tradeRecordInfo != null)
-            {
-                // Запись найдена, обновляем Volume, Price и Operation
-                tradeRecordInfo.Price = price; // Обновляем цену
-                tradeRecordInfo.Operation = operation; // Обновляем тип операции
+        //    if (tradeRecordInfo != null)
+        //    {
+        //        // Запись найдена, обновляем Volume, Price и Operation
+        //        tradeRecordInfo.Price = price; // Обновляем цену
+        //        tradeRecordInfo.Operation = operation; // Обновляем тип операции
 
-                if (subtractVolume)
-                {
-                    // Если нужно вычесть объем, убедимся, что объем не становится отрицательным
-                    if (tradeRecordInfo.Volume >= VolumeTradingTicker)
-                    {
-                        tradeRecordInfo.Volume -= VolumeTradingTicker;
-                    }
-                    else
-                    {
-                        // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
-                        MessageBox.Show("Недостаточно объема для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return; // Выходим из метода, так как объем недостаточный
-                    }
-                }
-                else
-                {
-                    tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
-                }
+        //        if (subtractVolume)
+        //        {
+        //            // Если нужно вычесть объем, убедимся, что объем не становится отрицательным
+        //            if (tradeRecordInfo.Volume >= VolumeTradingTicker)
+        //            {
+        //                tradeRecordInfo.Volume -= VolumeTradingTicker;
+        //            }
+        //            else
+        //            {
+        //                // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
+        //                MessageBox.Show("Недостаточно объема для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //                return; // Выходим из метода, так как объем недостаточный
+        //            }
+        //        }
+        //        else
+        //        {
+        //            tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
+        //        }
 
-                if (tradeRecordInfo.Volume == 0)
-                {
-                    // Если объем стал равным 0, удаляем запись из базы данных
-                    _db.TradeRecordsInfo.Remove(tradeRecordInfo);
-                }
-            }
-            else if (subtractVolume)
-            {
-                // Запись не найдена и мы пытаемся продать, отображаем сообщение об ошибке
-                MessageBox.Show("Нет записи для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            else
-            {
-                // Запись не найдена и мы пытаемся купить, создаем новую запись
-                tradeRecordInfo = new TradeRecordInfo
-                {
-                    TickerName = tickerName,
-                    Price = price,
-                    IsBuy = operation == "Покупка", // Определение типа операции
-                    Operation = operation,
-                    Volume = subtractVolume ? -VolumeTradingTicker : VolumeTradingTicker // Устанавливаем объем с учетом операции
-                };
+        //        if (tradeRecordInfo.Volume == 0)
+        //        {
+        //            // Если объем стал равным 0, удаляем запись из базы данных
+        //            _db.TradeRecordsInfo.Remove(tradeRecordInfo);
+        //        }
+        //    }
+        //    else if (subtractVolume)
+        //    {
+        //        // Запись не найдена и мы пытаемся продать, отображаем сообщение об ошибке
+        //        MessageBox.Show("Нет записи для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        // Запись не найдена и мы пытаемся купить, создаем новую запись
+        //        tradeRecordInfo = new TradeRecordInfo
+        //        {
+        //            TickerName = tickerName,
+        //            Price = price,
+        //            IsBuy = operation == "Покупка", // Определение типа операции
+        //            Operation = operation,
+        //            Volume = subtractVolume ? -VolumeTradingTicker : VolumeTradingTicker // Устанавливаем объем с учетом операции
+        //        };
 
-                // Добавляем запись в _db.TradeRecordsInfo
-                _db.TradeRecordsInfo.Add(tradeRecordInfo);
-            }
+        //        // Добавляем запись в _db.TradeRecordsInfo
+        //        _db.TradeRecordsInfo.Add(tradeRecordInfo);
+        //    }
 
-            // Создаем новую запись для истории торговли
-            HistoricalTradeRecordInfo historicalTradeRecordInfo = new HistoricalTradeRecordInfo
-            {
-                TickerName = tickerName,
-                Price = price,
-                Operation = operation,
-                Volume = VolumeTradingTicker, // Используем значение из VolumeTradingTicker
-                Date = DateTime.Now // Устанавливаем дату
-            };
+        //    // Создаем новую запись для истории торговли
+        //    HistoricalTradeRecordInfo historicalTradeRecordInfo = new HistoricalTradeRecordInfo
+        //    {
+        //        TickerName = tickerName,
+        //        Price = price,
+        //        Operation = operation,
+        //        Volume = VolumeTradingTicker, // Используем значение из VolumeTradingTicker
+        //        Date = DateTime.Now // Устанавливаем дату
+        //    };
 
-            // Добавляем запись в _db.HistoricalTradeRecordsInfo
-            _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
+        //    // Добавляем запись в _db.HistoricalTradeRecordsInfo
+        //    _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
 
-            // Сохраняем изменения в базе данных
-            _db.SaveChanges();
+        //    // Сохраняем изменения в базе данных
+        //    _db.SaveChanges();
 
+        //    // Очищаем и обновляем _tradeHistoricalInfoList
+        //    _tradeHistoricalInfoList.Clear();
+        //    foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
+        //    {
+        //        _tradeHistoricalInfoList.Add(item);
+        //    }
+
+        //    // Очищаем и обновляем _tradeCurrentInfoList из базы данных
+        //    _tradeCurrentInfoList.Clear();
+        //    foreach (var item in _db.TradeRecordsInfo.ToList())
+        //    {
+        //        _tradeCurrentInfoList.Add(item);
+        //    }
+
+        //    // Опубликовываем событие для текущей коллекции
+        //    EventAggregator.PublishTradingInfoChanged(_tradeCurrentInfoList);
+
+        //    // Опубликовываем событие для исторической коллекции
+        //    EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
+        //}
+
+        // Метод обновления источников данных после покупки или продажи тикеров
+        private void UpdateTradingInfoAfterExecuteTrade()
+        {            
             // Очищаем и обновляем _tradeHistoricalInfoList
             _tradeHistoricalInfoList.Clear();
             foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
@@ -424,20 +481,20 @@ namespace TinkoffTradeSimulator.ViewModels
             EventAggregator.PublishTradingInfoChanged(_tradeCurrentInfoList);
 
             // Опубликовываем событие для исторической коллекции
-            EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);
+            EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);           
         }
 
         // Метод для покупки
-        private void BuyTicker()
-        {
-            ExecuteTrade("Покупка");
-        }
+        //private void BuyTicker()
+        //{
+        //    ExecuteTrade("Покупка");
+        //}
 
-        // Метод для продажи
-        private void SellTicker()
-        {
-            ExecuteTrade("Продажа");
-        }
+        //// Метод для продажи
+        //private void SellTicker()
+        //{
+        //    ExecuteTrade("Продажа");
+        //}
 
         #endregion
         // Метод установки стилей для графика
