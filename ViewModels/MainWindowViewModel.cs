@@ -158,35 +158,44 @@ namespace TinkoffTradeSimulator.ViewModels
 
             if (sender is TradeRecordInfo tradeRecordInfo)
             {
-                // Нахожу объект TradeRecordInfo в базе данных и удаляю его
-                var tradeRecordToDelete = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.Id == tradeRecordInfo.Id);
-                if (tradeRecordToDelete != null)
-                {
-                    _db.TradeRecordsInfo.Remove(tradeRecordToDelete);
-                    _db.SaveChanges();
+                string tickerName = tradeRecordInfo.TickerName;
+                double tickerPrice = tradeRecordInfo.Price;
+                int volumeTradingTicker = tradeRecordInfo.Volume;
 
-                    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
-                }
+                TradeManager.SellTicker(tickerName, tickerPrice, volumeTradingTicker);
 
-                // Создаю объект HistoricalTradeRecordInfo и копирую данные
-                var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
-                {
-                    Date = DateTime.Now,
-                    TickerName = tradeRecordInfo.TickerName,
-                    Price = tradeRecordInfo.Price,
-                    Operation = tradeRecordInfo.Operation,
-                    Volume = tradeRecordInfo.Volume,
-                    IsBuy = tradeRecordInfo.IsBuy,
-                    IsSell = tradeRecordInfo.IsSell,
-                    IsClosed = tradeRecordInfo.IsClosed
-                };
+                UpdateTradingInfoAfterExecuteTrade();
 
-                // Добавляю новый объект HistoricalTradeRecordInfo в базу данных
-                _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
-                _db.SaveChanges();
 
-                // Обновляю колллекцию для отобажения 
-                TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
+                //// Нахожу объект TradeRecordInfo в базе данных и удаляю его
+                //var tradeRecordToDelete = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.Id == tradeRecordInfo.Id);
+                //if (tradeRecordToDelete != null)
+                //{
+                //    _db.TradeRecordsInfo.Remove(tradeRecordToDelete);
+                //    _db.SaveChanges();
+
+                //    TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
+                //}
+
+                //// Создаю объект HistoricalTradeRecordInfo и копирую данные
+                //var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
+                //{
+                //    Date = DateTime.Now,
+                //    TickerName = tradeRecordInfo.TickerName,
+                //    Price = tradeRecordInfo.Price,
+                //    Operation = tradeRecordInfo.Operation,
+                //    Volume = tradeRecordInfo.Volume,
+                //    IsBuy = tradeRecordInfo.IsBuy,
+                //    IsSell = tradeRecordInfo.IsSell,
+                //    IsClosed = tradeRecordInfo.IsClosed
+                //};
+
+                //// Добавляю новый объект HistoricalTradeRecordInfo в базу данных
+                //_db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
+                //_db.SaveChanges();
+
+                //// Обновляю колллекцию для отобажения 
+                //TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
             }
                         
         }
@@ -373,6 +382,30 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #endregion
+
+        // Метод обновления источников данных после покупки или продажи тикеров
+        private void UpdateTradingInfoAfterExecuteTrade()
+        {
+            // Очищаем и обновляем _tradeHistoricalInfoList
+            TradeHistoricalInfoList.Clear();
+            foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
+            {
+                TradeHistoricalInfoList.Add(item);
+            }
+
+            // Очищаем и обновляем _tradeCurrentInfoList из базы данных
+            TradingInfoList.Clear();
+            foreach (var item in _db.TradeRecordsInfo.ToList())
+            {
+                TradingInfoList.Add(item);
+            }
+
+            // Опубликовываем событие для текущей коллекции
+            EventAggregator.PublishTradingInfoChanged(TradingInfoList);
+
+            // Опубликовываем событие для исторической коллекции
+            EventAggregator.PublishHistoricalTradeInfoChanged(TradeHistoricalInfoList);
+        }
 
         // Метод сохранения настроек приложения
         private void SaveSettings()

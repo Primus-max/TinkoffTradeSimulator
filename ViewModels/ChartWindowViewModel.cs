@@ -281,7 +281,6 @@ namespace TinkoffTradeSimulator.ViewModels
             return plotModel;
         }
 
-
         // Метод получения выбранной кнопки для отображения имени
         private async void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
         {
