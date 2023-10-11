@@ -75,6 +75,9 @@ namespace TinkoffTradeSimulator.Services
 
                 // Добавляем запись в _db.TradeRecordsInfo
                 _db.TradeRecordsInfo.Add(tradeRecordInfo);
+
+                // Сохраняем изменения в базе данных
+                _db.SaveChanges();
             }
 
             // Создаем новую запись для истории торговли

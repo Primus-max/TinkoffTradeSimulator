@@ -297,9 +297,9 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Методы
         #region Методы подписчиков на события
         // Метод оповещения об изменении источника данных для отображения во View
-        private void OnTradingInfoListChanged(ObservableCollection<TradeRecordInfo> tradingIndolist)
+        private void OnTradingInfoListChanged()
         {
-            TradingInfoList = tradingIndolist;
+            TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
         }
 
         // Метод оповещения об изменении источника данных для отображения во View
@@ -401,7 +401,7 @@ namespace TinkoffTradeSimulator.ViewModels
             }
 
             // Опубликовываем событие для текущей коллекции
-            EventAggregator.PublishTradingInfoChanged(TradingInfoList);
+            EventAggregator.PublishTradingInfoChanged();
 
             // Опубликовываем событие для исторической коллекции
             EventAggregator.PublishHistoricalTradeInfoChanged(TradeHistoricalInfoList);

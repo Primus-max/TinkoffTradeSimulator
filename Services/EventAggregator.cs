@@ -20,11 +20,11 @@ namespace TinkoffTradeSimulator.Services
             HistoricalTradeInfoChanged?.Invoke(historicalTradeRecordInfo);
         }
 
-        public static event Action<ObservableCollection<TradeRecordInfo>>? TradingRecordInfoChanged;
+        public static event Action? TradingRecordInfoChanged;
 
-        public static void PublishTradingInfoChanged(ObservableCollection<TradeRecordInfo> tradingRecordInfo)
+        public static void PublishTradingInfoChanged()
         {
-            TradingRecordInfoChanged?.Invoke(tradingRecordInfo);
+            TradingRecordInfoChanged?.Invoke();
         }
 
         // Событие, которое будет вызываться при запросе обновления данных

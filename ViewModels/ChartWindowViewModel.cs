@@ -463,21 +463,22 @@ namespace TinkoffTradeSimulator.ViewModels
         private void UpdateTradingInfoAfterExecuteTrade()
         {            
             // Очищаем и обновляем _tradeHistoricalInfoList
-            _tradeHistoricalInfoList.Clear();
-            foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
-            {
-                _tradeHistoricalInfoList.Add(item);
-            }
+            //_tradeHistoricalInfoList.Clear();
+            //foreach (var item in _db.HistoricalTradeRecordsInfo.ToList())
+            //{
+            //    _tradeHistoricalInfoList.Add(item);
+            //}
 
-            // Очищаем и обновляем _tradeCurrentInfoList из базы данных
-            _tradeCurrentInfoList.Clear();
-            foreach (var item in _db.TradeRecordsInfo.ToList())
-            {
-                _tradeCurrentInfoList.Add(item);
-            }
+            //// Очищаем и обновляем _tradeCurrentInfoList из базы данных
+            //_tradeCurrentInfoList.Clear();
+            //foreach (var item in _db.TradeRecordsInfo.ToList())
+            //{
+            //    _tradeCurrentInfoList.Add(item);
+            //}
+
 
             // Опубликовываем событие для текущей коллекции
-            EventAggregator.PublishTradingInfoChanged(_tradeCurrentInfoList);
+            EventAggregator.PublishTradingInfoChanged();
 
             // Опубликовываем событие для исторической коллекции
             EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);           
