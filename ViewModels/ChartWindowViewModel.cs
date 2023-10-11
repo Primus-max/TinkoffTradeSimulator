@@ -1,4 +1,6 @@
-﻿using DromAutoTrader.Views;
+﻿using DromAutoTrader.Data;
+using DromAutoTrader.Views;
+using Microsoft.EntityFrameworkCore;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -162,8 +164,7 @@ namespace TinkoffTradeSimulator.ViewModels
             #endregion
 
             #region Инициализация базы данных
-            DbManager dbManager = new();
-            _db = dbManager.InitializeDB();
+            InitializeDatabase();
             #endregion
 
             #region Инициализация источников данных
@@ -481,7 +482,7 @@ namespace TinkoffTradeSimulator.ViewModels
             EventAggregator.PublishTradingInfoChanged();
 
             // Опубликовываем событие для исторической коллекции
-            EventAggregator.PublishHistoricalTradeInfoChanged(_tradeHistoricalInfoList);           
+            EventAggregator.PublishHistoricalTradeInfoChanged();           
         }
 
         // Метод для покупки
@@ -497,7 +498,23 @@ namespace TinkoffTradeSimulator.ViewModels
         //}
 
         #endregion
-        // Метод установки стилей для графика
+        // Инициализация базы данных
+        private void InitializeDatabase()
+        {
+            try
+            {
+                // Экземпляр базы данных
+                _db = AppContextFactory.GetInstance();
+                // загружаем данные о поставщиках из БД
+                _db.HistoricalTradeRecordsInfo.Load();
+                _db.TradeRecordsInfo.Load();
+            }
+            catch (Exception)
+            {
+                // TODO сделать запись логов
+                //Console.WriteLine($"Не удалось инициализировать базу данных: {ex.Message}");
+            }
+        }
 
         #endregion
     }

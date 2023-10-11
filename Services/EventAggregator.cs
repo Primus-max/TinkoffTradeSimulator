@@ -13,11 +13,11 @@ namespace TinkoffTradeSimulator.Services
             CandleIntervalSelected?.Invoke(selectedButton);
         }
 
-        public static event Action<ObservableCollection<HistoricalTradeRecordInfo>>? HistoricalTradeInfoChanged;
+        public static event Action? HistoricalTradeInfoChanged;
 
-        public static void PublishHistoricalTradeInfoChanged(ObservableCollection<HistoricalTradeRecordInfo> historicalTradeRecordInfo)
+        public static void PublishHistoricalTradeInfoChanged()
         {
-            HistoricalTradeInfoChanged?.Invoke(historicalTradeRecordInfo);
+            HistoricalTradeInfoChanged?.Invoke();
         }
 
         public static event Action? TradingRecordInfoChanged;

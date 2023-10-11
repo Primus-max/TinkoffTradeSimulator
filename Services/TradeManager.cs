@@ -1,4 +1,5 @@
-﻿using DromAutoTrader.Views;
+﻿using DromAutoTrader.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Windows;
@@ -11,66 +12,27 @@ namespace TinkoffTradeSimulator.Services
     {
         private static AppContext _db = null;
 
-         static TradeManager()
+        static TradeManager()
         {
             #region Инициализация базы данных
-            DbManager dbManager = new();
-            _db = dbManager.InitializeDB();
+            InitializeDatabase();
             #endregion
         }
 
         public static void ExecuteTrade(string operation, string tickerName, double price, bool subtractVolume, int VolumeTradingTicker)
-        {            
+        {
             // Поиск записи с тем же TickerName в _db.TradeRecordsInfo
             TradeRecordInfo tradeRecordInfo = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.TickerName == tickerName);
 
-            if (tradeRecordInfo != null)
+            if (tradeRecordInfo == null)
             {
-                // Запись найдена, обновляем Volume, Price и Operation
-                tradeRecordInfo.Price = price; // Обновляем цену
-                tradeRecordInfo.Operation = operation; // Обновляем тип операции
-
-                if (subtractVolume)
-                {
-                    // Если нужно вычесть объем, убедимся, что объем не становится отрицательным
-                    if (tradeRecordInfo.Volume >= VolumeTradingTicker)
-                    {
-                        tradeRecordInfo.Volume -= VolumeTradingTicker;
-                    }
-                    else
-                    {
-                        // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
-                        MessageBox.Show("Недостаточно объема для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                        return; // Выходим из метода, так как объем недостаточный
-                    }
-                }
-                else
-                {
-                    tradeRecordInfo.Volume += VolumeTradingTicker; // Пример, можете использовать нужную логику увеличения объема
-                }
-
-                if (tradeRecordInfo.Volume == 0)
-                {
-                    // Если объем стал равным 0, удаляем запись из базы данных
-                    _db.TradeRecordsInfo.Remove(tradeRecordInfo);
-                }
-            }
-            else if (subtractVolume)
-            {
-                // Запись не найдена и мы пытаемся продать, отображаем сообщение об ошибке
-                MessageBox.Show("Нет записи для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            else
-            {
-                // Запись не найдена и мы пытаемся купить, создаем новую запись
                 tradeRecordInfo = new TradeRecordInfo
                 {
                     TickerName = tickerName,
                     Price = price,
-                    IsBuy = operation == "Покупка", // Определение типа операции
+                    IsBuy = operation == "Покупка",
                     Operation = operation,
-                    Volume = subtractVolume ? -VolumeTradingTicker : VolumeTradingTicker // Устанавливаем объем с учетом операции
+                    Volume = subtractVolume ? -VolumeTradingTicker : VolumeTradingTicker
                 };
 
                 // Добавляем запись в _db.TradeRecordsInfo
@@ -79,6 +41,56 @@ namespace TinkoffTradeSimulator.Services
                 // Сохраняем изменения в базе данных
                 _db.SaveChanges();
             }
+            else
+            {
+                // Запись найдена, обновляем Volume, Price и Operation
+                tradeRecordInfo.Price = price; // Обновляем цену
+                tradeRecordInfo.Operation = operation; // Обновляем тип операции
+
+                if (operation == "Покупка")
+                {                
+
+                    tradeRecordInfo.Volume += VolumeTradingTicker;
+
+                    // Используйте контекст базы данных для обновления записи
+                    _db.TradeRecordsInfo.Update(tradeRecordInfo);
+
+                    _db.SaveChanges();
+
+                    var asdfasdf = _db.TradeRecordsInfo.ToList();
+                }
+
+                if (operation == "Продажа")
+                {                  
+
+                    // Если нужно вычесть объем, убедимся, что объем не становится отрицательным
+                    if (tradeRecordInfo.Volume >= VolumeTradingTicker)
+                    {
+                        tradeRecordInfo.Volume -= VolumeTradingTicker;
+
+                        // Если объем стал равным 0, удаляем запись из базы данных
+                        _db.TradeRecordsInfo.Update(tradeRecordInfo);
+
+                        // Сохраняем изменения в базе данных
+                        _db.SaveChanges();
+                    }
+                    else
+                    {
+                        // Обработка ошибки, если объем торговли меньше, чем пытаемся продать
+                        MessageBox.Show("Недостаточно объема для продажи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return; // Выходим из метода, так как объем недостаточный
+                    }
+
+                    if (tradeRecordInfo.Volume <= 0)
+                    {
+                        // Если объем стал равным 0, удаляем запись из базы данных
+                        _db.TradeRecordsInfo.Remove(tradeRecordInfo);
+
+                        // Сохраняем изменения в базе данных
+                        _db.SaveChanges();
+                    }
+                }
+            }         
 
             // Создаем новую запись для истории торговли
             HistoricalTradeRecordInfo historicalTradeRecordInfo = new HistoricalTradeRecordInfo
@@ -94,7 +106,7 @@ namespace TinkoffTradeSimulator.Services
             _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
 
             // Сохраняем изменения в базе данных
-            _db.SaveChanges();           
+            _db.SaveChanges();
         }
 
         // Вызываемый метод покупки тикера
@@ -107,6 +119,24 @@ namespace TinkoffTradeSimulator.Services
         public static void SellTicker(string tickerName, double price, int volumeTradingTicker)
         {
             ExecuteTrade("Продажа", tickerName, price, true, volumeTradingTicker);
+        }
+
+        // Базы данных
+        private static void InitializeDatabase()
+        {
+            try
+            {
+                // Экземпляр базы данных
+                _db = AppContextFactory.GetInstance();
+                // загружаем данные о поставщиках из БД
+                _db.HistoricalTradeRecordsInfo.Load();
+                _db.TradeRecordsInfo.Load();
+            }
+            catch (Exception)
+            {
+                // TODO сделать запись логов
+                //Console.WriteLine($"Не удалось инициализировать базу данных: {ex.Message}");
+            }
         }
     }
 }
