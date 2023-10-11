@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DromAutoTrader.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -157,7 +158,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             if (sender is TradeRecordInfo tradeRecordInfo)
             {
-                // Найдите объект TradeRecordInfo в базе данных и удалите его
+                // Нахожу объект TradeRecordInfo в базе данных и удаляю его
                 var tradeRecordToDelete = _db.TradeRecordsInfo.SingleOrDefault(tr => tr.Id == tradeRecordInfo.Id);
                 if (tradeRecordToDelete != null)
                 {
@@ -167,7 +168,7 @@ namespace TinkoffTradeSimulator.ViewModels
                     TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.ToList());
                 }
 
-                // Создайте объект HistoricalTradeRecordInfo и скопируйте данные
+                // Создаю объект HistoricalTradeRecordInfo и копирую данные
                 var historicalTradeRecordInfo = new HistoricalTradeRecordInfo
                 {
                     Date = DateTime.Now,
@@ -180,13 +181,14 @@ namespace TinkoffTradeSimulator.ViewModels
                     IsClosed = tradeRecordInfo.IsClosed
                 };
 
-                // Добавьте новый объект HistoricalTradeRecordInfo в базу данных
+                // Добавляю новый объект HistoricalTradeRecordInfo в базу данных
                 _db.HistoricalTradeRecordsInfo.Add(historicalTradeRecordInfo);
                 _db.SaveChanges();
 
                 // Обновляю колллекцию для отобажения 
                 TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
             }
+                        
         }
 
         public ICommand? FilterTickerInfoListCommand { get; } = null;
@@ -290,6 +292,7 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             TradingInfoList = tradingIndolist;
         }
+
         // Метод оповещения об изменении источника данных для отображения во View
         private void OnHistoricalTradeInfoChanged(ObservableCollection<HistoricalTradeRecordInfo> historicalTradeRecord)
         {
@@ -479,6 +482,10 @@ namespace TinkoffTradeSimulator.ViewModels
             // Открываем окно
             chartWindow.Show();
         }
+
+        #region Сделки
+        
+        #endregion
 
         #region Фильтры
         // Метод фильтрации по имени тикера

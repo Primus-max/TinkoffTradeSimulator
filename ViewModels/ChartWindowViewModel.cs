@@ -140,7 +140,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Подписки на события
             // Подписываемся на событие выбранного таймфрейма CandleIntervalSelected
-            EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
+            EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;            
             #endregion
 
             //StockInfo = new TickerInfo();
