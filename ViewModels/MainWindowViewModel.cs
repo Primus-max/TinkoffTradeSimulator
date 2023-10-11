@@ -1,5 +1,4 @@
 ﻿using DromAutoTrader.Data;
-using DromAutoTrader.Views;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ using System.Windows;
 using System.Windows.Input;
 using Tinkoff.InvestApi;
 using TinkoffTradeSimulator.ApiServices;
-using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Services;
@@ -19,7 +17,7 @@ using TinkoffTradeSimulator.ViewModels.Base;
 using TinkoffTradeSimulator.Views.Windows;
 
 namespace TinkoffTradeSimulator.ViewModels
-{        
+{
     internal class MainWindowViewModel : BaseViewModel
     {
         #region Приватные поля
@@ -199,7 +197,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 //// Обновляю колллекцию для отобажения 
                 //TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.ToList());
             }
-                        
+
         }
 
         public ICommand? FilterTickerInfoListCommand { get; } = null;
@@ -249,7 +247,7 @@ namespace TinkoffTradeSimulator.ViewModels
             var asdf = AppConfig;
             SaveSettings();
         }
-              
+
 
         #endregion
 
@@ -289,8 +287,7 @@ namespace TinkoffTradeSimulator.ViewModels
             //LoadFavoriteTickers();
             #endregion
 
-            #region Подписчики на события
-            EventAggregator.HistoricalTradeInfoChanged += OnHistoricalTradeInfoChanged;
+            #region Подписчики на события            
             EventAggregator.TradingRecordInfoChanged += OnTradingInfoListChanged;
             #endregion
         }
@@ -301,13 +298,9 @@ namespace TinkoffTradeSimulator.ViewModels
         private void OnTradingInfoListChanged()
         {
             TradingInfoList = new ObservableCollection<TradeRecordInfo>(_db.TradeRecordsInfo.AsNoTracking().ToList());
-        }
-
-        // Метод оповещения об изменении источника данных для отображения во View
-        private void OnHistoricalTradeInfoChanged()
-        {
             TradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>(_db.HistoricalTradeRecordsInfo.AsNoTracking().ToList());
         }
+
         #endregion
 
         #region Методы загрузки данных при инициализации приложения        
@@ -403,9 +396,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Опубликовываем событие для текущей коллекции
             EventAggregator.PublishTradingInfoChanged();
-
-            // Опубликовываем событие для исторической коллекции
-            EventAggregator.PublishHistoricalTradeInfoChanged();
         }
 
         // Метод сохранения настроек приложения
@@ -413,11 +403,11 @@ namespace TinkoffTradeSimulator.ViewModels
         {
             AppSettings.SaveConfig(AppConfig);
         }
-        
+
         // Метод получения настроек приложения
         private void GetSettings()
         {
-          AppConfig = AppSettings.LoadConfig();
+            AppConfig = AppSettings.LoadConfig();
         }
 
         // Добавляю тикер в избранное
@@ -518,7 +508,7 @@ namespace TinkoffTradeSimulator.ViewModels
         }
 
         #region Сделки
-        
+
         #endregion
 
         #region Фильтры

@@ -12,14 +12,8 @@ namespace TinkoffTradeSimulator.Services
         {
             CandleIntervalSelected?.Invoke(selectedButton);
         }
-
-        public static event Action? HistoricalTradeInfoChanged;
-
-        public static void PublishHistoricalTradeInfoChanged()
-        {
-            HistoricalTradeInfoChanged?.Invoke();
-        }
-
+              
+        // Событие обновления источников данных. Продажа / покупка / закрытие сделки
         public static event Action? TradingRecordInfoChanged;
 
         public static void PublishTradingInfoChanged()
