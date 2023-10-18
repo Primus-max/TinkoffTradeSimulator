@@ -205,7 +205,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Методы
         // Метод установки или обновления свечей для отображения в графике
-        public async Task SetAndUpdateCandlesChartWindow(string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
+        public void SetAndUpdateCandlesChartWindow(string ticker = null!, int? candleHistoricalIntervalIndex = null, CandleInterval? candleInterval = null)
         {
             // Проверка на null перед использованием параметров
             if (ticker == null)
@@ -227,7 +227,10 @@ namespace TinkoffTradeSimulator.ViewModels
             var plotModel = CreateCandlestickPlotModel();
 
             // Источник данных для формирования отображения
-            List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
+           // List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
+
+            // TODO логика получения нужных тикеров из хранилища
+            List<CandlestickData> candlestickData = _localStorageLastTickers;
 
             // Очистите старые серии данных из PlotModel
             plotModel.Series.Clear();
@@ -252,6 +255,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 ));
             }
 
+            // TODO Вынести в отдельный метод
             #region Формирование инфомрации о тикере для отображения
 
             try
@@ -283,11 +287,11 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #endregion
 
-
+            // TODO Вынести в отдельный метод
             plotModel.Series.Add(candlestickSeries);
             PlotModel.Model = plotModel;
 
-            // Обновите PlotModel, чтобы обновить график
+            // ОБновляю PlotModel, чтобы обновить график
             PlotModel.InvalidatePlot(true);
         }
         
@@ -309,7 +313,8 @@ namespace TinkoffTradeSimulator.ViewModels
             if (_intervalMapping.TryGetValue(intervalName, out TimeSpan time))
             {
                 SelectedTimeFrame.Time = time;
-                await SetAndUpdateCandlesChartWindow(candleInterval: (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName));
+                await GetLastCandlesForLocalSotarageAsync();
+                //SetAndUpdateCandlesChartWindow(candleInterval: (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName));
             }
             else
             {
@@ -346,7 +351,7 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Выбор исторического интервала для свечей       
 
         //// Метод увеличения таймфрейма свечи
-        public async void IncreaseCandleHistorical()
+        public void IncreaseCandleHistorical()
         {
             int maxIndex = 100;
 
@@ -355,10 +360,11 @@ namespace TinkoffTradeSimulator.ViewModels
 
             int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
 
-            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
+            SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
+            
         }
         // Метод уменьшения таймфрейма свечи
-        public async void DecreaseCandleIHistorical()
+        public  void DecreaseCandleIHistorical()
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 10;
@@ -368,16 +374,18 @@ namespace TinkoffTradeSimulator.ViewModels
 
             int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
 
-            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
+            SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
         }
 
         #endregion
 
         // Метод получения последних 100 свечей для локального хранения
-        internal async Task GetLastCandlesForLocalSotarageAsync(string ticker)
+        internal async Task GetLastCandlesForLocalSotarageAsync(string ticker = null!)
         {
-            if (string.IsNullOrWhiteSpace(ticker)) return;
-
+            if (ticker == null) 
+            {
+                
+            }
             // По деволту всегда получаю 100 единиц вермени, для лоакльного хранения свечей
             int candleHistoricalIntervalByDefault = 100;
 
@@ -387,7 +395,11 @@ namespace TinkoffTradeSimulator.ViewModels
             // Привожу к типу данных 
             CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), selectedTimeframe);
 
+            // Заполняю локальное хранилище тикерами за последние 100
             _localStorageLastTickers = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalByDefault, candleInterval: candleInterval);
+
+            // Вызываю обоновление или отображение списка
+            SetAndUpdateCandlesChartWindow(ticker);
         }
 
         // Получаю минуты исходя из выбранного временого диапазона и выбранного таймфрема свечи
