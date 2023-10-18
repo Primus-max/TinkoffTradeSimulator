@@ -16,7 +16,6 @@ using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.ApiServices;
 using TinkoffTradeSimulator.ApiServices.Tinkoff;
-using TinkoffTradeSimulator.Data;
 using TinkoffTradeSimulator.Infrastacture.Commands;
 using TinkoffTradeSimulator.Models;
 using TinkoffTradeSimulator.Services;
@@ -42,6 +41,21 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _ticker = string.Empty;
         private ObservableCollection<CandlestickData> _candlestickData = null!;
         private TickerInfo _tickerInfo = null!;
+        private Dictionary<string, TimeSpan> _intervalMapping = new Dictionary<string, TimeSpan>
+        {
+            { "_1Min", TimeSpan.FromMinutes(1) },
+            { "_2Min", TimeSpan.FromMinutes(2) },
+            { "_3Min", TimeSpan.FromMinutes(3) },
+            { "_5Min", TimeSpan.FromMinutes(5) },
+            { "_10Min", TimeSpan.FromMinutes(10) },
+            { "_15Min", TimeSpan.FromMinutes(15) },
+            { "_30Min", TimeSpan.FromMinutes(30) },
+            { "Hour", TimeSpan.FromHours(1) },
+            { "_2Hour", TimeSpan.FromHours(2) },
+            { "_4Hour", TimeSpan.FromHours(4) },
+            { "Day", TimeSpan.FromDays(1) },
+        };
+
         #endregion
 
         #region Публичные свойства
@@ -148,7 +162,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Обновляю источники данных после совершения сделки
             UpdateTradingInfoAfterExecuteTrade();
-        } 
+        }
         #endregion
 
         #endregion
@@ -169,12 +183,12 @@ namespace TinkoffTradeSimulator.ViewModels
 
             #region Инициализация источников данных
             _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
-            _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();           
+            _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();
             #endregion
 
             #region Подписки на события
             // Подписываемся на событие выбранного таймфрейма CandleIntervalSelected
-            EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;            
+            EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
             #endregion
 
             //StockInfo = new TickerInfo();
@@ -253,7 +267,7 @@ namespace TinkoffTradeSimulator.ViewModels
                     Price = actualPrice,
                     MaxPrice = maxPrice.ToString("F2"),
                     MinPrice = minPrice.ToString("F2")
-                };                
+                };
 
                 EventAggregator.PublishUpdateTickerInfo(tickerInfo);
             }
@@ -271,7 +285,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Обновите PlotModel, чтобы обновить график
             PlotModel.InvalidatePlot(true);
         }
-                
+
 
         // Метод создания объекта модели отображения свечей
         private PlotModel CreateCandlestickPlotModel()
@@ -288,9 +302,15 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedTimeFrame = selectedButton;
             string? intervalName = SelectedTimeFrame.Name;
 
-            CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName);
-
-            await SetAndUpdateCandlesChartWindow(candleInterval: candleInterval);
+            if (_intervalMapping.TryGetValue(intervalName, out TimeSpan time))
+            {
+                SelectedTimeFrame.Time = time;
+                await SetAndUpdateCandlesChartWindow(candleInterval: (CandleInterval)Enum.Parse(typeof(CandleInterval), intervalName));
+            }
+            else
+            {
+                // Обработка ошибки, если введенный интервал не найден в словаре.
+            }
         }
 
         // Метод загрузки асинхронных данных для вызова из конструктора
@@ -335,8 +355,7 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex += 10;
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
 
-            var asdfasd = SelectedHistoricalTimeCandleIndex;
-            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);            
         }
 
         // Метод уменьшения таймфрейма свечи
@@ -348,33 +367,20 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex -= 10;
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
-            var asdfasd = SelectedHistoricalTimeCandleIndex;
-
             await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
         }
         // Метод продажи
         #endregion
 
         #region Методы по торговле (покупка/продажа)
-       
+
         // Метод обновления источников данных после покупки или продажи тикеров
         private void UpdateTradingInfoAfterExecuteTrade()
-        {  
+        {
             // Опубликовываем событие для текущей коллекции
-            EventAggregator.PublishTradingInfoChanged();                   
+            EventAggregator.PublishTradingInfoChanged();
         }
 
-        // Метод для покупки
-        //private void BuyTicker()
-        //{
-        //    ExecuteTrade("Покупка");
-        //}
-
-        //// Метод для продажи
-        //private void SellTicker()
-        //{
-        //    ExecuteTrade("Продажа");
-        //}
 
         #endregion
         // Инициализация базы данных
