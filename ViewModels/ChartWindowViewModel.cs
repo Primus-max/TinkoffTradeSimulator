@@ -32,8 +32,12 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _title = string.Empty;
         private AppContext _db = null!;
         private PlotView _plotModel = null!;
-        private int _selectedHistoricalTimeCandleIndex = 100;
-        private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton { Name = CandleInterval._1Min.ToString() };
+        private int _selectedHistoricalTimeCandleIndex = 10;
+        private CandleTimeFrameButton _selectedTimeFrame = new CandleTimeFrameButton
+        {
+            Name = CandleInterval._1Min.ToString(), // При инициализации значение по дефолту
+            Time = _intervalMapping[CandleInterval._1Min.ToString()] // При инициализации значение по дефолту
+        };
         private int _volumeTradingTicker = 1;
         private ObservableCollection<HistoricalTradeRecordInfo> _tradeHistoricalInfoList = null!;
         private ObservableCollection<TradeRecordInfo> _tradeCurrentInfoList = null!;
@@ -41,7 +45,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private string _ticker = string.Empty;
         private ObservableCollection<CandlestickData> _candlestickData = null!;
         private TickerInfo _tickerInfo = null!;
-        private Dictionary<string, TimeSpan> _intervalMapping = new Dictionary<string, TimeSpan>
+        private static Dictionary<string, TimeSpan> _intervalMapping = new Dictionary<string, TimeSpan>
         {
             { "_1Min", TimeSpan.FromMinutes(1) },
             { "_2Min", TimeSpan.FromMinutes(2) },
@@ -55,7 +59,7 @@ namespace TinkoffTradeSimulator.ViewModels
             { "_4Hour", TimeSpan.FromHours(4) },
             { "Day", TimeSpan.FromDays(1) },
         };
-
+        private List<CandlestickData> _localStorageLastTickers = null!;
         #endregion
 
         #region Публичные свойства
@@ -211,7 +215,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             if (candleHistoricalIntervalIndex == null)
             {
-                // Обработка случая, когда 'candleHistoricalIntervalIndex' не был передан
+                candleHistoricalIntervalIndex = CalculatedMinuteFromSelectedTimeFrame();
             }
 
             if (candleInterval == null)
@@ -222,7 +226,8 @@ namespace TinkoffTradeSimulator.ViewModels
             // Создаю объект для отображения свечей
             var plotModel = CreateCandlestickPlotModel();
 
-            List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex, candleInterval: candleInterval);
+            // Источник данных для формирования отображения
+            List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
 
             // Очистите старые серии данных из PlotModel
             plotModel.Series.Clear();
@@ -285,8 +290,7 @@ namespace TinkoffTradeSimulator.ViewModels
             // Обновите PlotModel, чтобы обновить график
             PlotModel.InvalidatePlot(true);
         }
-
-
+        
         // Метод создания объекта модели отображения свечей
         private PlotModel CreateCandlestickPlotModel()
         {
@@ -320,11 +324,6 @@ namespace TinkoffTradeSimulator.ViewModels
             _client = await TinkoffClient.CreateAsync();
 
             TinkoffTradingPrices tinkoff = new TinkoffTradingPrices(_client);
-
-            // Получаю обновлённый список свечей c задаными параметрами
-            // List<CandlestickData> candles = await TinkoffTradingPrices.GetCandlesData(ticker: Title, candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
-
-            //UpdateData(candles);
         }
 
         // Открываю окно с выбором таймфрема
@@ -349,28 +348,55 @@ namespace TinkoffTradeSimulator.ViewModels
         //// Метод увеличения таймфрейма свечи
         public async void IncreaseCandleHistorical()
         {
-            // Максимально допустимый индекс для выбора таймфрейма
             int maxIndex = 100;
 
-            SelectedHistoricalTimeCandleIndex += 10;
+            SelectedHistoricalTimeCandleIndex += 1; // Увеличиваем на одну "единицу" времени
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
 
-            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);            
-        }
+            int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
 
+            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
+        }
         // Метод уменьшения таймфрейма свечи
         public async void DecreaseCandleIHistorical()
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 10;
 
-            SelectedHistoricalTimeCandleIndex -= 10;
+            SelectedHistoricalTimeCandleIndex -= 1;
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
-            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: SelectedHistoricalTimeCandleIndex);
+            int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
+
+            await SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
         }
-        // Метод продажи
+
         #endregion
+
+        // Метод получения последних 100 свечей для локального хранения
+        internal async Task GetLastCandlesForLocalSotarageAsync(string ticker)
+        {
+            if (string.IsNullOrWhiteSpace(ticker)) return;
+
+            // По деволту всегда получаю 100 единиц вермени, для лоакльного хранения свечей
+            int candleHistoricalIntervalByDefault = 100;
+
+            // Получаю таймфрейм свечи (_1Min, _2Min, _15Min)
+            string? selectedTimeframe  = SelectedTimeFrame.Name;
+
+            // Привожу к типу данных 
+            CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), selectedTimeframe);
+
+            _localStorageLastTickers = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalByDefault, candleInterval: candleInterval);
+        }
+
+        // Получаю минуты исходя из выбранного временого диапазона и выбранного таймфрема свечи
+        private int CalculatedMinuteFromSelectedTimeFrame()
+        {
+            int totalMinute = 0;
+            totalMinute = SelectedHistoricalTimeCandleIndex * (int)SelectedTimeFrame.Time.TotalMinutes;
+            return totalMinute;
+        }
 
         #region Методы по торговле (покупка/продажа)
 

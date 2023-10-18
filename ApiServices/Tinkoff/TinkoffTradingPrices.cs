@@ -13,7 +13,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
     {
         private static InvestApiClient? _client = null;
         private static string _currentTicker = string.Empty;
-        private static double _currentCandleHistoricalIntervalIndex = 10;
+        private static int _currentCandleHistoricalIntervalIndex = 10;
         private static CandleInterval _currentCandleInterval = CandleInterval._1Min;
 
         public TinkoffTradingPrices(InvestApiClient client)
@@ -86,7 +86,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
             if (candleHistoricalIntervalIndex != null)
             {
-                _currentCandleHistoricalIntervalIndex = (double)candleHistoricalIntervalIndex;
+                _currentCandleHistoricalIntervalIndex = (int)candleHistoricalIntervalIndex;
             }
 
             if(candleInterval != null)
