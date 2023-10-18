@@ -206,15 +206,16 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Методы
         // Метод установки или обновления свечей для отображения в графике
         public void SetAndUpdateCandlesChartWindow()
-        {
-            // Создаю объект для отображения свечей
-            var plotModel = CreateCandlestickPlotModel();
+        {            
 
             // Источник данных для формирования отображения
             // List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
 
             // TODO логика получения нужных тикеров из хранилища
             List<CandlestickData> candlestickData = GetCandlestickData();
+
+            // Создаю объект для отображения свечей
+            var plotModel = CreateCandlestickPlotModel();
 
             // Очистите старые серии данных из PlotModel
             plotModel.Series.Clear();
@@ -283,6 +284,7 @@ namespace TinkoffTradeSimulator.ViewModels
         private PlotModel CreateCandlestickPlotModel()
         {
             var plotModel = new PlotModel { Title = $"График свечей для {Title}" };
+            plotModel.Culture = System.Globalization.CultureInfo.CurrentCulture;
             plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false }); // Горизонтальная ось
             plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
             return plotModel;
@@ -291,6 +293,12 @@ namespace TinkoffTradeSimulator.ViewModels
         // Метод получения выбранной кнопки для отображения имени
         private async void OnCandleIntervalSelected(CandleTimeFrameButton selectedButton)
         {
+            if (selectedButton == null || _intervalMapping == null)
+            {
+                // Добавьте обработку null, если необходимо.
+                return;
+            }
+
             SelectedTimeFrame = selectedButton;
             string? intervalName = SelectedTimeFrame.Name;
 
@@ -301,7 +309,7 @@ namespace TinkoffTradeSimulator.ViewModels
             }
             else
             {
-                // Обработка ошибки, если введенный интервал не найден в словаре.
+                MessageBox.Show("Выбранный интервал не найден в словаре, попробуй еще раз", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -408,7 +416,7 @@ namespace TinkoffTradeSimulator.ViewModels
             _localStorageLastTickers = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalByDefault, candleInterval: candleInterval);
 
             // Вызываю обоновление или отображение списка
-            SetAndUpdateCandlesChartWindow(ticker);
+            SetAndUpdateCandlesChartWindow();
         }
 
         // Получаю минуты исходя из выбранного временого диапазона и выбранного таймфрема свечи
