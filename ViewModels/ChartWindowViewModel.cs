@@ -208,8 +208,6 @@ namespace TinkoffTradeSimulator.ViewModels
         public void SetAndUpdateCandlesChartWindow()
         {            
 
-            // Источник данных для формирования отображения
-            // List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
 
             // TODO логика получения нужных тикеров из хранилища
             List<CandlestickData> candlestickData = GetCandlestickData();
@@ -349,10 +347,7 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex += 1; // Увеличиваем на одну "единицу" времени
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
 
-            int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
-
             SetAndUpdateCandlesChartWindow();
-
         }
 
         // Метод уменьшения таймфрейма свечи
@@ -364,7 +359,6 @@ namespace TinkoffTradeSimulator.ViewModels
             SelectedHistoricalTimeCandleIndex -= 1;
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
-            int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
             SetAndUpdateCandlesChartWindow();
         }
 
@@ -382,7 +376,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 return candlestickData;
             }
 
-            int numberOfCandlesToRetrieve = SelectedHistoricalTimeCandleIndex;
+            int numberOfCandlesToRetrieve = CalculatedMinuteFromSelectedTimeFrame();
 
             // Ограничиваем количество свечей, чтобы не выйти за пределы массива
             if (numberOfCandlesToRetrieve > _localStorageLastTickers.Count)
@@ -403,7 +397,7 @@ namespace TinkoffTradeSimulator.ViewModels
             {
 
             }
-            // По деволту всегда получаю 100 единиц вермени, для лоакльного хранения свечей
+            // По дефолту всегда получаю 100 единиц вермени, для лоакльного хранения свечей
             int candleHistoricalIntervalByDefault = 100;
 
             // Получаю таймфрейм свечи (_1Min, _2Min, _15Min)

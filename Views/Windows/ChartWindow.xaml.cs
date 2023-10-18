@@ -52,14 +52,13 @@ namespace TinkoffTradeSimulator.Views.Windows
             if (e.Delta > 0)
             {
                 // Прокрутка колесика мыши вперед
-                // Вызовите метод для обработки прокрутки вперед
-                _chartViewModel.IncreaseCandleHistorical();
+                _chartViewModel.DecreaseCandleIHistorical();
+
             }
             else
             {
-                // Прокрутка колесика мыши назад
-                // Вызовите метод для обработки прокрутки назад
-                _chartViewModel.DecreaseCandleIHistorical();
+                // Прокрутка колесика мыши назад                
+                _chartViewModel.IncreaseCandleHistorical();
             }
 
             e.Handled = true; // Предотвратите дальнейшее распространение события
