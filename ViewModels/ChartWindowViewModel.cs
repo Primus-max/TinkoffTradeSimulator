@@ -227,10 +227,10 @@ namespace TinkoffTradeSimulator.ViewModels
             var plotModel = CreateCandlestickPlotModel();
 
             // Источник данных для формирования отображения
-           // List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
+            // List<CandlestickData> candlestickData = await TinkoffTradingPrices.GetCandlesData(ticker: ticker, candleHistoricalIntervalIndex, candleInterval: candleInterval);
 
             // TODO логика получения нужных тикеров из хранилища
-            List<CandlestickData> candlestickData = _localStorageLastTickers;
+            List<CandlestickData> candlestickData = GetCandlestickData();
 
             // Очистите старые серии данных из PlotModel
             plotModel.Series.Clear();
@@ -360,11 +360,39 @@ namespace TinkoffTradeSimulator.ViewModels
 
             int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
 
-            SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
+            SetAndUpdateCandlesChartWindow();
             
         }
+
+        // Получаю выбранное количество свечей из локального хранилища
+        public List<CandlestickData> GetCandlestickData()
+        {           
+
+            List<CandlestickData> candlestickData = new List<CandlestickData>();
+
+            if (SelectedHistoricalTimeCandleIndex <= 0)
+            {
+                // Возвращаем пустой список, если запрошено 0 или отрицательное количество свечей
+                return candlestickData;
+            }
+
+            int numberOfCandlesToRetrieve = SelectedHistoricalTimeCandleIndex;
+
+            // Ограничиваем количество свечей, чтобы не выйти за пределы массива
+            if (numberOfCandlesToRetrieve > _localStorageLastTickers.Count)
+            {
+                numberOfCandlesToRetrieve = _localStorageLastTickers.Count;
+            }
+
+            // Получаем указанное количество свечей
+            candlestickData = _localStorageLastTickers.TakeLast(numberOfCandlesToRetrieve).ToList();
+
+            return candlestickData;
+        }
+
+
         // Метод уменьшения таймфрейма свечи
-        public  void DecreaseCandleIHistorical()
+        public void DecreaseCandleIHistorical()
         {
             // Минимально допустимый индекс для выбора таймфрейма
             int minxIndex = 10;
@@ -373,8 +401,7 @@ namespace TinkoffTradeSimulator.ViewModels
             if (SelectedHistoricalTimeCandleIndex < minxIndex) SelectedHistoricalTimeCandleIndex = minxIndex;
 
             int minutesToAdd = CalculatedMinuteFromSelectedTimeFrame();
-
-            SetAndUpdateCandlesChartWindow(candleHistoricalIntervalIndex: minutesToAdd);
+            SetAndUpdateCandlesChartWindow();
         }
 
         #endregion

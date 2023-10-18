@@ -73,10 +73,9 @@ namespace TinkoffTradeSimulator.Views.Windows
 
         public async Task SetCandlesTOView()
         {
-            string? ticker = Title;
-            // Вызываем метод UpdateData, когда требуется обновление данных
-            //await _chartViewModel.SetAndUpdateCandlesChartWindow(ticker: ticker);
+            string? ticker = Title;           
 
+            // Получаю тикеры в локальное хранилище
             await _chartViewModel.GetLastCandlesForLocalSotarageAsync(ticker);
         }
 
