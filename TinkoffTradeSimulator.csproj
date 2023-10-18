@@ -5,18 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Converters\**" />
-    <Compile Remove="Test\**" />
-    <EmbeddedResource Remove="Converters\**" />
-    <EmbeddedResource Remove="Test\**" />
-    <None Remove="Converters\**" />
-    <None Remove="Test\**" />
-    <Page Remove="Converters\**" />
-    <Page Remove="Test\**" />
-  </ItemGroup>
+  </PropertyGroup> 
 	
   <ItemGroup>
     <PackageReference Include="Grpc.Core.Api" Version="2.57.0" />
@@ -48,6 +37,5 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
  
 </Project>

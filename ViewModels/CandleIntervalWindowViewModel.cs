@@ -104,6 +104,9 @@ namespace TinkoffTradeSimulator.ViewModels
                     // Имя значения перечисления
                     var name = cadleInterval.ToString();
 
+                    if (name == "Unspecified" || name == "Week" || name == "Month")
+                        continue;
+
                     // Создайте и добавьте кнопку во временную коллекцию
                     tempCollection.Add(new CandleTimeFrameButton { Name = name });
                 }
