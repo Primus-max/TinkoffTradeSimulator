@@ -287,6 +287,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 Title = $"График свечей для {Title}",
                 Culture = System.Globalization.CultureInfo.CurrentCulture
             };
+
             var horizontalAxis = new DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
