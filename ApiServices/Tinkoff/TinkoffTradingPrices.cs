@@ -103,8 +103,15 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 // Метод получения информации по тикеру
                 Share instrument = await GetShareByTicker(_currentTicker);
 
-                // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex + (12 * 60));
+                int additionalTimeForCandles = CalcadditionalTimeForCandles(_currentCandleInterval); 
+                int currentCandleHistoricalIntervalIndex = 100;
+                int totalMinutes = additionalTimeForCandles + currentCandleHistoricalIntervalIndex;
+
+                TimeSpan timeFrame = TimeSpan.FromMinutes(totalMinutes);
+
+                int hours = timeFrame.Hours; // Получить количество часов (171)
+                int minutes = timeFrame.Minutes; // Получить количество минут (20)
+
 
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 //CandleInterval interval = candleInterval ?? CandleInterval._1Min;
@@ -147,39 +154,30 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
 
 
-        //  Метод получения свойства из CandleInterval по индексу, который получаем при скролле, чтобы сформировать таймфрейм свечи
-        public static CandleInterval GetCandleIntervalByIndex(int index)
+        //  Метод добавления к общему времени получения свечей дополнительго времени (брать с запасом)
+        public static int  CalcadditionalTimeForCandles(CandleInterval interaval)
         {
-            switch (index)
+            switch (interaval)
             {
-                case 1:
-                    return CandleInterval._1Min;
-                case 2:
-                    return CandleInterval._2Min;
-                case 3:
-                    return CandleInterval._3Min;
-                case 4:
-                    return CandleInterval._5Min;
-                case 5:
-                    return CandleInterval._10Min;
-                case 6:
-                    return CandleInterval._15Min;
+                case CandleInterval._1Min:
+                case CandleInterval._2Min:
+                case CandleInterval._3Min:
+                case CandleInterval._5Min:
+                case CandleInterval._10Min:
+                case CandleInterval._15Min:
+                    return (24 * 60 - _currentCandleHistoricalIntervalIndex);
+                case CandleInterval._30Min:
+                    return (2 * 24 * 60 - _currentCandleHistoricalIntervalIndex);
+                case CandleInterval.Hour:
+                    return (7 * 24 * 60 - _currentCandleHistoricalIntervalIndex);
+                case CandleInterval._2Hour:
+                    return (29 * 24 * 60 - _currentCandleHistoricalIntervalIndex);
+                case CandleInterval._4Hour:
+                    return (29 * 24 * 60 - _currentCandleHistoricalIntervalIndex);
+                case CandleInterval.Day:
+                    return (360 * 24 * 60 - _currentCandleHistoricalIntervalIndex);
                 default:
-                    // Если индекс больше или равен длине CandleInterval, вернуть _15Min
-                    if (index >= System.Enum.GetValues(typeof(CandleInterval)).Length)
-                    {
-                        return CandleInterval._15Min;
-                    }
-                    // Если индекс меньше 0, вернуть _1Min
-                    else if (index <= 0)
-                    {
-                        return CandleInterval._1Min;
-                    }
-                    // Иначе вернуть соответствующий интервал
-                    else
-                    {
-                        return (CandleInterval)index;
-                    }
+                    return (24 * 60);
             }
         }
 

@@ -362,7 +362,7 @@ namespace TinkoffTradeSimulator.ViewModels
         // Метод увеличения таймфрейма свечи
         public void IncreaseCandleHistorical()
         {
-            int maxIndex = _localStorageLastTickers.Count >= 100 ? 100 : _localStorageLastTickers.Count;
+            int maxIndex = 100;
 
             SelectedHistoricalTimeCandleIndex += 1; // Увеличиваем на одну "единицу" времени
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
@@ -396,7 +396,7 @@ namespace TinkoffTradeSimulator.ViewModels
                 return candlestickData;
             }
 
-            int numberOfCandlesToRetrieve = CalculatedMinuteFromSelectedTimeFrame();
+            int numberOfCandlesToRetrieve = CalculatedMinuteFromSelectedTimeFrame() > 100? 100 : CalculatedMinuteFromSelectedTimeFrame();
 
             // Ограничиваем количество свечей, чтобы не выйти за пределы массива
             if (numberOfCandlesToRetrieve > _localStorageLastTickers.Count)
