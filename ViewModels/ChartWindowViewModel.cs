@@ -206,9 +206,7 @@ namespace TinkoffTradeSimulator.ViewModels
         #region Методы
         // Метод установки или обновления свечей для отображения в графике
         public void SetAndUpdateCandlesChartWindow()
-        {            
-
-
+        {        
             // TODO логика получения нужных тикеров из хранилища
             List<CandlestickData> candlestickData = GetCandlestickData();
 
@@ -221,7 +219,10 @@ namespace TinkoffTradeSimulator.ViewModels
             var candlestickSeries = new CandleStickSeries
             {
                 Title = "Candlesticks",
-                Background = OxyColor.FromAColor(128, OxyColor.Parse("#A5424B51")) // Темный полупрозрачный фон               
+                Background = OxyColor.FromAColor(128, OxyColor.Parse("#A5424B51")) ,
+                 
+                
+                                                                                  
             };
 
             foreach (var candle in candlestickData)
@@ -281,10 +282,28 @@ namespace TinkoffTradeSimulator.ViewModels
         // Метод создания объекта модели отображения свечей
         private PlotModel CreateCandlestickPlotModel()
         {
-            var plotModel = new PlotModel { Title = $"График свечей для {Title}" };
-            plotModel.Culture = System.Globalization.CultureInfo.CurrentCulture;
+            var plotModel = new PlotModel
+            {
+                Title = $"График свечей для {Title}",
+                Culture = System.Globalization.CultureInfo.CurrentCulture
+            };
+            var horizontalAxis = new DateTimeAxis
+            {
+                Position = AxisPosition.Bottom,
+                IsZoomEnabled = false,
+                StringFormat = "HH:mm", // Формат времени
+                MaximumPadding = 0.03,
+                MinimumPadding = 0.03,
+                MajorGridlineStyle = LineStyle.Dot,
+                MinorGridlineStyle = LineStyle.Dot,
+                MajorGridlineColor = OxyColor.FromRgb(44, 44, 44),
+                TicklineColor = OxyColor.FromRgb(82, 82, 82)
+            };
+
+            plotModel.Axes.Add(horizontalAxis);
+
             plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false }); // Горизонтальная ось
-            plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
+            //plotModel.Axes.Add(new LinearAxis { IsPanEnabled = true, IsZoomEnabled = false, Position = AxisPosition.Bottom }); // Вертикальная ось
             return plotModel;
         }
 
@@ -339,10 +358,10 @@ namespace TinkoffTradeSimulator.ViewModels
 
         #region Выбор исторического интервала для свечей по скроллу       
 
-        //// Метод увеличения таймфрейма свечи
+        // Метод увеличения таймфрейма свечи
         public void IncreaseCandleHistorical()
         {
-            int maxIndex = 100;
+            int maxIndex = _localStorageLastTickers.Count >= 100 ? 100 : _localStorageLastTickers.Count;
 
             SelectedHistoricalTimeCandleIndex += 1; // Увеличиваем на одну "единицу" времени
             if (SelectedHistoricalTimeCandleIndex > maxIndex) SelectedHistoricalTimeCandleIndex = maxIndex;
@@ -393,11 +412,8 @@ namespace TinkoffTradeSimulator.ViewModels
         // Метод получения последних 100 свечей для локального хранения
         internal async Task GetLastCandlesForLocalSotarageAsync(string ticker = null!)
         {
-            if (ticker == null)
-            {
-
-            }
-            // По дефолту всегда получаю 100 единиц вермени, для лоакльного хранения свечей
+            if (ticker == null) { }
+            // По дефолту всегда получаю 100 единиц вермени, для локального хранения свечей
             int candleHistoricalIntervalByDefault = 100;
 
             // Получаю таймфрейм свечи (_1Min, _2Min, _15Min)
