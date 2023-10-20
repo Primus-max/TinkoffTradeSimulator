@@ -52,14 +52,13 @@ namespace TinkoffTradeSimulator.Views.Windows
             if (e.Delta > 0)
             {
                 // Прокрутка колесика мыши вперед
-                // Вызовите метод для обработки прокрутки вперед
-                _chartViewModel.IncreaseCandleHistorical();
+                _chartViewModel.DecreaseCandleIHistorical();
+
             }
             else
             {
-                // Прокрутка колесика мыши назад
-                // Вызовите метод для обработки прокрутки назад
-                _chartViewModel.DecreaseCandleIHistorical();
+                // Прокрутка колесика мыши назад                
+                _chartViewModel.IncreaseCandleHistorical();
             }
 
             e.Handled = true; // Предотвратите дальнейшее распространение события
@@ -73,9 +72,10 @@ namespace TinkoffTradeSimulator.Views.Windows
 
         public async Task SetCandlesTOView()
         {
-            string? ticker = Title;
-            // Вызываем метод UpdateData, когда требуется обновление данных
-            await _chartViewModel.SetAndUpdateCandlesChartWindow(ticker: ticker);
+            string? ticker = Title;           
+
+            // Получаю тикеры в локальное хранилище
+            await _chartViewModel.GetLastCandlesForLocalSotarageAsync(ticker);
         }
 
         private async void EventAggregator_UpdateDataRequested()

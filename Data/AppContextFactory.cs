@@ -1,4 +1,4 @@
-﻿using TinkoffTradeSimulator;
+﻿using AppContext = TinkoffTradeSimulator.AppContext;
 
 namespace DromAutoTrader.Data
 {

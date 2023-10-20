@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Tinkoff.InvestApi;
 using Tinkoff.InvestApi.V1;
 using TinkoffTradeSimulator.Models;
@@ -13,7 +14,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
     {
         private static InvestApiClient? _client = null;
         private static string _currentTicker = string.Empty;
-        private static double _currentCandleHistoricalIntervalIndex = 10;
+        private static int _currentCandleHistoricalIntervalIndex = 10;
         private static CandleInterval _currentCandleInterval = CandleInterval._1Min;
 
         public TinkoffTradingPrices(InvestApiClient client)
@@ -66,11 +67,14 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
                 return candles;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Обработка ошибки при получении свечей
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+
                 return new List<HistoricCandle>();
             }
+
         }
 
         // Метод обновления и получения данных по свечам, учитывая имя тикера, таймфрем, временной интервал (именовыные параметры)
@@ -86,7 +90,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
 
             if (candleHistoricalIntervalIndex != null)
             {
-                _currentCandleHistoricalIntervalIndex = (double)candleHistoricalIntervalIndex;
+                _currentCandleHistoricalIntervalIndex = (int)candleHistoricalIntervalIndex;
             }
 
             if(candleInterval != null)
@@ -100,7 +104,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 Share instrument = await GetShareByTicker(_currentTicker);
 
                 // Определяем временной интервал для запроса свечей
-                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex);
+                TimeSpan timeFrame = TimeSpan.FromMinutes(_currentCandleHistoricalIntervalIndex + (12 * 60));
 
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 //CandleInterval interval = candleInterval ?? CandleInterval._1Min;
