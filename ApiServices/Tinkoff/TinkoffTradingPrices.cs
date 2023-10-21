@@ -112,7 +112,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 //CandleInterval interval = candleInterval ?? CandleInterval._1Min;
 
-                List<HistoricCandle> candles = await GetCandles(instrument, timeFrame, _currentCandleInterval);
+                List<HistoricCandle> candles = await GetAtLeast100Candles(instrument, _currentCandleInterval);
 
                 List<CandlestickData> candlestickData = new List<CandlestickData>();
 
@@ -148,6 +148,66 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             }
         }
 
+        public static async Task<List<HistoricCandle>> GetAtLeast100Candles(Share instrument, CandleInterval candleInterval)
+        {
+            List<HistoricCandle> allCandles = new List<HistoricCandle>();
+            int limit = CalcadditionalTimeForCandles(candleInterval);
+
+            DateTimeOffset now = DateTimeOffset.Now;
+            DateTimeOffset endDate = now; // Начинаем с текущей даты
+
+            while (allCandles.Count < 100)
+            {
+                DateTimeOffset startDate = endDate.AddMinutes(-limit);
+
+                Timestamp startDateTimestamp = Timestamp.FromDateTimeOffset(startDate);
+                Timestamp endDateTimestamp = Timestamp.FromDateTimeOffset(endDate);
+
+                var request = new GetCandlesRequest()
+                {
+                    InstrumentId = instrument.Uid,
+                    From = startDateTimestamp,
+                    To = endDateTimestamp,
+                    Interval = candleInterval
+                };
+
+                try
+                {
+                    var response = await _client?.MarketData.GetCandlesAsync(request);
+
+                    List<HistoricCandle>? candles = response.Candles?.ToList();
+
+                    if (candles != null && candles.Any())
+                    {
+                        allCandles.InsertRange(0, candles); // Вставляем свечи в начало списка
+                    }
+                    else
+                    {
+                        // Если не удалось получить свечи, прерываем цикл
+                        break;
+                    }
+
+                    // Устанавливаем конечную дату для следующего запроса
+                    endDate = startDate;
+                }
+                catch (Exception ex)
+                {
+                    // Обработка ошибки при получении свечей
+                    //MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    break;
+                }
+            }
+
+            // Если свечей больше 100, возвращаем только последние 100
+            if (allCandles.Count > 100)
+            {
+                return allCandles.TakeLast(100).ToList();
+            }
+            else
+            {
+                return allCandles;
+            }
+        }
 
 
         //  Метод добавления к общему времени получения свечей дополнительго времени (брать с запасом)
@@ -176,6 +236,5 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                     return (24 * 60);
             }
         }
-
     }
 }
