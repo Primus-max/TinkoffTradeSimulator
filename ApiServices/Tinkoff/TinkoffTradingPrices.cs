@@ -42,40 +42,40 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
         }
 
         // Получаю исторические свечи по Share и временному промежутку
-        public static async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, CandleInterval candlInterval)
-        {
-            DateTimeOffset now = DateTimeOffset.Now;
-            DateTimeOffset intervalAgo = now.Subtract(timeFrame);
-            Timestamp nowTimestamp = Timestamp.FromDateTimeOffset(now);
-            Timestamp intervalAgoTimestamp = Timestamp.FromDateTimeOffset(intervalAgo);
+        //public static async Task<List<HistoricCandle>> GetCandles(Share instrument, TimeSpan timeFrame, CandleInterval candlInterval)
+        //{
+        //    DateTimeOffset now = DateTimeOffset.Now;
+        //    DateTimeOffset intervalAgo = now.Subtract(timeFrame);
+        //    Timestamp nowTimestamp = Timestamp.FromDateTimeOffset(now);
+        //    Timestamp intervalAgoTimestamp = Timestamp.FromDateTimeOffset(intervalAgo);
 
-            // Формирую объект для отправки на сервер
-            var request = new GetCandlesRequest()
-            {
-                InstrumentId = instrument.Uid,
-                From = intervalAgoTimestamp,
-                To = nowTimestamp,
-                Interval = candlInterval
-            };
+        //    // Формирую объект для отправки на сервер
+        //    var request = new GetCandlesRequest()
+        //    {
+        //        InstrumentId = instrument.Uid,
+        //        From = intervalAgoTimestamp,
+        //        To = nowTimestamp,
+        //        Interval = candlInterval
+        //    };
 
-            try
-            {
-                // Отправляю запрос и получаю ответ по свечам
-                var response = await _client?.MarketData.GetCandlesAsync(request);
+        //    try
+        //    {
+        //        // Отправляю запрос и получаю ответ по свечам
+        //        var response = await _client?.MarketData.GetCandlesAsync(request);
 
-                List<HistoricCandle>? candles = response.Candles?.ToList();
+        //        List<HistoricCandle>? candles = response.Candles?.ToList();
 
-                return candles;
-            }
-            catch (Exception ex)
-            {
-                // Обработка ошибки при получении свечей
-                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //        return candles;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Обработка ошибки при получении свечей
+        //        MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
 
-                return new List<HistoricCandle>();
-            }
+        //        return new List<HistoricCandle>();
+        //    }
 
-        }
+        //}
 
         // Метод обновления и получения данных по свечам, учитывая имя тикера, таймфрем, временной интервал (именовыные параметры)
         public static async Task<List<CandlestickData>> GetCandlesData(string ticker = null!,  int? candleHistoricalIntervalIndex = null,  CandleInterval? candleInterval = null)
@@ -148,6 +148,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
             }
         }
 
+        // Метод рекурсивного получения свечей, минимум должны получить 100 свчей
         public static async Task<List<HistoricCandle>> GetAtLeast100Candles(Share instrument, CandleInterval candleInterval)
         {
             List<HistoricCandle> allCandles = new List<HistoricCandle>();
