@@ -15,7 +15,7 @@
     Height="600"
     Background="#A4353C42"
     Closed="ChartWindow_Closed"
-    mc:Ignorable="d">
+    mc:Ignorable="d" >
     <Window.DataContext>
         <vm:ChartWindowViewModel />
     </Window.DataContext>
@@ -96,11 +96,12 @@
             <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
                 <!--<TextBlock VerticalAlignment="Center" Text="Таймфрейм:" />-->
                 <Button
+                    x:Name="TimeFrameButton"
                     Width="80"
                     Margin="8,0,0,0"
                     Command="{Binding OpenCandleIntervalWindowCommand}"
                     Content="{Binding SelectedTimeFrame.Name}" />
-                <!--  Добавьте другие кнопки для других таймфреймов  -->
+               
                 <Separator />
                 <!--<ComboBox Margin="8 0" Width="80" Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Food">
                     <ComboBoxItem Content="Fries" IsSelected="True" />

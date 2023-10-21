@@ -87,6 +87,11 @@ namespace TinkoffTradeSimulator.Views.Windows
         {
             EventAggregator.UpdateDataRequested -= EventAggregator_UpdateDataRequested;
         }
-        #endregion        
+        #endregion
+
+        //private void Window_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    TimeFrameButton.Content = "";
+        //}
     }
 }

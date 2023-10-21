@@ -173,7 +173,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
         // Пустой (необходимый) конструктор
         public ChartWindowViewModel()
-        {
+        {            
             // TODO разобраться какая инициализация лишняя
             #region Инициализация команд
             OpenCandleIntervalWindowCommand = new LambdaCommand(OnOpenCandleIntervalWindowCommandExecuted, CanOpenCandleIntervalWindowCommandExecute);
@@ -188,18 +188,16 @@ namespace TinkoffTradeSimulator.ViewModels
             #region Инициализация источников данных
             _tradeHistoricalInfoList = new ObservableCollection<HistoricalTradeRecordInfo>();
             _tradeCurrentInfoList = new ObservableCollection<TradeRecordInfo>();
+
+            PlotModel = new PlotView();
+            CandlestickData = new ObservableCollection<CandlestickData>();
             #endregion
 
             #region Подписки на события
             // Подписываемся на событие выбранного таймфрейма CandleIntervalSelected
             EventAggregator.CandleIntervalSelected += OnCandleIntervalSelected;
-            #endregion
-
-            //StockInfo = new TickerInfo();
-            PlotModel = new PlotView();
-            // Ваша логика загрузки данных о свечах должна быть здесь
-            CandlestickData = new ObservableCollection<CandlestickData>();
-            //UpdateData(1);
+            #endregion            
+            
             LoadAsyncData();
         }
 
@@ -220,9 +218,6 @@ namespace TinkoffTradeSimulator.ViewModels
             {
                 Title = "Candlesticks",
                 Background = OxyColor.FromAColor(128, OxyColor.Parse("#A5424B51")) ,
-                 
-                
-                                                                                  
             };
 
             foreach (var candle in candlestickData)
@@ -396,16 +391,16 @@ namespace TinkoffTradeSimulator.ViewModels
                 return candlestickData;
             }
 
-            int numberOfCandlesToRetrieve = CalculatedMinuteFromSelectedTimeFrame() > 100? 100 : CalculatedMinuteFromSelectedTimeFrame();
+            //int numberOfCandlesToRetrieve = CalculatedMinuteFromSelectedTimeFrame() > 100? 100 : CalculatedMinuteFromSelectedTimeFrame();
 
-            // Ограничиваем количество свечей, чтобы не выйти за пределы массива
-            if (numberOfCandlesToRetrieve > _localStorageLastTickers.Count)
-            {
-                numberOfCandlesToRetrieve = _localStorageLastTickers.Count;
-            }
+            //// Ограничиваем количество свечей, чтобы не выйти за пределы массива
+            //if (numberOfCandlesToRetrieve > _localStorageLastTickers.Count)
+            //{
+            //    numberOfCandlesToRetrieve = _localStorageLastTickers.Count;
+            //}
 
             // Получаем указанное количество свечей
-            candlestickData = _localStorageLastTickers.TakeLast(numberOfCandlesToRetrieve).ToList();
+            candlestickData = _localStorageLastTickers.TakeLast(SelectedHistoricalTimeCandleIndex).ToList();
 
             return candlestickData;
         }
@@ -419,7 +414,7 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Получаю таймфрейм свечи (_1Min, _2Min, _15Min)
             string? selectedTimeframe = SelectedTimeFrame.Name;
-
+            
             // Привожу к типу данных 
             CandleInterval candleInterval = (CandleInterval)Enum.Parse(typeof(CandleInterval), selectedTimeframe);
 
@@ -428,14 +423,6 @@ namespace TinkoffTradeSimulator.ViewModels
 
             // Вызываю обоновление или отображение списка
             SetAndUpdateCandlesChartWindow();
-        }
-
-        // Получаю минуты исходя из выбранного временого диапазона и выбранного таймфрема свечи
-        private int CalculatedMinuteFromSelectedTimeFrame()
-        {
-            int totalMinute = 0;
-            totalMinute = SelectedHistoricalTimeCandleIndex * (int)SelectedTimeFrame.Time.TotalMinutes;
-            return totalMinute;
         }
 
         #region Методы по торговле (покупка/продажа)

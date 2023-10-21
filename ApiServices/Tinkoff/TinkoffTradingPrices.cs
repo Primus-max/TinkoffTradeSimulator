@@ -108,11 +108,7 @@ namespace TinkoffTradeSimulator.ApiServices.Tinkoff
                 int totalMinutes = additionalTimeForCandles + currentCandleHistoricalIntervalIndex;
 
                 TimeSpan timeFrame = TimeSpan.FromMinutes(totalMinutes);
-
-                int hours = timeFrame.Hours; // Получить количество часов (171)
-                int minutes = timeFrame.Minutes; // Получить количество минут (20)
-
-
+                                
                 // Определение CandleInterval на основе параметра или значения по умолчанию
                 //CandleInterval interval = candleInterval ?? CandleInterval._1Min;
 
